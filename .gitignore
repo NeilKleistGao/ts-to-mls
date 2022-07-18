@@ -1,2 +1,9 @@
 *.class
 *.log
+
+.bsp/
+.bloop/
+.metals/
+.vscode/
+target/
+node_modules/
