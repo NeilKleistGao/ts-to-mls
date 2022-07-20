@@ -10,5 +10,5 @@ case class TSPrimitiveType(typeName: String) extends TSType {
 
 case class TSFunctionType(params: List[TSType], res: TSType) extends TSType {
   override def toString(): String = 
-    s"(${params.reduce((ls: String, p: TSType) => ls + ", " + p.toString())}) -> ${res.toString()}"
+    s"(${params.reduce((ls: String, p: TSType) => ls + ", " + p.toString())}) => ${res.toString()}"
 }

@@ -12,7 +12,7 @@ class TSProgram(filename: String) {
   private val checker: js.Dynamic = program.getTypeChecker()
   private val sourceFile: js.Dynamic = program.getSourceFile(filename)
 
-  private var types: HashMap[String, TSType]
+  private var types: HashMap[String, TSType] = new HashMap[String, TSType]()
 
   def this() = {
     this()
@@ -21,10 +21,32 @@ class TSProgram(filename: String) {
 
   private def generateInterfaceTypeInfo() = {
     def visit(node: ts.Node): Unit = {
+      if (!isExported(node)) return
 
+      if (ts.isFunctionDeclaration(node))
+        val funcName = node.symbol.escapedName
+        val typeInfo = getFunctionType(node)
+        types += funcName -> typeInfo
     }
 
     ts.forEachChild(sourceFile, visit _)
+  }
+
+  private def isExported(node: ts.Node) = (ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0 ||
+    (node.parent != null && node.parent.kind == ts.SyntaxKind.SourceFile)
+  
+  private def getPrimitiveTypeString(sym: ts.Symbol): String =
+    checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
+
+  private def getFunctionType(node: ts.Node): TSType = {
+    val params = node.symbol.valueDeclaration.parameters
+    val pList = if (params.length == 0) List() else getFunctionParametersType()
+  }
+
+  private def getFunctionParametersType(list: js.Dynamic): List[TSType] = {
+    val tail = list.pop()
+    val tailType = getPrimitiveTypeString(tail.symbol) // TODO: we assumed that all parameters are primitive type
+    if (tail == js.undefined) List() else getFunctionParametersType(list) :+ tailType
   }
 }
 
