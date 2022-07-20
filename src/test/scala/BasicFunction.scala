@@ -8,7 +8,10 @@ class BasicFunction extends AnyFunSuite {
     assert(TypeCompare(program.getType("hello"), "void"))
     assert(TypeCompare(program.getType("add"), "(number, number) => number"))
     assert(TypeCompare(program.getType("sub"), "(number, number) => number"))
-    assert(TypeCompare(program.getType("not"), "(boolean) => boolean"))
     assert(TypeCompare(program.getType("foo"), "number"))
+    assert(TypeCompare(program.getType("id"), "any => any"))
+    assert(TypeCompare(program.getType("odd"), "number => boolean"))
+    assert(TypeCompare(program.getType("isnull"), "any => boolean"))
+    assert(TypeCompare(program.getType("bar"), "any"))
   }
 }

@@ -10,10 +10,22 @@ function sub(x: number, y: number) {
     return x - y
 }
 
-function not(x): boolean {
-    return !x;
-}
-
 function foo() {
     return 42;
+}
+
+function id(x) {
+    return x;
+}
+
+function odd(x: number) {
+    return (x % 2) !== 0;
+}
+
+function isnull(x) {
+    return x == null;
+}
+
+function bar() {
+    return undefined;
 }
