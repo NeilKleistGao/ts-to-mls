@@ -13,3 +13,7 @@ function sub(x: number, y: number) {
 function not(x): boolean {
     return !x;
 }
+
+function foo() {
+    return 42;
+}

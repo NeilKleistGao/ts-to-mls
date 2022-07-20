@@ -38,7 +38,7 @@ class TSProgram(filename: String) {
 
   private def getFunctionType(node: ts.Node): TSType = {
     val params = node.symbol.valueDeclaration.parameters
-    val pList = if (params == null) List() else getFunctionParametersType(params)
+    val pList = if (params == js.undefined) List() else getFunctionParametersType(params)
     val signature = checker.getSignatureFromDeclaration(node.symbol.declarations.shift())
     val res = new TSPrimitiveType(checker.getReturnTypeOfSignature(signature).intrinsicName.toString)
     new TSFunctionType(pList, res)
@@ -46,9 +46,11 @@ class TSProgram(filename: String) {
 
   private def getFunctionParametersType(list: js.Dynamic): List[TSType] = {
     val tail = list.pop()
-    val tailType = getPrimitiveType(tail.symbol) // TODO: we assumed that all parameters are primitive type
-    if (tail == null) List() else getFunctionParametersType(list) :+ tailType
+    // TODO: we assumed that all parameters are primitive type
+    if (tail == js.undefined) List() else getFunctionParametersType(list) :+ getPrimitiveType(tail.symbol)
   }
+
+  def getType(name: String): TSType = types.getOrElse(name, throw new java.lang.Exception("Symbol not found."))
 }
 
 object TSProgram {
