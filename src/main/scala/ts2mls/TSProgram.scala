@@ -3,6 +3,8 @@ package ts2mls;
 import scala.scalajs.js
 import js.Dynamic.{global => g}
 import js.DynamicImplicits._
+import scala.collection.mutable.HashMap
+import ts2mls.types._
 
 class TSProgram(filename: String) {
   private val ts: js.Dynamic = g.require("typescript")
@@ -10,9 +12,20 @@ class TSProgram(filename: String) {
   private val checker: js.Dynamic = program.getTypeChecker()
   private val sourceFile: js.Dynamic = program.getSourceFile(filename)
 
-  type ASTNode = ts.Node
+  private var types: HashMap[String, TSType]
 
-  def visit(func: (ASTNode => Unit)): Unit = ts.forEachChild(sourceFile, func)
+  def this() = {
+    this()
+    generateInterfaceTypeInfo()
+  }
+
+  private def generateInterfaceTypeInfo() = {
+    def visit(node: ts.Node): Unit = {
+
+    }
+
+    ts.forEachChild(sourceFile, visit _)
+  }
 }
 
 object TSProgram {
