@@ -58,10 +58,12 @@ class TSProgram(filename: String) {
   private def getMembersType(list: js.Dynamic): Map[String, TSType] = {
     val tail = list.pop()
     if (tail == js.undefined) Map()
-    else
-      if (ts.isFunctionDeclaration(tail)) // TODO: we assumed that there is no inner class
-        getMembersType(list) + (tail.symbol.escapedName.toString -> getFunctionType(tail.symbol))
+    else {
+      val name = tail.symbol.escapedName.toString
+      if (ts.isFunctionLike(tail) && !name.equals("__constructor")) // TODO: we assumed that there is no inner class
+        getMembersType(list) ++ Map(name -> getFunctionType(tail))
       else getMembersType(list)
+    }
   }
 
   private def parseClassMembers(node: ts.Node): TSClassType = {

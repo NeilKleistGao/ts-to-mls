@@ -4,7 +4,7 @@ import scala.collection.mutable.HashMap
 
 abstract class TSType {
   override def toString(): String = ???
-  def ::(fieldName: String): TSType = throw new java.lang.Exception("Field is not allowed.")
+  def >(fieldName: String): TSType = throw new java.lang.Exception("Field is not allowed.")
 }
 
 case class TSPrimitiveType(typeName: String) extends TSType {
@@ -24,6 +24,6 @@ case class TSFunctionType(params: List[TSType], res: TSType) extends TSType {
 case class TSClassType(name: String, members: Map[String, TSType]) extends TSType {
   override def toString(): String = s"class $name"
 
-  override def ::(fieldName: String): TSType =
+  override def >(fieldName: String): TSType =
     members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
 }
