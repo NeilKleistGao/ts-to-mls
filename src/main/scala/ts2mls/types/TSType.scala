@@ -41,3 +41,11 @@ case class TSNamespaceType(name: String, members: Map[String, TSType]) extends T
   override def >(fieldName: String): TSType =
     members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
 }
+
+case class TSArrayType(eletype: TSType) extends TSType {
+  override def toString(): String = s"$name[]"
+}
+
+case class TSUnionType(lhs: TSType, rhs: TSType) extends TSType {
+  override def toString(): String = s"$lhs | $rhs"
+}
