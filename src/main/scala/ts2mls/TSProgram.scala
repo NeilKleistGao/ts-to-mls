@@ -25,6 +25,11 @@ class TSProgram(filename: String) {
         val typeInfo = getFunctionType(node)
         types += funcName -> typeInfo
       }
+      else if (ts.isClassDeclaration(node)) {
+        val className = node.symbol.escapedName.toString
+        val typeInfo = parseClassMembers(node)
+        types += className -> typeInfo
+      }
     }
 
     ts.forEachChild(sourceFile, visit _)
@@ -36,7 +41,7 @@ class TSProgram(filename: String) {
   private def getPrimitiveType(sym: ts.Symbol): TSPrimitiveType =
     new TSPrimitiveType(checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString)
 
-  private def getFunctionType(node: ts.Node): TSType = {
+  private def getFunctionType(node: ts.Node): TSFunctionType = {
     val params = node.symbol.valueDeclaration.parameters
     val pList = if (params == js.undefined) List() else getFunctionParametersType(params)
     val signature = checker.getSignatureFromDeclaration(node.symbol.declarations.shift())
@@ -50,7 +55,23 @@ class TSProgram(filename: String) {
     if (tail == js.undefined) List() else getFunctionParametersType(list) :+ getPrimitiveType(tail.symbol)
   }
 
-  def getType(name: String): TSType = types.getOrElse(name, throw new java.lang.Exception("Symbol not found."))
+  private def getMembersType(list: js.Dynamic): Map[String, TSType] = {
+    val tail = list.pop()
+    if (tail == js.undefined) Map()
+    else
+      if (ts.isFunctionDeclaration(tail)) // TODO: we assumed that there is no inner class
+        getMembersType(list) + (tail.symbol.escapedName.toString -> getFunctionType(tail.symbol))
+      else getMembersType(list)
+  }
+
+  private def parseClassMembers(node: ts.Node): TSClassType = {
+    val name = node.symbol.escapedName.toString
+    val members = node.symbol.valueDeclaration.members
+    val mList = getMembersType(members)
+    new TSClassType(name, mList)
+  }
+
+  def getType(name: String): TSType = types.getOrElse(name, throw new java.lang.Exception(s"Symbol \"$name\" not found."))
 }
 
 object TSProgram {
