@@ -30,6 +30,11 @@ class TSProgram(filename: String) {
         val typeInfo = parseClassMembers(node)
         types += className -> typeInfo
       }
+      else if (ts.isInterfaceDeclaration(node)) {
+        val iName = node.symbol.escapedName.toString
+        val typeInfo = parseInterfaceMembers(node)
+        types += iName -> typeInfo
+      }
     }
 
     ts.forEachChild(sourceFile, visit _)
@@ -49,28 +54,54 @@ class TSProgram(filename: String) {
     new TSFunctionType(pList, res)
   }
 
+  private def getInterfaceFunctionType(node: ts.Node): TSFunctionType = {
+    val pList = getFunctionParametersType(node.parameters)
+    val signature = checker.getSignatureFromDeclaration(node)
+    val res = new TSPrimitiveType(checker.getReturnTypeOfSignature(signature).intrinsicName.toString)
+    new TSFunctionType(pList, res)
+  } 
+
   private def getFunctionParametersType(list: js.Dynamic): List[TSType] = {
     val tail = list.pop()
     // TODO: we assumed that all parameters are primitive type
     if (tail == js.undefined) List() else getFunctionParametersType(list) :+ getPrimitiveType(tail.symbol)
   }
 
-  private def getMembersType(list: js.Dynamic): Map[String, TSType] = {
+  private def getClassMembersType(list: js.Dynamic): Map[String, TSType] = {
     val tail = list.pop()
     if (tail == js.undefined) Map()
     else {
       val name = tail.symbol.escapedName.toString
-      if (ts.isFunctionLike(tail) && !name.equals("__constructor")) // TODO: we assumed that there is no inner class
-        getMembersType(list) ++ Map(name -> getFunctionType(tail))
-      else getMembersType(list)
+      if (ts.isMethodDeclaration(tail) && !name.equals("__constructor")) // TODO: we assumed that there is no inner class
+        getClassMembersType(list) ++ Map(name -> getFunctionType(tail))
+      else getClassMembersType(list)
+    }
+  }
+
+  private def getInterfacePropertiesType(list: js.Dynamic): Map[String, TSType] = {
+    val tail = list.pop()
+    if (tail == js.undefined) Map()
+    else {
+      val name = tail.symbol.escapedName.toString
+      val typeObject = tail.symbol.valueDeclaration.selectDynamic("type")
+      if (typeObject.parameters != js.undefined)
+        getInterfacePropertiesType(list) ++ Map(name -> getInterfaceFunctionType(typeObject))
+      else getInterfacePropertiesType(list)
     }
   }
 
   private def parseClassMembers(node: ts.Node): TSClassType = {
     val name = node.symbol.escapedName.toString
     val members = node.symbol.valueDeclaration.members
-    val mList = getMembersType(members)
+    val mList = getClassMembersType(members)
     new TSClassType(name, mList)
+  }
+
+  private def parseInterfaceMembers(node: ts.Node): TSInterfaceType = {
+    val name = node.symbol.escapedName.toString
+    val members = node.members
+    val pList = getInterfacePropertiesType(members)
+    new TSInterfaceType(name, pList)
   }
 
   def getType(name: String): TSType = types.getOrElse(name, throw new java.lang.Exception(s"Symbol \"$name\" not found."))

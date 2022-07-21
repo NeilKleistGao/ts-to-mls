@@ -27,3 +27,10 @@ case class TSClassType(name: String, members: Map[String, TSType]) extends TSTyp
   override def >(fieldName: String): TSType =
     members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
 }
+
+case class TSInterfaceType(name: String, members: Map[String, TSType]) extends TSType {
+  override def toString(): String = s"interface $name"
+
+  override def >(fieldName: String): TSType =
+    members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
+}
