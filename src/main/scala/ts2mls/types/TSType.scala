@@ -34,3 +34,10 @@ case class TSInterfaceType(name: String, members: Map[String, TSType]) extends T
   override def >(fieldName: String): TSType =
     members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
 }
+
+case class TSNamespaceType(name: String, members: Map[String, TSType]) extends TSType {
+  override def toString(): String = s"namespace $name"
+
+  override def >(fieldName: String): TSType =
+    members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
+}

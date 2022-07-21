@@ -18,7 +18,7 @@ class TSProgram(filename: String) {
 
   private def generateInterfaceTypeInfo() = {
     def visit(node: ts.Node): Unit = {
-      if (!isExported(node)) return
+      if (!isExported(node) || ts.isToken(node)) return
 
       if (ts.isFunctionDeclaration(node)) {
         val funcName = node.symbol.escapedName.toString
@@ -35,6 +35,11 @@ class TSProgram(filename: String) {
         val typeInfo = parseInterfaceMembers(node)
         types += iName -> typeInfo
       }
+      else if (node.symbol.exports != js.undefined) {
+        val nsName = node.symbol.escapedName.toString
+        val typeInfo = parseNamespace(node)
+        types += nsName -> typeInfo
+      }
     }
 
     ts.forEachChild(sourceFile, visit _)
@@ -49,7 +54,7 @@ class TSProgram(filename: String) {
   private def getFunctionType(node: ts.Node): TSFunctionType = {
     val params = node.symbol.valueDeclaration.parameters
     val pList = if (params == js.undefined) List() else getFunctionParametersType(params)
-    val signature = checker.getSignatureFromDeclaration(node.symbol.declarations.shift())
+    val signature = checker.getSignatureFromDeclaration(node)
     val res = new TSPrimitiveType(checker.getReturnTypeOfSignature(signature).intrinsicName.toString)
     new TSFunctionType(pList, res)
   }
@@ -102,6 +107,28 @@ class TSProgram(filename: String) {
     val members = node.members
     val pList = getInterfacePropertiesType(members)
     new TSInterfaceType(name, pList)
+  }
+
+  private def parseNamespaceExports(it: js.Dynamic): Map[String, TSType] = {
+    val next = it.next()
+    if (next.done) Map()
+    else {
+      val data = next.value
+      val name = data.shift().toString
+      val node = data.shift().declarations.shift()
+
+      if (ts.isFunctionDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> getFunctionType(node)) 
+      else if (ts.isClassDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> parseClassMembers(node)) 
+      else if (ts.isInterfaceDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> parseInterfaceMembers(node))
+      else if (node.symbol.exports != js.undefined) parseNamespaceExports(it) ++ Map(name -> parseNamespace(node))
+      else parseNamespaceExports(it)
+    }
+  }
+
+  private def parseNamespace(node: ts.Node): TSNamespaceType = {
+    val name = node.symbol.escapedName.toString
+    val iterator = node.symbol.exports.entries()
+    new TSNamespaceType(name, parseNamespaceExports(iterator))
   }
 
   def getType(name: String): TSType = types.getOrElse(name, throw new java.lang.Exception(s"Symbol \"$name\" not found."))
