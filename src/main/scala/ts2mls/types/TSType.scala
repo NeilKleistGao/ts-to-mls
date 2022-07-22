@@ -7,7 +7,7 @@ abstract class TSType {
   def >(fieldName: String): TSType = throw new java.lang.Exception("Field is not allowed.")
 }
 
-case class TSPrimitiveType(typeName: String) extends TSType {
+case class TSNamedType(typeName: String) extends TSType {
   override def toString(): String = typeName
 }
 
@@ -51,7 +51,4 @@ case class TSArrayType(eleType: TSType) extends TSType {
 
 case class TSUnionType(lhs: TSType, rhs: TSType) extends TSType {
   override def toString(): String = s"$lhs | $rhs"
-}
-
-case class TSUnknownType() extends TSType {
 }

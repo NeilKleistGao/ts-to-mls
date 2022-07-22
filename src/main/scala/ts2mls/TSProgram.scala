@@ -50,27 +50,27 @@ class TSProgram(filename: String) {
     else if (ts.isClassDeclaration(node)) parseClassMembers(node)
     else if (ts.isInterfaceDeclaration(node)) parseInterfaceMembers(node)
     else if (node.symbol.exports != js.undefined) parseNamespace(node)
-    else new TSUnknownType()
+    else getPrimitiveType(node.symbol)
   }
 
   private def isExported(node: ts.Node) = ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0 ||
     (node.parent != null && node.parent.kind == ts.SyntaxKind.SourceFile))
   
-  private def getPrimitiveType(sym: ts.Symbol): TSPrimitiveType =
-    new TSPrimitiveType(checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString)
+  private def getPrimitiveType(sym: ts.Symbol): TSNamedType =
+    new TSNamedType(checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString)
 
   private def getFunctionType(node: ts.Node): TSFunctionType = {
     val params = node.symbol.valueDeclaration.parameters
     val pList = if (params == js.undefined) List() else getFunctionParametersType(params)
     val signature = checker.getSignatureFromDeclaration(node)
-    val res = new TSPrimitiveType(checker.getReturnTypeOfSignature(signature).intrinsicName.toString)
+    val res = new TSNamedType(checker.getReturnTypeOfSignature(signature).intrinsicName.toString)
     new TSFunctionType(pList, res)
   }
 
   private def getInterfaceFunctionType(node: ts.Node): TSFunctionType = {
     val pList = getFunctionParametersType(node.parameters)
     val signature = checker.getSignatureFromDeclaration(node)
-    val res = new TSPrimitiveType(checker.getReturnTypeOfSignature(signature).intrinsicName.toString)
+    val res = new TSNamedType(checker.getReturnTypeOfSignature(signature).intrinsicName.toString)
     new TSFunctionType(pList, res)
   } 
 
@@ -127,7 +127,7 @@ class TSProgram(filename: String) {
 
       val t = parseType(node)
       t match {
-        case u: TSUnknownType => parseNamespaceExports(it)
+        case TSNamedType(_) => parseNamespaceExports(it)
         case _ => parseNamespaceExports(it) ++ Map(name -> t)
       }
     }
