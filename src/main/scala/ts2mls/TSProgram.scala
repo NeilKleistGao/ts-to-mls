@@ -50,13 +50,13 @@ class TSProgram(filename: String) {
     else if (ts.isClassDeclaration(node)) parseClassMembers(node)
     else if (ts.isInterfaceDeclaration(node)) parseInterfaceMembers(node)
     else if (node.symbol.exports != js.undefined) parseNamespace(node)
-    else getPrimitiveType(node.symbol)
+    else getNamedType(node.symbol)
   }
 
   private def isExported(node: ts.Node) = ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0 ||
     (node.parent != null && node.parent.kind == ts.SyntaxKind.SourceFile))
   
-  private def getPrimitiveType(sym: ts.Symbol): TSNamedType =
+  private def getNamedType(sym: ts.Symbol): TSNamedType =
     new TSNamedType(checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString)
 
   private def getFunctionType(node: ts.Node): TSFunctionType = {
@@ -77,7 +77,7 @@ class TSProgram(filename: String) {
   private def getFunctionParametersType(list: js.Dynamic): List[TSType] = {
     val tail = list.pop()
     // TODO: we assumed that all parameters are primitive type
-    if (tail == js.undefined) List() else getFunctionParametersType(list) :+ getPrimitiveType(tail.symbol)
+    if (tail == js.undefined) List() else getFunctionParametersType(list) :+ getNamedType(tail.symbol)
   }
 
   private def getClassMembersType(list: js.Dynamic): Map[String, TSType] = {
@@ -99,7 +99,7 @@ class TSProgram(filename: String) {
       val typeObject = tail.symbol.valueDeclaration.selectDynamic("type")
       if (typeObject.parameters != js.undefined)
         getInterfacePropertiesType(list) ++ Map(name -> getInterfaceFunctionType(typeObject))
-      else getInterfacePropertiesType(list) ++ Map(name -> getPrimitiveType(tail.symbol))
+      else getInterfacePropertiesType(list) ++ Map(name -> getNamedType(tail.symbol))
     }
   }
 
