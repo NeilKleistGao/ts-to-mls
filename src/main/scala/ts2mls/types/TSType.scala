@@ -12,13 +12,18 @@ case class TSNamedType(typeName: String) extends TSType {
 }
 
 case class TSFunctionType(params: List[TSType], res: TSType) extends TSType {
-  override def toString(): String =
-    if (params.length == 0) res.toString()
-    else if (params.length == 1) s"${params(0).toString()} => ${res.toString()}"
+  override def toString(): String = {
+    val rhs = res match {
+      case TSFunctionType(rp, _) if (params.length > 0 && rp.length > 0) => s"(${res.toString()})"
+      case _ => res.toString()
+    }
+    if (params.length == 0) rhs
+    else if (params.length == 1) s"${params(0).toString()} => ${rhs}"
     else {
       val ps = params.foldLeft("")((ls: String, p: TSType) => ls + p.toString() + ", ")
-      s"(${ps.substring(0, ps.length() - 2)}) => ${res.toString()}"
+      s"(${ps.substring(0, ps.length() - 2)}) => ${rhs}"
     }
+  }
 }
 
 case class TSClassType(name: String, members: Map[String, TSType]) extends TSType {
