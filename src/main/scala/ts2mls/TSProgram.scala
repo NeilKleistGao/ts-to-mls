@@ -71,10 +71,15 @@ class TSProgram(filename: String) {
     new TSFunctionType(pList, res)
   }
 
+  private def getTokenType(token: ts.TokenObject): TSType = {
+    return new TSNamedType(checker.getTypeFromTypeNode(token).intrinsicName.toString)
+  }
+
   private def getFunctionParameterType(node: ts.node): TSType = {
     val typeNode = node.selectDynamic("type")
     // TODO: add more types
     if (typeNode != js.undefined && ts.isFunctionTypeNode(typeNode)) getFunctionTypeInfo(typeNode)
+    else if (typeNode != js.undefined && ts.isArrayTypeNode(typeNode)) new TSArrayType(getTokenType(typeNode.elementType))
     else getNamedType(node.symbol)
   }
 
