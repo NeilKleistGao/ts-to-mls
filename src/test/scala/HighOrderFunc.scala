@@ -7,7 +7,6 @@ class HighOrderFunc extends AnyFunSuite {
     val program = TSProgram("src/test/typescript/HighOrderFunc.ts")
     assert(TypeCompare(program.getType("h1"), "(number => number, number) => number"))
     assert(TypeCompare(program.getType("h2"), "string => string"))
-    System.out.println(program.getType("h3"))
     assert(TypeCompare(program.getType("h3"), "(number => number, number => number) => (number => number)"))
   }
 }

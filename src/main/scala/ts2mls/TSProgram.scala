@@ -52,7 +52,7 @@ class TSProgram(filename: String) {
     new TSNamedType(checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString)
 
   private def getFunctionType(node: ts.Node): TSFunctionType = {
-    val params = node.symbol.valueDeclaration.parameters
+    val params = node.parameters
     val pList = if (params == js.undefined) List() else getFunctionParametersType(params)
     val signature = checker.getSignatureFromDeclaration(node)
     val res = checker.getReturnTypeOfSignature(signature)
@@ -60,26 +60,22 @@ class TSProgram(filename: String) {
       new TSFunctionType(pList, new TSNamedType(res.intrinsicName.toString))
     else {
       val funcNode = res.symbol.declarations.shift()
-      new TSFunctionType(pList, getFunctionType(funcNode))
+      if (funcNode.parameters != js.undefined) new TSFunctionType(pList, getFunctionType(funcNode))
+      else new TSFunctionType(pList, getFunctionType(funcNode))
     }
   }
 
-  private def getFunctionTypeInfo(node: ts.Node): TSFunctionType = {
-    val pList = getFunctionParametersType(node.parameters)
-    val signature = checker.getSignatureFromDeclaration(node)
-    val res = new TSNamedType(checker.getReturnTypeOfSignature(signature).intrinsicName.toString)
-    new TSFunctionType(pList, res)
-  }
-
-  private def getTokenType(token: ts.TokenObject): TSType = {
-    return new TSNamedType(checker.getTypeFromTypeNode(token).intrinsicName.toString)
+  private def getElementType(token: js.Dynamic): TSType = {
+    val tp = token.selectDynamic("type")
+    if (tp != js.undefined) getFunctionType(tp.symbol.declarations.shift())
+    else new TSNamedType(checker.getTypeFromTypeNode(token).intrinsicName.toString)
   }
 
   private def getFunctionParameterType(node: ts.node): TSType = {
     val typeNode = node.selectDynamic("type")
     // TODO: add more types
-    if (typeNode != js.undefined && ts.isFunctionTypeNode(typeNode)) getFunctionTypeInfo(typeNode)
-    else if (typeNode != js.undefined && ts.isArrayTypeNode(typeNode)) new TSArrayType(getTokenType(typeNode.elementType))
+    if (typeNode != js.undefined && ts.isFunctionTypeNode(typeNode)) getFunctionType(typeNode)
+    else if (typeNode != js.undefined && ts.isArrayTypeNode(typeNode)) new TSArrayType(getElementType(typeNode.elementType))
     else getNamedType(node.symbol)
   }
 
@@ -106,7 +102,7 @@ class TSProgram(filename: String) {
       val name = tail.symbol.escapedName.toString
       val typeObject = tail.symbol.valueDeclaration.selectDynamic("type")
       if (typeObject.parameters != js.undefined)
-        getInterfacePropertiesType(list) ++ Map(name -> getFunctionTypeInfo(typeObject))
+        getInterfacePropertiesType(list) ++ Map(name -> getFunctionType(typeObject))
       else getInterfacePropertiesType(list) ++ Map(name -> getNamedType(tail.symbol))
     }
   }
