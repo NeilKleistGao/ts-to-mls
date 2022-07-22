@@ -91,7 +91,7 @@ class TSProgram(filename: String) {
       val typeObject = tail.symbol.valueDeclaration.selectDynamic("type")
       if (typeObject.parameters != js.undefined)
         getInterfacePropertiesType(list) ++ Map(name -> getInterfaceFunctionType(typeObject))
-      else getInterfacePropertiesType(list)
+      else getInterfacePropertiesType(list) ++ Map(name -> getPrimitiveType(tail.symbol))
     }
   }
 

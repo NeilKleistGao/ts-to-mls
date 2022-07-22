@@ -29,7 +29,10 @@ case class TSClassType(name: String, members: Map[String, TSType]) extends TSTyp
 }
 
 case class TSInterfaceType(name: String, members: Map[String, TSType]) extends TSType {
-  override def toString(): String = s"interface $name"
+  override def toString(): String = {
+    val memString = members.foldLeft("")((str, it) => str + s"\n\t${it._1}: ${it._2.toString()}")
+    s"interface $name {$memString\n}"
+  }
 
   override def >(fieldName: String): TSType =
     members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
