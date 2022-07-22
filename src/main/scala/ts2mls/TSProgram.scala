@@ -45,6 +45,14 @@ class TSProgram(filename: String) {
     ts.forEachChild(sourceFile, visit _)
   }
 
+  private def parseType(node: ts.Node): TSType = {
+    if (ts.isFunctionDeclaration(node)) getFunctionType(node)
+    else if (ts.isClassDeclaration(node)) parseClassMembers(node)
+    else if (ts.isInterfaceDeclaration(node)) parseInterfaceMembers(node)
+    else if (node.symbol.exports != js.undefined) parseNamespace(node)
+    else new TSUnknownType()
+  }
+
   private def isExported(node: ts.Node) = ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0 ||
     (node.parent != null && node.parent.kind == ts.SyntaxKind.SourceFile))
   
@@ -117,11 +125,11 @@ class TSProgram(filename: String) {
       val name = data.shift().toString
       val node = data.shift().declarations.shift()
 
-      if (ts.isFunctionDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> getFunctionType(node)) 
-      else if (ts.isClassDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> parseClassMembers(node)) 
-      else if (ts.isInterfaceDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> parseInterfaceMembers(node))
-      else if (node.symbol.exports != js.undefined) parseNamespaceExports(it) ++ Map(name -> parseNamespace(node))
-      else parseNamespaceExports(it)
+      val t = parseType(node)
+      t match {
+        case u: TSUnknownType => parseNamespaceExports(it)
+        case _ => parseNamespaceExports(it) ++ Map(name -> t)
+      }
     }
   }
 
