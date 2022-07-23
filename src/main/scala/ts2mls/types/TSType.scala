@@ -12,10 +12,10 @@ case class TSNamedType(typeName: String) extends TSType {
   override def toString(): String = typeName
 }
 
-case class TSFunctionType(params: List[TSType], res: TSType) extends TSType {
+case class TSFunctionType(params: List[TSType], res: TSType, constraint: Map[String, TSType]) extends TSType {
   override def toString(): String = {
     val rhs = res match {
-      case TSFunctionType(rp, _) if (params.length > 0 && rp.length > 0) => s"(${res.toString()})"
+      case TSFunctionType(rp, _, _) if (params.length > 0 && rp.length > 0) => s"(${res.toString()})"
       case _ => res.toString()
     }
     if (params.length == 0) rhs
@@ -30,6 +30,10 @@ case class TSFunctionType(params: List[TSType], res: TSType) extends TSType {
       s"(${ps.substring(0, ps.length() - 2)}) => ${rhs}"
     }
   }
+
+  def this(params: List[TSType], res: TSType) {
+    this(params, res, Map())
+  }
 }
 
 case class TSClassType(name: String, members: Map[String, TSType]) extends TSType {
@@ -39,7 +43,7 @@ case class TSClassType(name: String, members: Map[String, TSType]) extends TSTyp
     members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
 }
 
-case class TSInterfaceType(name: String, members: Map[String, TSType]) extends TSType {
+case class TSInterfaceType(name: String, members: Map[String, TSType], constraint: Map[String, TSType]) extends TSType {
   override def toString(): String = {
     val memString = members.foldLeft("")((str, it) => str + s"\n\t${it._1}: ${it._2.toString()}")
     s"interface $name {$memString\n}"
@@ -47,6 +51,10 @@ case class TSInterfaceType(name: String, members: Map[String, TSType]) extends T
 
   override def >(fieldName: String): TSType =
     members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
+
+  def this(name: String, members: Map[String, TSType]) {
+    this(name, members, Map())
+  }
 }
 
 case class TSNamespaceType(name: String, members: Map[String, TSType]) extends TSType {
