@@ -56,19 +56,22 @@ class TSProgram(filename: String) {
     val pList = if (params == js.undefined) List() else getFunctionParametersType(params)
     val signature = checker.getSignatureFromDeclaration(node)
     val res = checker.getReturnTypeOfSignature(signature)
-    if (res.symbol == js.undefined)
-      new TSFunctionType(pList, new TSNamedType(res.intrinsicName.toString))
-    else {
-      val funcNode = res.symbol.declarations.shift()
-      if (funcNode.parameters != js.undefined) new TSFunctionType(pList, getFunctionType(funcNode))
-      else new TSFunctionType(pList, getFunctionType(funcNode))
+    if (res.symbol != js.undefined && res.symbol.declarations.length > 0) {
+      if (res.resolvedTypeArguments != js.undefined)
+        new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.shift())))
+      else
+        new TSFunctionType(pList, getFunctionType(res.symbol.declarations.shift()))
     }
+    else
+      new TSFunctionType(pList, new TSNamedType(res.intrinsicName.toString))
   }
 
   private def getElementType(token: js.Dynamic): TSType = {
     val tp = token.selectDynamic("type")
     if (tp != js.undefined) getFunctionType(tp.symbol.declarations.shift())
-    else new TSNamedType(checker.getTypeFromTypeNode(token).intrinsicName.toString)
+    else
+      if (token.intrinsicName != js.undefined) new TSNamedType(token.intrinsicName.toString) 
+      else new TSNamedType(checker.getTypeFromTypeNode(token).intrinsicName.toString)
   }
 
   private def getFunctionParameterType(node: ts.node): TSType = {
