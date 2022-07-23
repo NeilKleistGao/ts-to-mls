@@ -18,21 +18,24 @@ case class TSFunctionType(params: List[TSType], res: TSType, constraint: Map[Str
       case TSFunctionType(rp, _, _) if (params.length > 0 && rp.length > 0) => s"(${res.toString()})"
       case _ => res.toString()
     }
-    if (params.length == 0) rhs
-    else if (params.length == 1) {
-      params(0) match {
-        case ut: TSUnionType => s"(${params(0).toString()}) => ${rhs}"
-        case _ => s"${params(0).toString()} => ${rhs}"
+    val body = 
+      if (params.length == 0) rhs
+      else if (params.length == 1) {
+        params(0) match {
+          case ut: TSUnionType => s"(${params(0).toString()}) => ${rhs}"
+          case _ => s"${params(0).toString()} => ${rhs}"
+        }
+      } 
+      else {
+        val ps = params.foldLeft("")((ls: String, p: TSType) => ls + p.toString() + ", ")
+        s"(${ps.substring(0, ps.length() - 2)}) => ${rhs}"
       }
-    } 
-    else {
-      val ps = params.foldLeft("")((ls: String, p: TSType) => ls + p.toString() + ", ")
-      s"(${ps.substring(0, ps.length() - 2)}) => ${rhs}"
-    }
-  }
 
-  def this(params: List[TSType], res: TSType) {
-    this(params, res, Map())
+    if (constraint.isEmpty) body
+    else {
+      val cons = constraint.foldLeft("")((s, p) => s"$s${p._1} <: ${p._2}, ")
+      s"$body where ${cons.substring(0, cons.length() - 2)}"
+    }
   }
 }
 
@@ -46,15 +49,17 @@ case class TSClassType(name: String, members: Map[String, TSType]) extends TSTyp
 case class TSInterfaceType(name: String, members: Map[String, TSType], constraint: Map[String, TSType]) extends TSType {
   override def toString(): String = {
     val memString = members.foldLeft("")((str, it) => str + s"\n\t${it._1}: ${it._2.toString()}")
-    s"interface $name {$memString\n}"
+    val body = s"interface $name {$memString\n}"
+
+    if (constraint.isEmpty) body
+    else {
+      val cons = constraint.foldLeft("")((s, p) => s"$s${p._1} <: ${p._2}, ")
+      s"$body where ${cons.substring(0, cons.length() - 2)}"
+    }
   }
 
   override def >(fieldName: String): TSType =
     members.getOrElse(fieldName, throw new java.lang.Exception(s"Field \"$fieldName\" not found."))
-
-  def this(name: String, members: Map[String, TSType]) {
-    this(name, members, Map())
-  }
 }
 
 case class TSNamespaceType(name: String, members: Map[String, TSType]) extends TSType {

@@ -51,6 +51,18 @@ class TSProgram(filename: String) {
   private def getNamedType(sym: ts.Symbol): TSNamedType =
     new TSNamedType(checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString)
 
+  private def getTypeConstraints(list: js.Dynamic, prev: Map[String, TSType]): Map[String, TSType] = {
+    val tail = list.pop()
+    if (tail == js.undefined) prev
+    else if (tail.constraint == js.undefined) getTypeConstraints(list, prev)
+    else getTypeConstraints(list, prev) ++ Map(tail.symbol.escapedName.toString() -> getElementType(tail.constraint))
+  }
+
+  private def getTypeConstraints(node: ts.Node): Map[String, TSType] = {
+    if (node.typeParameters == js.undefined) Map()
+    else getTypeConstraints(node.typeParameters, Map())
+  } 
+
   private def getFunctionType(node: ts.Node): TSFunctionType = {
     val params = node.parameters
     val pList = if (params == js.undefined) List() else getFunctionParametersType(params)
@@ -58,12 +70,12 @@ class TSProgram(filename: String) {
     val res = checker.getReturnTypeOfSignature(signature)
     if (res.symbol != js.undefined && res.symbol.declarations.length > 0) {
       if (res.resolvedTypeArguments != js.undefined)
-        new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.shift())))
+        new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.shift())), getTypeConstraints(node))
       else
-        new TSFunctionType(pList, getFunctionType(res.symbol.declarations.shift()))
+        new TSFunctionType(pList, getFunctionType(res.symbol.declarations.shift()), getTypeConstraints(node))
     }
     else
-      new TSFunctionType(pList, new TSNamedType(res.intrinsicName.toString))
+      new TSFunctionType(pList, new TSNamedType(res.intrinsicName.toString), getTypeConstraints(node))
   }
 
   private def getElementType(token: js.Dynamic): TSType = {
@@ -134,7 +146,7 @@ class TSProgram(filename: String) {
     val name = node.symbol.escapedName.toString
     val members = node.members
     val pList = getInterfacePropertiesType(members)
-    new TSInterfaceType(name, pList)
+    new TSInterfaceType(name, pList, getTypeConstraints(node))
   }
 
   private def parseNamespaceExports(it: js.Dynamic): Map[String, TSType] = {
