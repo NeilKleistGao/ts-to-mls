@@ -74,11 +74,24 @@ class TSProgram(filename: String) {
       else new TSNamedType(checker.getTypeFromTypeNode(token).intrinsicName.toString)
   }
 
+  private def getUnionType(types: js.Dynamic, prev: TSUnionType): TSUnionType = {
+    val t = types.pop()
+    if (t == js.undefined) prev
+    else getUnionType(types, new TSUnionType(getElementType(t), prev))
+  }
+
+  private def getUnionType(types: js.Dynamic): TSUnionType = {
+    val snd = types.pop()
+    val fst = types.pop()
+    val u = new TSUnionType(getElementType(fst), getElementType(snd))
+    getUnionType(types, u)
+  }
+
   private def getFunctionParameterType(node: ts.node): TSType = {
     val typeNode = node.selectDynamic("type")
-    // TODO: add more types
     if (typeNode != js.undefined && ts.isFunctionTypeNode(typeNode)) getFunctionType(typeNode)
     else if (typeNode != js.undefined && ts.isArrayTypeNode(typeNode)) new TSArrayType(getElementType(typeNode.elementType))
+    else if (typeNode != js.undefined && typeNode.types != js.undefined && typeNode.types.length > 1) getUnionType(typeNode.types)
     else getNamedType(node.symbol)
   }
 
