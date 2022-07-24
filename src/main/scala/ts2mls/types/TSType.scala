@@ -70,7 +70,11 @@ case class TSNamespaceType(name: String, members: Map[String, TSType]) extends T
 }
 
 case class TSArrayType(eleType: TSType) extends TSType {
-  override def toString(): String = s"$eleType[]"
+  override def toString(): String = eleType match {
+    case t: TSNamedType => s"$t[]"
+    case t: TSFunctionType => s"($t)[]"
+    case t: TSUnionType => s"($t)[]"
+  }
 }
 
 case class TSUnionType(lhs: TSType, rhs: TSType) extends TSType {
