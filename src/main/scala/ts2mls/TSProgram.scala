@@ -22,22 +22,22 @@ class TSProgram(filename: String) {
       if (!isExported(node) || nodeObject.isToken) return
 
       if (nodeObject.isFunctionDeclaration) {
-        val funcName = node.symbol.escapedName.toString
+        val funcName = nodeObject.symbol.escapedName
         val typeInfo = getFunctionType(node)
         types += funcName -> typeInfo
       }
       else if (nodeObject.isClassDeclaration) {
-        val className = node.symbol.escapedName.toString
+        val className = nodeObject.symbol.escapedName
         val typeInfo = parseClassMembers(node)
         types += className -> typeInfo
       }
       else if (nodeObject.isInterfaceDeclaration) {
-        val iName = node.symbol.escapedName.toString
+        val iName = nodeObject.symbol.escapedName
         val typeInfo = parseInterfaceMembers(node)
         types += iName -> typeInfo
       }
       else if (node.symbol.exports != js.undefined) {
-        val nsName = node.symbol.escapedName.toString
+        val nsName = nodeObject.symbol.escapedName
         val typeInfo = parseNamespace(node)
         types += nsName -> typeInfo
       }
