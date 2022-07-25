@@ -19,7 +19,7 @@ class TSProgram(filename: String) {
   private def generateInterfaceTypeInfo() = {
     def visit(node: js.Dynamic): Unit = {
       val nodeObject = TSNodeObject(node)
-      if (!isExported(node) || nodeObject.isToken) return
+      if (!isExported(nodeObject) || nodeObject.isToken) return
 
       if (nodeObject.isFunctionDeclaration) {
         val funcName = nodeObject.symbol.escapedName
@@ -46,8 +46,7 @@ class TSProgram(filename: String) {
     ts.forEachChild(sourceFile, visit _)
   }
 
-  private def isExported(node: ts.Node) = ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0 ||
-    (node.parent != null && node.parent.kind == ts.SyntaxKind.SourceFile))
+  private def isExported(node: TSNodeObject) = (node.hasExportModifier || (!node.parent.isNull && node.parent.isSourceFile))
   
   private def getNamedType(sym: ts.Symbol): TSNamedType =
     new TSNamedType(checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString)

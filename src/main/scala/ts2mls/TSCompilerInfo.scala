@@ -6,7 +6,7 @@ import js.DynamicImplicits._
 
 class TSSymbolObject(node: js.Dynamic, ts: js.Dynamic) {
     lazy val escapedName: String = node.escapedName.toString
-    
+
 }
 
 object TSSymbolObject {
@@ -18,7 +18,11 @@ class TSNodeObject(node: js.Dynamic, ts: js.Dynamic) {
     lazy val isFunctionDeclaration: Boolean = ts.isFunctionDeclaration(node)
     lazy val isClassDeclaration: Boolean = ts.isClassDeclaration(node)
     lazy val isInterfaceDeclaration: Boolean = ts.isInterfaceDeclaration(node)
+    lazy val hasExportModifier: Boolean = (ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0
+    lazy val isNull: Boolean = node == null
+    lazy val isSourceFile: Boolean = node.kind == ts.SyntaxKind.SourceFile
 
+    lazy val parent: TSNodeObject = if (!isNull) TSNodeObject(node.parent)(ts) else throw new java.lang.Exception("Access parent of null node.")
     lazy val symbol: TSSymbolObject = TSSymbolObject(node.symbol)(ts)
 }
 
