@@ -7,7 +7,7 @@ import scala.collection.mutable.HashMap
 import ts2mls.types._
 
 class TSProgram(filename: String) {
-  private val ts: js.Dynamic = g.require("typescript")
+  implicit private val ts: js.Dynamic = g.require("typescript")
   private val program: js.Dynamic = ts.createProgram(js.Array(filename), js.Dictionary("maxNodeModuleJsDepth" -> 0))
   private val checker: js.Dynamic = program.getTypeChecker()
   private val sourceFile: js.Dynamic = program.getSourceFile(filename)
@@ -17,20 +17,21 @@ class TSProgram(filename: String) {
   generateInterfaceTypeInfo()
 
   private def generateInterfaceTypeInfo() = {
-    def visit(node: ts.Node): Unit = {
-      if (!isExported(node) || ts.isToken(node)) return
+    def visit(node: js.Dynamic): Unit = {
+      val nodeObject = TSNodeObject(node)
+      if (!isExported(node) || nodeObject.isToken) return
 
-      if (ts.isFunctionDeclaration(node)) {
+      if (nodeObject.isFunctionDeclaration) {
         val funcName = node.symbol.escapedName.toString
         val typeInfo = getFunctionType(node)
         types += funcName -> typeInfo
       }
-      else if (ts.isClassDeclaration(node)) {
+      else if (nodeObject.isClassDeclaration) {
         val className = node.symbol.escapedName.toString
         val typeInfo = parseClassMembers(node)
         types += className -> typeInfo
       }
-      else if (ts.isInterfaceDeclaration(node)) {
+      else if (nodeObject.isInterfaceDeclaration) {
         val iName = node.symbol.escapedName.toString
         val typeInfo = parseInterfaceMembers(node)
         types += iName -> typeInfo
