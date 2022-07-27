@@ -9,7 +9,7 @@ import ts2mls.types._
 class TSProgram(filename: String) {
   private val ts: js.Dynamic = g.require("typescript")
   private val program: js.Dynamic = ts.createProgram(js.Array(filename), js.Dictionary("maxNodeModuleJsDepth" -> 0))
-  private val checker: js.Dynamic = program.getTypeChecker()
+  implicit private val checker: TSTypeChecker = TSTypeChecker(program.getTypeChecker())
   private val sourceFile: js.Dynamic = program.getSourceFile(filename)
 
   private var types: HashMap[String, TSType] = new HashMap[String, TSType]()
@@ -48,8 +48,8 @@ class TSProgram(filename: String) {
 
   private def isExported(node: TSNodeObject) = (node.hasExportModifier || (!node.parent.isNull && node.parent.isSourceFile))
   
-  private def getNamedType(sym: ts.Symbol): TSNamedType =
-    new TSNamedType(checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString)
+  private def getNamedType(sym: TSSymbolObject): TSNamedType =
+    new TSNamedType(sym.getType())
 
   private def getTypeConstraints(list: js.Dynamic, prev: Map[String, TSType]): Map[String, TSType] = {
     val tail = list.pop()
@@ -104,7 +104,7 @@ class TSProgram(filename: String) {
     if (typeNode != js.undefined && ts.isFunctionTypeNode(typeNode)) getFunctionType(typeNode)
     else if (typeNode != js.undefined && ts.isArrayTypeNode(typeNode)) new TSArrayType(getElementType(typeNode.elementType))
     else if (typeNode != js.undefined && typeNode.types != js.undefined && typeNode.types.length > 1) getUnionType(typeNode.types)
-    else getNamedType(node.symbol)
+    else getNamedType(TSSymbolObject(node.symbol))
   }
 
   private def getFunctionParametersType(list: js.Dynamic): List[TSType] = {
@@ -131,7 +131,7 @@ class TSProgram(filename: String) {
       val typeObject = tail.symbol.valueDeclaration.selectDynamic("type")
       if (typeObject.parameters != js.undefined)
         getInterfacePropertiesType(list) ++ Map(name -> getFunctionType(typeObject))
-      else getInterfacePropertiesType(list) ++ Map(name -> getNamedType(tail.symbol))
+      else getInterfacePropertiesType(list) ++ Map(name -> getNamedType(TSSymbolObject(tail.symbol)))
     }
   }
 

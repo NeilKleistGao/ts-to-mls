@@ -17,8 +17,25 @@ object TypeScript {
   def getCombinedModifierFlags(node: js.Dynamic): Int = ts.getCombinedModifierFlags(node).asInstanceOf[Int]
 }
 
-class TSSymbolObject(node: js.Dynamic) {
-  lazy val escapedName: String = node.escapedName.toString
+class TSTypeChecker(checker: js.Dynamic) {
+  def getTypeOfSymbolAtLocation(sym: js.Dynamic): String =
+    checker.typeToString(checker.getTypeOfSymbolAtLocation(sym, sym.valueDeclaration)).toString
+
+  // TODO
+  def getSignatureFromDeclaration(node: js.Dynamic) = checker.getSignatureFromDeclaration(node)
+  def getReturnTypeOfSignature(signature: js.Dynamic) = checker.getReturnTypeOfSignature(signature)
+  def getTypeFromTypeNode(token: js.Dynamic) = checker.getTypeFromTypeNode(token)
+}
+
+object TSTypeChecker {
+  def apply(checker: js.Dynamic) = new TSTypeChecker(checker)
+}
+
+class TSSymbolObject(sym: js.Dynamic) {
+  lazy val escapedName: String = sym.escapedName.toString
+  lazy val valueDeclaration: TSNodeObject = TSNodeObject(sym.valueDeclaration)
+
+  def getType()(implicit checker: TSTypeChecker): String = checker.getTypeOfSymbolAtLocation(sym)
 }
 
 object TSSymbolObject {
