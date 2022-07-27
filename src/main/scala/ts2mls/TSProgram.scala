@@ -48,8 +48,7 @@ class TSProgram(filename: String) {
 
   private def isExported(node: TSNodeObject) = (node.hasExportModifier || (!node.parent.isNull && node.parent.isSourceFile))
   
-  private def getNamedType(sym: TSSymbolObject): TSNamedType =
-    new TSNamedType(sym.getType())
+  private def getNamedType(sym: TSSymbolObject): TSNamedType = new TSNamedType(sym.getType())
 
   private def getTypeConstraints(list: js.Dynamic, prev: Map[String, TSType]): Map[String, TSType] = {
     val tail = list.pop()
@@ -61,7 +60,7 @@ class TSProgram(filename: String) {
   private def getTypeConstraints(node: ts.Node): Map[String, TSType] = {
     if (js.isUndefined(node.typeParameters)) Map()
     else getTypeConstraints(node.typeParameters, Map())
-  } 
+  }
 
   private def getFunctionType(node: ts.Node): TSFunctionType = {
     val params = node.parameters
