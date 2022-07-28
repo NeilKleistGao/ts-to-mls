@@ -7,10 +7,9 @@ import scala.collection.mutable.HashMap
 import ts2mls.types._
 
 class TSProgram(filename: String) {
-  private val ts: js.Dynamic = g.require("typescript")
-  private val program: js.Dynamic = ts.createProgram(js.Array(filename), js.Dictionary("maxNodeModuleJsDepth" -> 0))
+  private val program = TypeScript.createProgram(filename)
   implicit private val checker: TSTypeChecker = TSTypeChecker(program.getTypeChecker())
-  private val sourceFile: js.Dynamic = program.getSourceFile(filename)
+  private val sourceFile = program.getSourceFile(filename)
 
   private var types: HashMap[String, TSType] = new HashMap[String, TSType]()
 
@@ -23,150 +22,156 @@ class TSProgram(filename: String) {
 
       if (nodeObject.isFunctionDeclaration) {
         val funcName = nodeObject.symbol.escapedName
-        val typeInfo = getFunctionType(node)
+        val typeInfo = getFunctionType(nodeObject)
         types += funcName -> typeInfo
       }
       else if (nodeObject.isClassDeclaration) {
         val className = nodeObject.symbol.escapedName
-        val typeInfo = parseClassMembers(node)
+        val typeInfo = parseClassMembers(nodeObject)
         types += className -> typeInfo
       }
       else if (nodeObject.isInterfaceDeclaration) {
         val iName = nodeObject.symbol.escapedName
-        val typeInfo = parseInterfaceMembers(node)
+        val typeInfo = parseInterfaceMembers(nodeObject)
         types += iName -> typeInfo
       }
-      else if (!js.isUndefined(node.symbol.exports)) {
+      else if (!node.symbol.exports.isUndefined) {
         val nsName = nodeObject.symbol.escapedName
-        val typeInfo = parseNamespace(node)
+        val typeInfo = parseNamespace(nodeObject)
         types += nsName -> typeInfo
       }
     }
 
-    ts.forEachChild(sourceFile, visit _)
+    TypeScript.forEachChild(sourceFile, visit)
   }
 
   private def isExported(node: TSNodeObject) = (node.hasExportModifier || (!node.parent.isNull && node.parent.isSourceFile))
   
   private def getNamedType(sym: TSSymbolObject): TSNamedType = new TSNamedType(sym.getType())
 
-  private def getTypeConstraints(list: js.Dynamic, prev: Map[String, TSType]): Map[String, TSType] = {
-    val tail = list.pop()
-    if (js.isUndefined(tail)) prev
-    else if (js.isUndefined(tail.constraint)) getTypeConstraints(list, prev)
+  private def getTypeConstraints(list: TSNodeArray, prev: Map[String, TSType]): Map[String, TSType] = {
+    val tail = list.head()
+    if (tail.isUndefined) prev
+    else if (tail.constraint.isUndefined) getTypeConstraints(list, prev)
     else getTypeConstraints(list, prev) ++ Map(tail.symbol.escapedName.toString() -> getElementType(tail.constraint))
   }
 
-  private def getTypeConstraints(node: ts.Node): Map[String, TSType] = {
-    if (js.isUndefined(node.typeParameters)) Map()
+  private def getTypeConstraints(node: TSNodeObject): Map[String, TSType] = {
+    if (node.typeParameters.isUndefined) Map()
     else getTypeConstraints(node.typeParameters, Map())
   }
 
-  private def getFunctionType(node: ts.Node): TSFunctionType = {
+  private def getFunctionType(node: TSNodeObject): TSFunctionType = {
     val params = node.parameters
-    val pList = if (js.isUndefined(params)) List() else getFunctionParametersType(params)
-    val signature = checker.getSignatureFromDeclaration(node)
-    val res = checker.getReturnTypeOfSignature(signature)
-    if (!js.isUndefined(res.symbol) && res.symbol.declarations.length > 0) {
-      if (!js.isUndefined(res.resolvedTypeArguments))
-        new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.shift())), getTypeConstraints(node))
-      else
-        new TSFunctionType(pList, getFunctionType(res.symbol.declarations.shift()), getTypeConstraints(node))
+    val pList = if (params.isUndefined) List() else getFunctionParametersType(params)
+    val res = node.getReturnTypeOfSignature()
+    val dec = if (res.symbol.isUndefined) null else res.symbol.getFirstDeclaration()
+    if (!res.symbol.isUndefined && dec != null && !dec.isUndefined) {
+      if (!res.resolvedTypeArguments.isUndefined)
+        new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.head())), getTypeConstraints(node))
+      else {
+        new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))}
     }
     else
-      new TSFunctionType(pList, new TSNamedType(res.intrinsicName.toString), getTypeConstraints(node))
+      new TSFunctionType(pList, new TSNamedType(res.intrinsicName), getTypeConstraints(node))
   }
 
-  private def getElementType(token: js.Dynamic): TSType = {
-    val tp = token.selectDynamic("type")
-    if (!js.isUndefined(tp)) getFunctionType(tp.symbol.declarations.shift())
-    else
-      if (!js.isUndefined(token.intrinsicName)) new TSNamedType(token.intrinsicName.toString) 
-      else new TSNamedType(checker.getTypeFromTypeNode(token).intrinsicName.toString)
+  private def getElementType(token: TSTokenObject): TSType = {
+    if (token.intrinsicName != null) new TSNamedType(token.intrinsicName) 
+    else new TSNamedType(token.getTypeFromTypeNode())
   }
 
-  private def getUnionType(types: js.Dynamic, prev: TSUnionType): TSUnionType = {
-    val t = types.pop()
-    if (js.isUndefined(t)) prev
+  private def getElementType(node: TSNodeObject): TSType = {    
+    val tp = node.`type`
+    if (tp.isUndefined) new TSNamedType(node.getTypeFromTypeNode())
+    else {
+      val dec = tp.symbol.getFirstDeclaration()
+      getFunctionType(dec)
+    }
+  }
+
+  private def getUnionType(types: TSTokenArray, prev: TSUnionType): TSUnionType = {
+    val t = types.tail()
+    if (t.isUndefined) prev
     else getUnionType(types, new TSUnionType(getElementType(t), prev))
   }
 
-  private def getUnionType(types: js.Dynamic): TSUnionType = {
-    val snd = types.pop()
-    val fst = types.pop()
+  private def getUnionType(types: TSTokenArray): TSUnionType = {
+    val snd = types.tail()
+    val fst = types.tail()
     val u = new TSUnionType(getElementType(fst), getElementType(snd))
     getUnionType(types, u)
   }
 
-  private def getFunctionParameterType(node: ts.node): TSType = {
-    val typeNode = node.selectDynamic("type")
-    if (!js.isUndefined(typeNode) && ts.isFunctionTypeNode(typeNode)) getFunctionType(typeNode)
-    else if (!js.isUndefined(typeNode) && ts.isArrayTypeNode(typeNode)) new TSArrayType(getElementType(typeNode.elementType))
-    else if (!js.isUndefined(typeNode) && !js.isUndefined(typeNode.types) && typeNode.types.length > 1) getUnionType(typeNode.types)
-    else getNamedType(TSSymbolObject(node.symbol))
+  private def getFunctionParameterType(node: TSNodeObject): TSType = {
+    val typeNode = node.`type`
+    if (!typeNode.isUndefined && typeNode.isFunctionTypeNode) getFunctionType(typeNode)
+    else if (!typeNode.isUndefined && typeNode.isArrayTypeNode) new TSArrayType(getElementType(typeNode.elementType))
+    else if (!typeNode.isUndefined && !typeNode.types.isUndefined && typeNode.types.length() > 1) getUnionType(typeNode.types)
+    else getNamedType(node.symbol)
   }
 
-  private def getFunctionParametersType(list: js.Dynamic): List[TSType] = {
-    val tail = list.pop()
-    if (js.isUndefined(tail)) List() else getFunctionParametersType(list) :+ getFunctionParameterType(tail)
+  private def getFunctionParametersType(list: TSNodeArray): List[TSType] = {
+    val tail = list.tail()
+    if (tail.isUndefined) List() else getFunctionParametersType(list) :+ getFunctionParameterType(tail)
   }
 
-  private def getClassMembersType(list: js.Dynamic): Map[String, TSType] = {
-    val tail = list.pop()
-    if (js.isUndefined(tail)) Map()
+  private def getClassMembersType(list: TSNodeArray): Map[String, TSType] = {
+    val tail = list.tail()
+    if (tail.isUndefined) Map()
     else {
-      val name = tail.symbol.escapedName.toString
-      if (ts.isMethodDeclaration(tail) && !name.equals("__constructor")) // TODO: we assumed that there is no inner class
+      val name = tail.symbol.escapedName
+      if (tail.isMethodDeclaration && !name.equals("__constructor")) // TODO: we assumed that there is no inner class
         getClassMembersType(list) ++ Map(name -> getFunctionType(tail))
       else getClassMembersType(list)
     }
   }
 
-  private def getInterfacePropertiesType(list: js.Dynamic): Map[String, TSType] = {
-    val tail = list.pop()
-    if (js.isUndefined(tail)) Map()
+  private def getInterfacePropertiesType(list: TSNodeArray): Map[String, TSType] = {
+    val tail = list.tail()
+    if (tail.isUndefined) Map()
     else {
-      val name = tail.symbol.escapedName.toString
-      val typeObject = tail.symbol.valueDeclaration.selectDynamic("type")
-      if (!js.isUndefined(typeObject.parameters))
+      val name = tail.symbol.escapedName
+      val typeObject = tail.symbol.valueDeclaration.`type`
+      if (!typeObject.parameters.isUndefined)
         getInterfacePropertiesType(list) ++ Map(name -> getFunctionType(typeObject))
-      else getInterfacePropertiesType(list) ++ Map(name -> getNamedType(TSSymbolObject(tail.symbol)))
+      else getInterfacePropertiesType(list) ++ Map(name -> getNamedType(tail.symbol))
     }
   }
 
-  private def parseClassMembers(node: ts.Node): TSClassType = {
-    val name = node.symbol.escapedName.toString
+  private def parseClassMembers(node: TSNodeObject): TSClassType = {
+    val name = node.symbol.escapedName
     val members = node.symbol.valueDeclaration.members
     val mList = getClassMembersType(members)
     new TSClassType(name, mList)
   }
 
-  private def parseInterfaceMembers(node: ts.Node): TSInterfaceType = {
-    val name = node.symbol.escapedName.toString
+  private def parseInterfaceMembers(node: TSNodeObject): TSInterfaceType = {
+    val name = node.symbol.escapedName
     val members = node.members
     val pList = getInterfacePropertiesType(members)
     new TSInterfaceType(name, pList, getTypeConstraints(node))
   }
 
-  private def parseNamespaceExports(it: js.Dynamic): Map[String, TSType] = {
-    val next = it.next()
-    if (next.done) Map()
+  private def parseNamespaceExports(it: TSSymbolIter): Map[String, TSType] = {
+    it.next()
+    if (it.done) Map()
     else {
-      val data = next.value
-      val name = data.shift().toString
-      val node = data.shift().declarations.shift()
+      val data = it.value()
+      val name = data._1
+      val node = data._2.getFirstDeclaration()
 
-      if (ts.isFunctionDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> getFunctionType(node))
-      else if (ts.isClassDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> parseClassMembers(node))
-      else if (ts.isInterfaceDeclaration(node)) parseNamespaceExports(it) ++ Map(name -> parseInterfaceMembers(node))
-      else if (!js.isUndefined(node.symbol.exports)) parseNamespaceExports(it) ++ Map(name -> parseNamespace(node))
+      if (node.isFunctionDeclaration) parseNamespaceExports(it) ++ Map(name -> getFunctionType(node))
+      else if (node.isClassDeclaration) parseNamespaceExports(it) ++ Map(name -> parseClassMembers(node))
+      else if (node.isInterfaceDeclaration) parseNamespaceExports(it) ++ Map(name -> parseInterfaceMembers(node))
+      else if (!node.symbol.exports.isUndefined) parseNamespaceExports(it) ++ Map(name -> parseNamespace(node))
       else parseNamespaceExports(it)
     }
   }
 
-  private def parseNamespace(node: ts.Node): TSNamespaceType = {
-    val name = node.symbol.escapedName.toString
-    val iterator = node.symbol.exports.entries()
+  private def parseNamespace(node: TSNodeObject): TSNamespaceType = {
+    val name = node.symbol.escapedName
+    val iterator = node.symbol.exports
     new TSNamespaceType(name, parseNamespaceExports(iterator))
   }
 
