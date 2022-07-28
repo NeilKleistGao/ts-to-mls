@@ -17,6 +17,7 @@ object TypeScript {
   def isFunctionTypeNode(node: js.Dynamic): Boolean = ts.isFunctionTypeNode(node)
   def isArrayTypeNode(node: js.Dynamic): Boolean = ts.isArrayTypeNode(node)
   def isMethodDeclaration(node: js.Dynamic): Boolean = ts.isMethodDeclaration(node)
+  def isNamespaceDeclaration(node: js.Dynamic): Boolean = ts.isModuleDeclaration(node)
 
   def getCombinedModifierFlags(node: js.Dynamic): Int = ts.getCombinedModifierFlags(node).asInstanceOf[Int]
   def forEachChild(root: js.Dynamic, func: js.Dynamic => Unit): Unit = ts.forEachChild(root, func)
@@ -62,7 +63,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) {
   lazy val isFunctionTypeNode: Boolean = TypeScript.isFunctionTypeNode(node)
   lazy val isArrayTypeNode: Boolean = TypeScript.isArrayTypeNode(node)
   lazy val isMethodDeclaration: Boolean = TypeScript.isMethodDeclaration(node)
-  lazy val isNamespace: Boolean = !js.isUndefined(node.symbol.exports)
+  lazy val isNamespace: Boolean = TypeScript.isNamespaceDeclaration(node)
   lazy val hasExportModifier: Boolean = (TypeScript.getCombinedModifierFlags(node) & TypeScript.ModifierFlagsExport) != 0
   lazy val isNull: Boolean = node == null
   lazy val kind: Int = node.kind.asInstanceOf[Int]
