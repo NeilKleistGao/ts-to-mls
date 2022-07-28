@@ -62,6 +62,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) {
   lazy val isFunctionTypeNode: Boolean = TypeScript.isFunctionTypeNode(node)
   lazy val isArrayTypeNode: Boolean = TypeScript.isArrayTypeNode(node)
   lazy val isMethodDeclaration: Boolean = TypeScript.isMethodDeclaration(node)
+  lazy val isNamespace: Boolean = !js.isUndefined(node.symbol.exports)
   lazy val hasExportModifier: Boolean = (TypeScript.getCombinedModifierFlags(node) & TypeScript.ModifierFlagsExport) != 0
   lazy val isNull: Boolean = node == null
   lazy val kind: Int = node.kind.asInstanceOf[Int]

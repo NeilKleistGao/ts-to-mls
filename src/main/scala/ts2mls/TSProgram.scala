@@ -35,7 +35,7 @@ class TSProgram(filename: String) {
         val typeInfo = parseInterfaceMembers(nodeObject)
         types += iName -> typeInfo
       }
-      else if (!node.symbol.exports.isUndefined) {
+      else if (nodeObject.isNamespace) {
         val nsName = nodeObject.symbol.escapedName
         val typeInfo = parseNamespace(nodeObject)
         types += nsName -> typeInfo
