@@ -1,6 +1,7 @@
 import org.scalatest.funsuite.AnyFunSuite
 import ts2mls.TSProgram
 import ts2mls.types._
+import mlscript._
 
 class BasicFunction extends AnyFunSuite {
   test("Basic Function") {
@@ -14,4 +15,16 @@ class BasicFunction extends AnyFunSuite {
     assert(TypeCompare(program.getType("isnull"), "any => boolean"))
     assert(TypeCompare(program.getType("bar"), "any"))
   }
+
+  test("Basic Convert") {
+    val program = TSProgram("src/test/typescript/BasicFunctions.ts")
+
+    program.getMLSType("hello") match {
+      case Function(lhs, rhs) => rhs match {
+        case TypeName(name) if (name.equals("void")) => assert(true)
+        case _ => assert(false)
+      }
+      case _ => assert(false)
+    }
+  } 
 }
