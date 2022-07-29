@@ -17,7 +17,7 @@ class BasicFunction extends AnyFunSuite {
   }
 
   test("Basic Convert") {
-    val program = TSProgram("src/test/typescript/BasicFunctions.ts")
+    val program = TSProgram(Seq("src/test/typescript/BasicFunctions.ts"))
 
     program.getMLSType("hello") match {
       case Function(lhs, rhs) => rhs match {
