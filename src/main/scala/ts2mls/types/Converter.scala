@@ -4,7 +4,7 @@ import mlscript._
 
 object Converter {
   private val primitiveName = Map[String, Type](
-    "number" -> new TypeName("int"),
+    "number" -> new TypeName("number"),
     "string" -> new TypeName("string"),
     "boolean" -> new TypeName("bool"),
     "void" -> Bot,

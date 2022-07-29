@@ -37,7 +37,7 @@ class BasicFunction extends AnyFunSuite {
     program.getMLSType("add") match {
       case Function(lhs, rhs) => {
         lhs match {
-          case TypeName(name) if (name.equals("int")) => assert(true)
+          case TypeName(name) if (name.equals("number")) => assert(true)
           case _ => assert(false)
         }
 
