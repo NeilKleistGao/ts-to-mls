@@ -20,9 +20,46 @@ class BasicFunction extends AnyFunSuite {
     val program = TSProgram(Seq("src/test/typescript/BasicFunctions.ts"))
 
     program.getMLSType("hello") match {
-      case Function(lhs, rhs) => rhs match {
-        case TypeName(name) if (name.equals("void")) => assert(true)
-        case _ => assert(false)
+      case Function(lhs, rhs) => {
+        rhs match {
+          case Bot => assert(true)
+          case _ => assert(false)
+        }
+
+        lhs match {
+          case Bot => assert(true)
+          case _ => assert(false)
+        }
+      }
+      case _ => assert(false)
+    }
+
+    program.getMLSType("add") match {
+      case Function(lhs, rhs) => {
+        lhs match {
+          case TypeName(name) if (name.equals("int")) => assert(true)
+          case _ => assert(false)
+        }
+
+        rhs match {
+          case Function(lhs2, rhs2) => assert(true)
+          case _ => assert(false)
+        }
+      }
+      case _ => assert(false)
+    }
+
+    program.getMLSType("id") match {
+      case Function(lhs, rhs) => {
+        lhs match {
+          case Top => assert(true)
+          case _ => assert(false)
+        }
+
+        rhs match {
+          case Top => assert(true)
+          case _ => assert(false)
+        }
       }
       case _ => assert(false)
     }
