@@ -39,6 +39,8 @@ class TSProgram(filenames: Seq[String]) extends Module {
     case Some(sf) => sf.>(symbol)
     case _ => throw new java.lang.Exception(s"Symbol $symbol not found")
   }
+  
+  def getMLSType(name: String) = Converter.convert(this.>(name))
 }
 
 object TSProgram {
