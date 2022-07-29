@@ -4,7 +4,7 @@ import ts2mls.types._
 
 class Union extends AnyFunSuite {
   test("Union") {
-    val program = TSProgram("src/test/typescript/Union.ts")
-    assert(TypeCompare(program.getType("getString"), "(string | number | boolean) => string"))
+    val program = TSProgram(Seq("src/test/typescript/Union.ts"))
+    assert(TypeCompare(program.>("getString"), "(string | number | boolean) => string"))
   }
 }
