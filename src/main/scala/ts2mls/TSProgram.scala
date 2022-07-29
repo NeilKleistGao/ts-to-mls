@@ -176,6 +176,7 @@ class TSProgram(filename: String) {
   }
 
   def getType(name: String): TSType = types.getOrElse(name, throw new java.lang.Exception(s"Symbol \"$name\" not found."))
+  def getMLSType(name: String) = Converter.convert(getType(name))
 }
 
 object TSProgram {
