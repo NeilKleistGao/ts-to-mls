@@ -3,6 +3,7 @@ package ts2mls;
 import scala.scalajs.js
 import js.Dynamic.{global => g}
 import js.DynamicImplicits._
+import js.JSConverters._
 
 object TypeScript {
   private lazy val ts = g.require("typescript")
@@ -21,7 +22,7 @@ object TypeScript {
 
   def getCombinedModifierFlags(node: js.Dynamic): Int = ts.getCombinedModifierFlags(node).asInstanceOf[Int]
   def forEachChild(root: js.Dynamic, func: js.Dynamic => Unit): Unit = ts.forEachChild(root, func)
-  def createProgram(filename: String): js.Dynamic = ts.createProgram(js.Array(filename), js.Dictionary("maxNodeModuleJsDepth" -> 0))
+  def createProgram(filenames: Seq[String]): js.Dynamic = ts.createProgram(filenames.toJSArray, js.Dictionary("maxNodeModuleJsDepth" -> 0))
 }
 
 class TSTypeChecker(checker: js.Dynamic) {
@@ -78,6 +79,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) {
   lazy val members = TSNodeArray(node.members)
   lazy val types = TSTokenArray(node.types)
   lazy val elementType: TSNodeObject = TSNodeObject(node.elementType)
+  lazy val heritageClauses = TSNodeArray(node.heritageClauses)
 
   def getReturnTypeOfSignature()(implicit checker: TSTypeChecker): TSTypeObject = {
     val signature = checker.getSignatureFromDeclaration(node)
@@ -94,6 +96,7 @@ object TSNodeObject {
 class TSTokenObject(token: js.Dynamic) extends TSAny(token) {
   lazy val intrinsicName: String = if (js.isUndefined(token.intrinsicName)) null else token.intrinsicName.toString
   lazy val `type`: TSNodeObject = TSNodeObject(token.selectDynamic("type"))
+  lazy val expression: TSIdentifierObject = TSIdentifierObject(token.expression)
 
   def getTypeFromTypeNode()(implicit checker: TSTypeChecker): String = checker.getTypeFromTypeNode(token)
 }
@@ -110,4 +113,12 @@ class TSTypeObject(obj: js.Dynamic) extends TSAny(obj) {
 
 object TSTypeObject {
   def apply(obj: js.Dynamic) = new TSTypeObject(obj)
+}
+
+class TSIdentifierObject(id: js.Dynamic) {
+  lazy val escapedText: String = id.escapedText.toString
+}
+
+object TSIdentifierObject {
+  def apply(id: js.Dynamic) = new TSIdentifierObject(id)
 }
