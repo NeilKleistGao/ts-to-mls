@@ -75,9 +75,8 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
 
   private def getElementType(token: TSTokenObject): TSType = {
     val tp = token.`type`
-    if (!tp.isUndefined && tp.isFunctionTypeNode) {
-      getFunctionType(tp)
-    }
+    if (!tp.isUndefined && tp.isFunctionTypeNode) getFunctionType(tp)
+    else if (token.isArrayTypeNode) new TSArrayType(getElementType(token.elementType))
     else
       if (token.intrinsicName != null) new TSNamedType(token.intrinsicName) 
       else new TSNamedType(token.getTypeFromTypeNode())

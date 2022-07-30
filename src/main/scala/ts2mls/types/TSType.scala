@@ -29,8 +29,8 @@ case class TSFunctionType(params: List[TSType], res: TSType, constraint: Map[Str
       if (params.length == 0) rhs
       else if (params.length == 1) {
         params(0) match {
-          case ut: TSUnionType => s"(${params(0).toString()}) => ${rhs}"
-          case _ => s"${params(0).toString()} => ${rhs}"
+          case ut: TSUnionType => s"(${ut.toString()}) => ${rhs}"
+          case t: TSType => s"${t.toString()} => ${rhs}"
         }
       } 
       else {

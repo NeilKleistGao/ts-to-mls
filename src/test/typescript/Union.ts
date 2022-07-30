@@ -10,3 +10,7 @@ function test(x: boolean): (string | number) {
 function run(f: ((x: number) => number) | ((x: number) => string)): any {
     return f(42);
 }
+
+function get(arr: number[] | string[]) {
+    console.log(arr[0])
+}
