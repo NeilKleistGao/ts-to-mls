@@ -16,7 +16,7 @@ class BasicFunction extends AnyFunSuite {
     assert(TypeCompare(program.>("bar"), "any"))
     assert(TypeCompare(program.>("nu"), "null => null"))
     assert(TypeCompare(program.>("un"), "undefined => undefined"))
-    // assert(TypeCompare(program.>("fail"), "never"))
+    assert(TypeCompare(program.>("fail"), "never"))
     assert(TypeCompare(program.>("create"), "object"))
   }
 

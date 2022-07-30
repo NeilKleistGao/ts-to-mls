@@ -38,7 +38,7 @@ function un(n: undefined): undefined {
     return n;
 }
 
-function fail(): never {
+function fail() : never {
     throw new Error("wuwuwu");
 }
 
