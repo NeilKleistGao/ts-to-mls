@@ -60,8 +60,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (!res.symbol.isUndefined && dec != null && !dec.isUndefined) {
       if (!res.resolvedTypeArguments.isUndefined)
         new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.head())), getTypeConstraints(node))
+      else if (!res.aliasSymbol.isUndefined)
+        new TSFunctionType(pList, new TSNamedType(res.symbol.escapedName), getTypeConstraints(node))
       else {
-        new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))}
+        new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))
+      }
     }
     else
       new TSFunctionType(pList, new TSNamedType(res.intrinsicName), getTypeConstraints(node))
