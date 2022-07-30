@@ -1,7 +1,6 @@
 package ts2mls.types;
 
 import scala.collection.mutable.HashMap
-import javax.lang.model.`type`.UnionType
 
 abstract class TSType {
   override def toString(): String = ???
@@ -79,5 +78,17 @@ case class TSArrayType(eleType: TSType) extends TSType {
 }
 
 case class TSUnionType(lhs: TSType, rhs: TSType) extends TSType {
-  override def toString(): String = s"$lhs | $rhs"
+  override def toString(): String = {
+    val ls = lhs match {
+      case f: TSFunctionType => s"($f)"
+      case t: TSType => t.toString
+    }
+
+    val rs = rhs match {
+      case f: TSFunctionType => s"($f)"
+      case t: TSType => t.toString
+    }
+
+    s"$ls | $rs"
+  }
 }
