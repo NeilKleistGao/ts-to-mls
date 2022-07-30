@@ -113,6 +113,9 @@ class TSTypeObject(obj: js.Dynamic) extends TSAny(obj) {
   lazy val resolvedTypeArguments = TSTokenArray(obj.resolvedTypeArguments)
   lazy val intrinsicName: String = if (js.isUndefined(obj.intrinsicName)) null else obj.intrinsicName.toString
   lazy val aliasSymbol: TSSymbolObject = TSSymbolObject(obj.aliasSymbol)
+
+  lazy val isTupleType: Boolean = obj.checker.isTupleType(obj)
+  lazy val isArrayType: Boolean = obj.checker.isArrayType(obj)
 }
 
 object TSTypeObject {

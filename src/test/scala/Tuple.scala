@@ -8,5 +8,6 @@ class Tuple extends AnyFunSuite {
     assert(TypeCompare(program.>("key"), "[string, boolean] => string"))
     assert(TypeCompare(program.>("value"), "[string, boolean] => boolean"))
     assert(TypeCompare(program.>("third"), "[number, number, number] => number"))
+    assert(TypeCompare(program.>("vec2"), "(number, number) => [number, number]"))
   }
 }

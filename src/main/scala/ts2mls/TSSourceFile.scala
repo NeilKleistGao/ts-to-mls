@@ -57,15 +57,14 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     val pList = if (params.isUndefined) List() else getFunctionParametersType(params)
     val res = node.getReturnTypeOfSignature()
     val dec = if (res.symbol.isUndefined) null else res.symbol.getFirstDeclaration()
-    if (!res.symbol.isUndefined && dec != null && !dec.isUndefined) {
-      if (!res.resolvedTypeArguments.isUndefined)
-        new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.head())), getTypeConstraints(node))
-      else if (!res.aliasSymbol.isUndefined)
-        new TSFunctionType(pList, new TSNamedType(res.symbol.escapedName), getTypeConstraints(node))
-      else {
-        new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))
-      }
-    }
+    if (res.isTupleType)
+      new TSFunctionType(pList, new TSTupleType(getTupleElements(res.resolvedTypeArguments)), getTypeConstraints(node))
+    else if (res.isArrayType)
+      new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.head())), getTypeConstraints(node))
+    else if (!res.aliasSymbol.isUndefined)
+      new TSFunctionType(pList, new TSNamedType(res.symbol.escapedName), getTypeConstraints(node))
+    else if (!res.symbol.isUndefined && dec != null && !dec.isUndefined)
+      new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))
     else
       new TSFunctionType(pList, new TSNamedType(res.intrinsicName), getTypeConstraints(node))
   }

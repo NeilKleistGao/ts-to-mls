@@ -9,3 +9,7 @@ function value(x: [string, boolean]): boolean {
 function third(x: [number, number, number]): number {
     return x[2];
 }
+
+function vec2(x: number, y: number): [number, number] {
+    return [x, y];
+}
