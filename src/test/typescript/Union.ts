@@ -14,3 +14,7 @@ function run(f: ((x: number) => number) | ((x: number) => string)): any {
 function get(arr: number[] | string[]) {
     console.log(arr[0])
 }
+
+function get2(t: [string, string] | [number, string]): string {
+    return t[1];
+}

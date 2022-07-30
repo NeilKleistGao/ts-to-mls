@@ -101,8 +101,10 @@ class TSTokenObject(token: js.Dynamic) extends TSAny(token) {
   lazy val `type`: TSNodeObject = TSNodeObject(token.selectDynamic("type"))
   lazy val expression: TSIdentifierObject = TSIdentifierObject(token.expression)
   lazy val elementType: TSNodeObject = TSNodeObject(token.elementType)
+  lazy val elements = TSTokenArray(token.elements)
 
   lazy val isArrayTypeNode: Boolean = TypeScript.isArrayTypeNode(token)
+  lazy val isTupleTypeNode: Boolean = TypeScript.isTupleTypeNode(token)
 
   def getTypeFromTypeNode()(implicit checker: TSTypeChecker): String = checker.getTypeFromTypeNode(token)
 }
