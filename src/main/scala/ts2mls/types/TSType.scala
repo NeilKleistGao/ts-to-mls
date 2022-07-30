@@ -12,6 +12,13 @@ case class TSNamedType(typeName: String) extends TSType {
   override def toString(): String = typeName
 }
 
+case class TSTupleType(types: List[TSType]) extends TSType {
+  override def toString(): String = {
+    val body = types.foldLeft("")((s, t) => s"$s$t, ")
+    s"[${body.substring(0, body.length() - 2)}]"
+  }
+}
+
 case class TSFunctionType(params: List[TSType], res: TSType, constraint: Map[String, TSType]) extends TSType {
   override def toString(): String = {
     val rhs = res match {

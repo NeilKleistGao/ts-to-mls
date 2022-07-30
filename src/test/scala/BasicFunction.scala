@@ -14,6 +14,10 @@ class BasicFunction extends AnyFunSuite {
     assert(TypeCompare(program.>("odd"), "number => boolean"))
     assert(TypeCompare(program.>("isnull"), "any => boolean"))
     assert(TypeCompare(program.>("bar"), "any"))
+    assert(TypeCompare(program.>("nu"), "null => null"))
+    assert(TypeCompare(program.>("un"), "undefined => undefined"))
+    assert(TypeCompare(program.>("fail"), "never"))
+    assert(TypeCompare(program.>("create"), "object"))
   }
 
   test("Basic Convert") {
@@ -22,12 +26,12 @@ class BasicFunction extends AnyFunSuite {
     program.getMLSType("hello") match {
       case Function(lhs, rhs) => {
         rhs match {
-          case Bot => assert(true)
+          case TypeName(name) if (name.equals("unit")) => assert(true)
           case _ => assert(false)
         }
 
         lhs match {
-          case Bot => assert(true)
+          case TypeName(name) if (name.equals("unit")) => assert(true)
           case _ => assert(false)
         }
       }

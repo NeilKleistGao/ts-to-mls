@@ -57,12 +57,14 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     val pList = if (params.isUndefined) List() else getFunctionParametersType(params)
     val res = node.getReturnTypeOfSignature()
     val dec = if (res.symbol.isUndefined) null else res.symbol.getFirstDeclaration()
-    if (!res.symbol.isUndefined && dec != null && !dec.isUndefined) {
-      if (!res.resolvedTypeArguments.isUndefined)
-        new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.head())), getTypeConstraints(node))
-      else {
-        new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))}
-    }
+    if (res.isTupleType)
+      new TSFunctionType(pList, new TSTupleType(getTupleElements(res.resolvedTypeArguments)), getTypeConstraints(node))
+    else if (res.isArrayType)
+      new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.head())), getTypeConstraints(node))
+    else if (!res.aliasSymbol.isUndefined)
+      new TSFunctionType(pList, new TSNamedType(res.symbol.escapedName), getTypeConstraints(node))
+    else if (!res.symbol.isUndefined && dec != null && !dec.isUndefined)
+      new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))
     else
       new TSFunctionType(pList, new TSNamedType(res.intrinsicName), getTypeConstraints(node))
   }
@@ -94,11 +96,18 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     getUnionType(types, u)
   }
 
+  private def getTupleElements(elements: TSTokenArray): List[TSType] = {
+    val tail = elements.tail()
+    if (tail.isUndefined) List()
+    else getTupleElements(elements) :+ getElementType(tail)
+  }
+
   private def getFunctionParameterType(node: TSNodeObject): TSType = {
     val typeNode = node.`type`
     if (!typeNode.isUndefined && typeNode.isFunctionTypeNode) getFunctionType(typeNode)
     else if (!typeNode.isUndefined && typeNode.isArrayTypeNode) new TSArrayType(getElementType(typeNode.elementType))
     else if (!typeNode.isUndefined && !typeNode.types.isUndefined && typeNode.types.length() > 1) getUnionType(typeNode.types)
+    else if (!typeNode.isUndefined && typeNode.isTupleTypeNode) new TSTupleType(getTupleElements(typeNode.elements))
     else getNamedType(node.symbol)
   }
 
