@@ -65,13 +65,22 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       new TSFunctionType(pList, new TSNamedType(res.symbol.escapedName), getTypeConstraints(node))
     else if (!res.symbol.isUndefined && dec != null && !dec.isUndefined)
       new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))
-    else
+    else if (res.intrinsicName != null)
       new TSFunctionType(pList, new TSNamedType(res.intrinsicName), getTypeConstraints(node))
+    else if (!res.types.isUndefined)
+      new TSFunctionType(pList, getUnionType(res.types), getTypeConstraints(node))
+    else
+      throw new java.lang.Exception("Unknown return value.")
   }
 
   private def getElementType(token: TSTokenObject): TSType = {
-    if (token.intrinsicName != null) new TSNamedType(token.intrinsicName) 
-    else new TSNamedType(token.getTypeFromTypeNode())
+    val tp = token.`type`
+    if (!tp.isUndefined && tp.isFunctionTypeNode) getFunctionType(tp)
+    else if (token.isArrayTypeNode) new TSArrayType(getElementType(token.elementType))
+    else if (token.isTupleTypeNode) new TSTupleType(getTupleElements(token.elements))
+    else
+      if (token.intrinsicName != null) new TSNamedType(token.intrinsicName) 
+      else new TSNamedType(token.getTypeFromTypeNode())
   }
 
   private def getElementType(node: TSNodeObject): TSType = {    

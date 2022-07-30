@@ -1,7 +1,6 @@
 package ts2mls.types;
 
 import scala.collection.mutable.HashMap
-import javax.lang.model.`type`.UnionType
 
 abstract class TSType {
   override def toString(): String = ???
@@ -23,14 +22,15 @@ case class TSFunctionType(params: List[TSType], res: TSType, constraint: Map[Str
   override def toString(): String = {
     val rhs = res match {
       case TSFunctionType(rp, _, _) if (params.length > 0 && rp.length > 0) => s"(${res.toString()})"
+      case u: TSUnionType => s"(${u.toString()})"
       case _ => res.toString()
     }
     val body = 
       if (params.length == 0) rhs
       else if (params.length == 1) {
         params(0) match {
-          case ut: TSUnionType => s"(${params(0).toString()}) => ${rhs}"
-          case _ => s"${params(0).toString()} => ${rhs}"
+          case ut: TSUnionType => s"(${ut.toString()}) => ${rhs}"
+          case t: TSType => s"${t.toString()} => ${rhs}"
         }
       } 
       else {
@@ -78,5 +78,17 @@ case class TSArrayType(eleType: TSType) extends TSType {
 }
 
 case class TSUnionType(lhs: TSType, rhs: TSType) extends TSType {
-  override def toString(): String = s"$lhs | $rhs"
+  override def toString(): String = {
+    val ls = lhs match {
+      case f: TSFunctionType => s"($f)"
+      case t: TSType => t.toString
+    }
+
+    val rs = rhs match {
+      case f: TSFunctionType => s"($f)"
+      case t: TSType => t.toString
+    }
+
+    s"$ls | $rs"
+  }
 }
