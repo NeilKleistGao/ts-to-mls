@@ -23,6 +23,7 @@ case class TSFunctionType(params: List[TSType], res: TSType, constraint: Map[Str
   override def toString(): String = {
     val rhs = res match {
       case TSFunctionType(rp, _, _) if (params.length > 0 && rp.length > 0) => s"(${res.toString()})"
+      case u: TSUnionType => s"(${u.toString()})"
       case _ => res.toString()
     }
     val body = 
