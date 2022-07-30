@@ -94,11 +94,18 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     getUnionType(types, u)
   }
 
+  private def getTupleElements(elements: TSTokenArray): List[TSType] = {
+    val tail = elements.tail()
+    if (tail.isUndefined) List()
+    else getTupleElements(elements) :+ getElementType(tail)
+  }
+
   private def getFunctionParameterType(node: TSNodeObject): TSType = {
     val typeNode = node.`type`
     if (!typeNode.isUndefined && typeNode.isFunctionTypeNode) getFunctionType(typeNode)
     else if (!typeNode.isUndefined && typeNode.isArrayTypeNode) new TSArrayType(getElementType(typeNode.elementType))
     else if (!typeNode.isUndefined && !typeNode.types.isUndefined && typeNode.types.length() > 1) getUnionType(typeNode.types)
+    else if (!typeNode.isUndefined && typeNode.isTupleTypeNode) new TSTupleType(getTupleElements(typeNode.elements))
     else getNamedType(node.symbol)
   }
 
