@@ -29,3 +29,19 @@ function isnull(x) {
 function bar() {
     return undefined;
 }
+
+function nu(n: null): null {
+    return n;
+}
+
+function un(n: undefined): undefined {
+    return n;
+}
+
+function fail(): never {
+    throw new Error("wuwuwu");
+}
+
+function create(): object {
+    return {v: 0};
+}
