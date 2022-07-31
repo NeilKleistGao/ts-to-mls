@@ -40,16 +40,16 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   
   private def getNamedType(sym: TSSymbolObject): TSNamedType = new TSNamedType(sym.getType())
 
-  private def getTypeConstraints(list: TSNodeArray, prev: Map[String, TSType]): Map[String, TSType] = {
-    val tail = list.head()
+  private def getTypeConstraints(list: TSNodeArray, prev: List[TSTypeVariable]): List[TSTypeVariable] = {
+    val tail = list.tail()
     if (tail.isUndefined) prev
-    else if (tail.constraint.isUndefined) getTypeConstraints(list, prev)
-    else getTypeConstraints(list, prev) ++ Map(tail.symbol.escapedName.toString() -> getElementType(tail.constraint))
+    else if (tail.constraint.isUndefined) getTypeConstraints(list, prev) 
+    else getTypeConstraints(list, prev) :+ new TSTypeVariable(tail.symbol.escapedName, Some(getElementType(tail.constraint)))
   }
 
-  private def getTypeConstraints(node: TSNodeObject): Map[String, TSType] = {
-    if (node.typeParameters.isUndefined) Map()
-    else getTypeConstraints(node.typeParameters, Map())
+  private def getTypeConstraints(node: TSNodeObject): List[TSTypeVariable] = {
+    if (node.typeParameters.isUndefined) List()
+    else getTypeConstraints(node.typeParameters, List())
   }
 
   private def getFunctionType(node: TSNodeObject): TSFunctionType = {
