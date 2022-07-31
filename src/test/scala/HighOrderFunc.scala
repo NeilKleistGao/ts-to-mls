@@ -9,4 +9,21 @@ class HighOrderFunc extends AnyFunSuite {
     assert(TypeCompare(program.>("h2"), "string => string"))
     assert(TypeCompare(program.>("h3"), "(number => number, number => number) => (number => number)"))
   }
+
+  test("High Order Convert") {
+    import mlscript._
+
+    val program = TSProgram(Seq("src/test/typescript/HighOrderFunc.ts"))
+
+    program.getMLSType("h1") match {
+      case Function(lhs, rhs) => lhs match {
+        case Function(lhs2, rhs2) => rhs2 match {
+          case TypeName(name) if (name.equals("number")) => assert(true)
+          case _ => assert(false)
+        }
+        case _ => assert(false)
+      }
+      case _ => assert(false)
+    }
+  }
 }
