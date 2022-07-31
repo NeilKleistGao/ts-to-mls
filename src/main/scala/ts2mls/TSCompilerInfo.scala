@@ -5,6 +5,8 @@ import js.Dynamic.{global => g}
 import js.DynamicImplicits._
 import js.JSConverters._
 
+trait TSTypeSource {}
+
 object TypeScript {
   private lazy val ts = g.require("typescript")
 
@@ -53,7 +55,7 @@ object TSSymbolObject {
   def apply(node: js.Dynamic) = new TSSymbolObject(node)
 }
 
-case class TSNodeObject(node: js.Dynamic) extends TSAny(node) {
+case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource {
   lazy val isToken: Boolean = TypeScript.isToken(node)
   lazy val isFunctionDeclaration: Boolean = !isUndefined && TypeScript.isFunctionDeclaration(node)
   lazy val isClassDeclaration: Boolean = !isUndefined && TypeScript.isClassDeclaration(node)
@@ -105,7 +107,7 @@ object TSTokenObject {
   def apply(token: js.Dynamic) = new TSTokenObject(token)
 }
 
-class TSTypeObject(obj: js.Dynamic) extends TSAny(obj) {
+class TSTypeObject(obj: js.Dynamic) extends TSAny(obj) with TSTypeSource {
   lazy val symbol: TSSymbolObject = TSSymbolObject(obj.symbol)
   lazy val resolvedTypeArguments = TSTypeArray(obj.resolvedTypeArguments)
   lazy val intrinsicName: String = if (js.isUndefined(obj.intrinsicName)) null else obj.intrinsicName.toString
