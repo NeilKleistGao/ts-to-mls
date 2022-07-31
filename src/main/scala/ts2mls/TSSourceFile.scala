@@ -93,14 +93,14 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   }
 
   private def getUnionType(types: TSTokenArray, prev: TSUnionType): TSUnionType = {
-    val t = types.tail()
+    val t = types.head()
     if (t.isUndefined) prev
-    else getUnionType(types, new TSUnionType(getElementType(t), prev))
+    else getUnionType(types, new TSUnionType(prev, getElementType(t)))
   }
 
   private def getUnionType(types: TSTokenArray): TSUnionType = {
-    val snd = types.tail()
-    val fst = types.tail()
+    val fst = types.head()
+    val snd = types.head()
     val u = new TSUnionType(getElementType(fst), getElementType(snd))
     getUnionType(types, u)
   }

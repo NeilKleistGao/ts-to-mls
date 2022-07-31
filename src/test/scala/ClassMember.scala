@@ -8,7 +8,7 @@ class ClassMember extends AnyFunSuite {
     val cls: TSType = program.>("Student")
     assert(TypeCompare(cls.>("getID"), "number"))
     assert(TypeCompare(cls.>("addScore"), "(string, number) => void"))
-    assert(TypeCompare(cls.>("isFriend"), "Student => boolean"))
+    assert(TypeCompare(cls.>("isFriend"), "(Student) => boolean"))
   }
 
   test("Inherit") {
