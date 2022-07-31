@@ -86,25 +86,6 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     new TSFunctionType(pList, getObjectType(res), getTypeConstraints(node))
   }
 
-  // private def getElementType(token: TSTokenObject): TSType = {
-  //   val tp = token.`type`
-  //   if (!tp.isUndefined && tp.isFunctionTypeNode) getFunctionType(tp)
-  //   else if (token.isArrayTypeNode) new TSArrayType(getElementType(token.elementType))
-  //   else if (token.isTupleTypeNode) new TSTupleType(getTupleElements(token.elements))
-  //   else
-  //     if (token.intrinsicName != null) new TSNamedType(token.intrinsicName) 
-  //     else new TSNamedType(token.getTypeFromTypeNode())
-  // }
-
-  // private def getElementType(node: TSNodeObject): TSType = {    
-  //   val tp = node.`type`
-  //   if (tp.isUndefined) new TSNamedType(node.getTypeFromTypeNode())
-  //   else {
-  //     val dec = tp.symbol.getFirstDeclaration()
-  //     getFunctionType(dec)
-  //   }
-  // }
-
   private def getUnionType(types: TSTokenArray, prev: TSUnionType): TSUnionType = {
     val t = types.head()
     if (t.isUndefined) prev
@@ -143,15 +124,6 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     else getTupleElements(elements) :+ getObjectType(tail)
   }
 
-  // private def getFunctionParameterType(node: TSNodeObject): TSType = {
-  //   val typeNode = node.`type`
-  //   if (!typeNode.isUndefined && typeNode.isFunctionTypeNode) getFunctionType(typeNode)
-  //   else if (!typeNode.isUndefined && typeNode.isArrayTypeNode) new TSArrayType(getObjectType(typeNode.elementType))
-  //   else if (!typeNode.isUndefined && !typeNode.types.isUndefined && typeNode.types.length() > 1) getUnionType(typeNode.types)
-  //   else if (!typeNode.isUndefined && typeNode.isTupleTypeNode) new TSTupleType(getTupleElements(typeNode.elements))
-  //   else getNamedType(node.symbol)
-  // }
-
   private def getInheritList(list: TSNodeArray)(implicit ns: TSNamespace): List[TSType] = {
     val tail = list.tail()
     if (tail.isUndefined) List()
@@ -179,11 +151,8 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      val typeObject = tail.symbol.valueDeclaration.`type`
+      val typeObject = tail.typeToken.getTypeFromTypeNode
       getInterfacePropertiesType(list) ++ Map(name -> getObjectType(typeObject))
-      // if (!typeObject.parameters.isUndefined)
-      //   getInterfacePropertiesType(list) ++ Map(name -> getFunctionType(typeObject))
-      // else getInterfacePropertiesType(list) ++ Map(name -> getNamedType(tail.symbol))
     }
   }
 
