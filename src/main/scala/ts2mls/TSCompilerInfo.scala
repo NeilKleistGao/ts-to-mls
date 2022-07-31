@@ -66,11 +66,9 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) {
   lazy val isTupleTypeNode: Boolean = !isUndefined && TypeScript.isTupleTypeNode(node)
   lazy val isUnionTypeNode: Boolean = !isUndefined && TypeScript.isUnionTypeNode(node)
   lazy val isEnumTypeNode: Boolean = !isUndefined && !typeName.isUndefined
-  lazy val isNull: Boolean = node == null
   lazy val flags: Int = node.flags.asInstanceOf[Int]
 
   lazy val typeName = TSIdentifierObject(node.typeName)
-  lazy val parent: TSNodeObject = if (!isNull) TSNodeObject(node.parent) else throw new java.lang.Exception("Access parent of null node.")
   lazy val symbol: TSSymbolObject = TSSymbolObject(node.symbol)
   lazy val parameters = TSNodeArray(node.parameters)
   lazy val typeParameters = TSNodeArray(node.typeParameters)
@@ -87,8 +85,6 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) {
     TSTypeObject(checker.getReturnTypeOfSignature(signature))
   }
 
-  // def getTypeFromTypeNode()(implicit checker: TSTypeChecker): String = checker.getTypeFromTypeNode(node)
-
   private def getTypeField(t: TSNodeObject): TSNodeObject =
     if (t.isUndefined || t.`type`.isUndefined || t.`type`.isToken) t else t.`type`
 
@@ -100,14 +96,7 @@ object TSNodeObject {
 }
 
 class TSTokenObject(token: js.Dynamic) extends TSAny(token) {
-  lazy val intrinsicName: String = if (js.isUndefined(token.intrinsicName)) null else token.intrinsicName.toString
-  lazy val `type`: TSNodeObject = TSNodeObject(token.selectDynamic("type"))
   lazy val expression: TSIdentifierObject = TSIdentifierObject(token.expression)
-  lazy val elementType: TSNodeObject = TSNodeObject(token.elementType)
-  lazy val elements = TSTokenArray(token.elements)
-
-  lazy val isArrayTypeNode: Boolean = TypeScript.isArrayTypeNode(token)
-  lazy val isTupleTypeNode: Boolean = TypeScript.isTupleTypeNode(token)
 
   def getTypeFromTypeNode()(implicit checker: TSTypeChecker): TSTypeObject = checker.getTypeFromTypeNode(token)
 }
