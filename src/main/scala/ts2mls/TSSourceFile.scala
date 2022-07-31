@@ -11,7 +11,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
 
   private def visit(node: js.Dynamic): Unit = {
     val nodeObject = TSNodeObject(node)
-    if (!isExported(nodeObject) || nodeObject.isToken) return
+    if (nodeObject.isToken) return
 
     if (nodeObject.isFunctionDeclaration) {
       val funcName = nodeObject.symbol.escapedName
@@ -20,12 +20,12 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     }
     else if (nodeObject.isClassDeclaration) {
       val className = nodeObject.symbol.escapedName
-      val typeInfo = parseClassMembers(nodeObject)(global)
+      val typeInfo = parseMembers(nodeObject, true)(global)
       global.put(className, typeInfo)
     }
     else if (nodeObject.isInterfaceDeclaration) {
       val iName = nodeObject.symbol.escapedName
-      val typeInfo = parseInterfaceMembers(nodeObject)(global)
+      val typeInfo = parseMembers(nodeObject, false)(global)
       global.put(iName, typeInfo)
     }
     else if (nodeObject.isNamespace) {
@@ -36,15 +36,36 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
 
   TypeScript.forEachChild(sf, visit)
 
-  private def isExported(node: TSNodeObject) = (node.hasExportModifier || (!node.parent.isNull && node.parent.isSourceFile))
-  
-  private def getNamedType(sym: TSSymbolObject): TSNamedType = new TSNamedType(sym.getType())
+  private def getNamedType(sym: TSSymbolObject): TSNamedType = TSNamedType(sym.getType())
+
+  private def getObjectType(node: TSTypeSource): TSType = node match {
+    case node: TSNodeObject => {
+      val typeNode = node.`type`
+      if (typeNode.isEnumTypeNode) TSNamedType(typeNode.typeName.escapedText)
+      else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
+      else if (typeNode.isTupleTypeNode) TSTupleType(getTupleElements(typeNode.elements))
+      else if (typeNode.isUnionTypeNode) getUnionType(typeNode.types, None)
+      else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
+      else getNamedType(node.symbol)
+    }
+    case obj: TSTypeObject => {
+      val dec = obj.declaration
+      if (obj.isEnumType) TSNamedType(obj.aliasSymbol.escapedName)
+      else if (dec.isFunctionLike) getFunctionType(dec)
+      else if (obj.isTupleType) TSTupleType(getTupleElements(obj.resolvedTypeArguments))
+      else if (obj.isUnionType) getUnionType(obj.types, None)
+      else if (obj.isArrayType) TSArrayType(getObjectType(obj.resolvedTypeArguments.head()))
+      else TSNamedType(obj.intrinsicName)
+    }
+  }
 
   private def getTypeConstraints(list: TSNodeArray, prev: List[TSTypeVariable]): List[TSTypeVariable] = {
     val tail = list.tail()
     if (tail.isUndefined) prev
-    else if (tail.constraint.isUndefined) getTypeConstraints(list, prev) 
-    else getTypeConstraints(list, prev) :+ new TSTypeVariable(tail.symbol.escapedName, Some(getElementType(tail.constraint)))
+    else if (tail.constraint.isUndefined)
+      getTypeConstraints(list, prev) :+ TSTypeVariable(tail.symbol.escapedName, None)
+    else
+      getTypeConstraints(list, prev) :+ TSTypeVariable(tail.symbol.escapedName, Some(getObjectType(tail.constraint.getTypeFromTypeNode)))
   }
 
   private def getTypeConstraints(node: TSNodeObject): List[TSTypeVariable] = {
@@ -52,84 +73,62 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     else getTypeConstraints(node.typeParameters, List())
   }
 
+  private def getFunctionParametersType(list: TSNodeArray): List[TSType] = {
+    val tail = list.tail()
+    if (tail.isUndefined) List() else getFunctionParametersType(list) :+ getObjectType(tail)
+  }
+
   private def getFunctionType(node: TSNodeObject): TSFunctionType = {
     val params = node.parameters
     val pList = if (params.isUndefined) List() else getFunctionParametersType(params)
     val res = node.getReturnTypeOfSignature()
-    val dec = if (res.symbol.isUndefined) null else res.symbol.getFirstDeclaration()
-    if (res.isTupleType)
-      new TSFunctionType(pList, new TSTupleType(getTupleElements(res.resolvedTypeArguments)), getTypeConstraints(node))
-    else if (res.isArrayType)
-      new TSFunctionType(pList, new TSArrayType(getElementType(res.resolvedTypeArguments.head())), getTypeConstraints(node))
-    else if (!res.aliasSymbol.isUndefined)
-      new TSFunctionType(pList, new TSNamedType(res.symbol.escapedName), getTypeConstraints(node))
-    else if (!res.symbol.isUndefined && dec != null && !dec.isUndefined)
-      new TSFunctionType(pList, getFunctionType(dec), getTypeConstraints(node))
-    else if (res.intrinsicName != null)
-      new TSFunctionType(pList, new TSNamedType(res.intrinsicName), getTypeConstraints(node))
-    else if (!res.types.isUndefined)
-      new TSFunctionType(pList, getUnionType(res.types), getTypeConstraints(node))
-    else
-      throw new java.lang.Exception("Unknown return value.")
+    TSFunctionType(pList, getObjectType(res), getTypeConstraints(node))
   }
 
-  private def getElementType(token: TSTokenObject): TSType = {
-    val tp = token.`type`
-    if (!tp.isUndefined && tp.isFunctionTypeNode) getFunctionType(tp)
-    else if (token.isArrayTypeNode) new TSArrayType(getElementType(token.elementType))
-    else if (token.isTupleTypeNode) new TSTupleType(getTupleElements(token.elements))
-    else
-      if (token.intrinsicName != null) new TSNamedType(token.intrinsicName) 
-      else new TSNamedType(token.getTypeFromTypeNode())
-  }
-
-  private def getElementType(node: TSNodeObject): TSType = {    
-    val tp = node.`type`
-    if (tp.isUndefined) new TSNamedType(node.getTypeFromTypeNode())
-    else {
-      val dec = tp.symbol.getFirstDeclaration()
-      getFunctionType(dec)
+  private def getUnionType(types: TSTokenArray, prev: Option[TSUnionType]): TSUnionType = prev match {
+    case None => {
+      val fst = types.head()
+      val snd = types.head()
+      val u = TSUnionType(getObjectType(fst.getTypeFromTypeNode), getObjectType(snd.getTypeFromTypeNode))
+      getUnionType(types, Some(u))
+    }
+    case _ => {
+      val t = types.head()
+      if (t.isUndefined) prev.get
+      else getUnionType(types, Some(TSUnionType(prev.get, getObjectType(t.getTypeFromTypeNode))))
     }
   }
 
-  private def getUnionType(types: TSTokenArray, prev: TSUnionType): TSUnionType = {
-    val t = types.tail()
-    if (t.isUndefined) prev
-    else getUnionType(types, new TSUnionType(getElementType(t), prev))
-  }
-
-  private def getUnionType(types: TSTokenArray): TSUnionType = {
-    val snd = types.tail()
-    val fst = types.tail()
-    val u = new TSUnionType(getElementType(fst), getElementType(snd))
-    getUnionType(types, u)
+  private def getUnionType(types: TSTypeArray, prev: Option[TSUnionType]): TSUnionType = prev match {
+    case None => {
+      val fst = types.head()
+      val snd = types.head()
+      val u = TSUnionType(getObjectType(fst), getObjectType(snd))
+      getUnionType(types, Some(u))
+    }
+    case _ => {
+      val t = types.head()
+      if (t.isUndefined) prev.get
+      else getUnionType(types, Some(TSUnionType(prev.get, getObjectType(t))))
+    }
   }
 
   private def getTupleElements(elements: TSTokenArray): List[TSType] = {
     val tail = elements.tail()
     if (tail.isUndefined) List()
-    else getTupleElements(elements) :+ getElementType(tail)
+    else getTupleElements(elements) :+ getObjectType(tail.getTypeFromTypeNode)
   }
 
-  private def getFunctionParameterType(node: TSNodeObject): TSType = {
-    val typeNode = node.`type`
-    if (!typeNode.isUndefined && typeNode.isFunctionTypeNode) getFunctionType(typeNode)
-    else if (!typeNode.isUndefined && typeNode.isArrayTypeNode) new TSArrayType(getElementType(typeNode.elementType))
-    else if (!typeNode.isUndefined && !typeNode.types.isUndefined && typeNode.types.length() > 1) getUnionType(typeNode.types)
-    else if (!typeNode.isUndefined && typeNode.isTupleTypeNode) new TSTupleType(getTupleElements(typeNode.elements))
-    else getNamedType(node.symbol)
-  }
-
-  private def getFunctionParametersType(list: TSNodeArray): List[TSType] = {
-    val tail = list.tail()
-    if (tail.isUndefined) List() else getFunctionParametersType(list) :+ getFunctionParameterType(tail)
+  private def getTupleElements(elements: TSTypeArray): List[TSType] = {
+    val tail = elements.tail()
+    if (tail.isUndefined) List()
+    else getTupleElements(elements) :+ getObjectType(tail)
   }
 
   private def getInheritList(list: TSNodeArray)(implicit ns: TSNamespace): List[TSType] = {
     val tail = list.tail()
     if (tail.isUndefined) List()
     else getInheritList(list) :+ ns.>(tail.types.head().expression.escapedText)
-
   }
 
   private def getInheritList(node: TSNodeObject)(implicit ns: TSNamespace): List[TSType] = {
@@ -142,7 +141,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      if (tail.isMethodDeclaration && !name.equals("__constructor")) // TODO: we assumed that there is no inner class
+      if (tail.isMethodDeclaration && !name.equals("__constructor"))
         getClassMembersType(list) ++ Map(name -> getFunctionType(tail))
       else getClassMembersType(list)
     }
@@ -153,25 +152,16 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      val typeObject = tail.symbol.valueDeclaration.`type`
-      if (!typeObject.parameters.isUndefined)
-        getInterfacePropertiesType(list) ++ Map(name -> getFunctionType(typeObject))
-      else getInterfacePropertiesType(list) ++ Map(name -> getNamedType(tail.symbol))
+      val typeObject = tail.typeToken.getTypeFromTypeNode
+      getInterfacePropertiesType(list) ++ Map(name -> getObjectType(typeObject))
     }
   }
 
-  private def parseClassMembers(node: TSNodeObject)(implicit ns: TSNamespace): TSClassType = {
-    val name = node.symbol.escapedName
-    val members = node.symbol.valueDeclaration.members
-    val mList = getClassMembersType(members)
-    new TSClassType(name, mList, getTypeConstraints(node), getInheritList(node))
-  }
-
-  private def parseInterfaceMembers(node: TSNodeObject)(implicit ns: TSNamespace): TSInterfaceType = {
+  private def parseMembers(node: TSNodeObject, isClass: Boolean)(implicit ns: TSNamespace): TSFieldType = {
     val name = node.symbol.escapedName
     val members = node.members
-    val pList = getInterfacePropertiesType(members)
-    new TSInterfaceType(name, pList, getTypeConstraints(node), getInheritList(node))
+    if (isClass) TSClassType(name, getClassMembersType(members), getTypeConstraints(node), getInheritList(node))
+    else TSInterfaceType(name, getInterfacePropertiesType(members), getTypeConstraints(node), getInheritList(node))
   }
 
   private def parseNamespaceExports(it: TSSymbolIter)(implicit ns: TSNamespace): Unit = {
@@ -186,11 +176,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         parseNamespaceExports(it)
       }
       else if (!node.isToken && node.isClassDeclaration) {
-        ns.put(name, parseClassMembers(node))
+        ns.put(name, parseMembers(node, true))
         parseNamespaceExports(it)
       }
       else if (!node.isToken && node.isInterfaceDeclaration) {
-        ns.put(name, parseInterfaceMembers(node))
+        ns.put(name, parseMembers(node, false))
         parseNamespaceExports(it)
       }
       else if (!node.isToken && node.isNamespace) {
