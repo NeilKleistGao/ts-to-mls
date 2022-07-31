@@ -127,7 +127,7 @@ class TSTypeObject(obj: js.Dynamic) extends TSAny(obj) {
   lazy val isTupleType: Boolean = obj.checker.isTupleType(obj)
   lazy val isArrayType: Boolean = obj.checker.isArrayType(obj)
   lazy val isEnumType: Boolean = !aliasSymbol.isUndefined
-  lazy val isUnionType: Boolean = (flags & TypeScript.typeFlagsUnion) != 0
+  lazy val isUnionType: Boolean = flags == TypeScript.typeFlagsUnion
   lazy val declaration: TSNodeObject = if (symbol.isUndefined) TSNodeObject(obj.symbol) else symbol.getFirstDeclaration()
 }
 

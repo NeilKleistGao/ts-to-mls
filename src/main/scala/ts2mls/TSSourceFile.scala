@@ -44,7 +44,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (typeNode.isEnumTypeNode) TSNamedType(typeNode.typeName.escapedText)
     else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
     else if (typeNode.isTupleTypeNode) TSTupleType(getTupleElements(typeNode.elements))
-    // else if (typeNode.isUnionTypeNode) getUnionType(typeNode.types)
+    else if (typeNode.isUnionTypeNode) getUnionType(typeNode.types)
     else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
     else getNamedType(node.symbol)
   }
@@ -55,7 +55,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (obj.isEnumType) TSNamedType(obj.aliasSymbol.escapedName)
     else if (dec.isFunctionLike) getFunctionType(dec)
     else if (obj.isTupleType) TSTupleType(getTupleElements(obj.resolvedTypeArguments))
-    // else if (obj.isUnionType) getUnionType(obj.types)
+    else if (obj.isUnionType) getUnionType(obj.types)
     else if (obj.isArrayType) TSArrayType(getObjectType(obj.resolvedTypeArguments.head()))
     else TSNamedType(obj.intrinsicName)
   }
@@ -63,8 +63,10 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   private def getTypeConstraints(list: TSNodeArray, prev: List[TSTypeVariable]): List[TSTypeVariable] = {
     val tail = list.tail()
     if (tail.isUndefined) prev
-    else if (tail.constraint.isUndefined) getTypeConstraints(list, prev) 
-    else getTypeConstraints(list, prev) :+ new TSTypeVariable(tail.symbol.escapedName, Some(getObjectType(tail)))
+    else if (tail.constraint.isUndefined)
+      getTypeConstraints(list, prev) :+ new TSTypeVariable(tail.symbol.escapedName, None)
+    else
+      getTypeConstraints(list, prev) :+ new TSTypeVariable(tail.symbol.escapedName, Some(getObjectType(tail.constraint.getTypeFromTypeNode)))
   }
 
   private def getTypeConstraints(node: TSNodeObject): List[TSTypeVariable] = {
