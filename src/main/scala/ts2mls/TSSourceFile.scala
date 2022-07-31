@@ -11,7 +11,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
 
   private def visit(node: js.Dynamic): Unit = {
     val nodeObject = TSNodeObject(node)
-    if (!isExported(nodeObject) || nodeObject.isToken) return
+    if (nodeObject.isToken) return
 
     if (nodeObject.isFunctionDeclaration) {
       val funcName = nodeObject.symbol.escapedName
@@ -35,8 +35,6 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   }
 
   TypeScript.forEachChild(sf, visit)
-
-  private def isExported(node: TSNodeObject) = (node.hasExportModifier || (!node.parent.isNull && node.parent.isSourceFile))
   
   private def getNamedType(sym: TSSymbolObject): TSNamedType = new TSNamedType(sym.getType())
 

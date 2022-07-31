@@ -8,9 +8,6 @@ import js.JSConverters._
 object TypeScript {
   private lazy val ts = g.require("typescript")
 
-  lazy val ModifierFlagsExport: Int = ts.ModifierFlags.Export.asInstanceOf[Int]
-  lazy val SyntaxKindSourceFile: Int = ts.SyntaxKind.SourceFile.asInstanceOf[Int]
-
   def isToken(node: js.Dynamic): Boolean = ts.isToken(node)
   def isFunctionDeclaration(node: js.Dynamic): Boolean = ts.isFunctionDeclaration(node)
   def isClassDeclaration(node: js.Dynamic): Boolean = ts.isClassDeclaration(node)
@@ -21,7 +18,6 @@ object TypeScript {
   def isNamespaceDeclaration(node: js.Dynamic): Boolean = ts.isModuleDeclaration(node)
   def isTupleTypeNode(node: js.Dynamic): Boolean = ts.isTupleTypeNode(node)
 
-  def getCombinedModifierFlags(node: js.Dynamic): Int = ts.getCombinedModifierFlags(node).asInstanceOf[Int]
   def forEachChild(root: js.Dynamic, func: js.Dynamic => Unit): Unit = ts.forEachChild(root, func)
   def createProgram(filenames: Seq[String]): js.Dynamic = ts.createProgram(filenames.toJSArray, js.Dictionary("maxNodeModuleJsDepth" -> 0))
 }
@@ -67,10 +63,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) {
   lazy val isMethodDeclaration: Boolean = TypeScript.isMethodDeclaration(node)
   lazy val isNamespace: Boolean = TypeScript.isNamespaceDeclaration(node)
   lazy val isTupleTypeNode: Boolean = TypeScript.isTupleTypeNode(node)
-  lazy val hasExportModifier: Boolean = (TypeScript.getCombinedModifierFlags(node) & TypeScript.ModifierFlagsExport) != 0
   lazy val isNull: Boolean = node == null
-  lazy val kind: Int = node.kind.asInstanceOf[Int]
-  lazy val isSourceFile: Boolean = kind == TypeScript.SyntaxKindSourceFile
 
   lazy val parent: TSNodeObject = if (!isNull) TSNodeObject(node.parent) else throw new java.lang.Exception("Access parent of null node.")
   lazy val symbol: TSSymbolObject = TSSymbolObject(node.symbol)
