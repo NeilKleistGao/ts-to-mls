@@ -7,15 +7,12 @@ abstract class TSType {
   def >(fieldName: String): TSType = throw new java.lang.Exception("Field is not allowed.")
 }
 
-case class TSTypeVariable(name: String, constraints: List[TSType]) extends TSType {
+case class TSTypeVariable(name: String, constraint: Option[TSType]) extends TSType {
   override def toString(): String = name
 
-  def getConstraints(): String = {
-    val res = constraints.foldLeft("")((s, c) => {
-      s"$s$name <: $c, "
-    })
-
-    res.substring(0, res.length() - 2)
+  def getConstraint(): String = constraint match {
+    case Some(t) => s"$name <: $t"
+    case _ => ""
   }
 }
 
@@ -30,7 +27,7 @@ case class TSTupleType(types: List[TSType]) extends TSType {
   }
 }
 
-case class TSFunctionType(params: List[TSType], res: TSType, constraint: Map[String, TSType]) extends TSType {
+case class TSFunctionType(params: List[TSType], res: TSType, typeVars: List[TSTypeVariable]) extends TSType {
   override def toString(): String = {
     val rhs = res match {
       case TSFunctionType(rp, _, _) if (params.length > 0 && rp.length > 0) => s"(${res.toString()})"
@@ -50,34 +47,43 @@ case class TSFunctionType(params: List[TSType], res: TSType, constraint: Map[Str
         s"(${ps.substring(0, ps.length() - 2)}) => ${rhs}"
       }
 
-    if (constraint.isEmpty) body
-    else {
-      val cons = constraint.foldLeft("")((s, p) => s"$s${p._1} <: ${p._2}, ")
-      s"$body where ${cons.substring(0, cons.length() - 2)}"
-    }
+    val cons = typeVars.foldLeft("")((s, v) => {
+      val c = v.getConstraint()
+      if (c.isEmpty()) s else s"$s$c, "
+    })
+
+    if (cons.isEmpty()) body
+    else s"$body where ${cons.substring(0, cons.length() - 2)}"
   }
 }
 
-case class TSClassType(name: String, members: Map[String, TSType], constraint: Map[String, TSType], parents: List[TSType])
+case class TSClassType(name: String, members: Map[String, TSType], typeVars: List[TSTypeVariable], parents: List[TSType])
   extends TSFieldType(members, parents) {
-  override def toString(): String = if (constraint.isEmpty) s"class $name"
-    else {
-      val cons = constraint.foldLeft("")((s, p) => s"$s${p._1} <: ${p._2}, ")
-      s"class $name where ${cons.substring(0, cons.length() - 2)}"
-    }
+  override def toString(): String = {
+    val body = s"class $name"
+    val cons = typeVars.foldLeft("")((s, v) => {
+      val c = v.getConstraint()
+      if (c.isEmpty()) s else s"$s$c, "
+    })
+
+    if (cons.isEmpty()) body
+    else s"$body where ${cons.substring(0, cons.length() - 2)}"
+  }
 }
 
-case class TSInterfaceType(name: String, members: Map[String, TSType], constraint: Map[String, TSType], parents: List[TSType])
+case class TSInterfaceType(name: String, members: Map[String, TSType], typeVars: List[TSTypeVariable], parents: List[TSType])
   extends TSFieldType(members, parents) {
   override def toString(): String = {
     val memString = members.foldLeft("")((str, it) => str + s"\n\t${it._1}: ${it._2.toString()}")
     val body = s"interface $name {$memString\n}"
 
-    if (constraint.isEmpty) body
-    else {
-      val cons = constraint.foldLeft("")((s, p) => s"$s${p._1} <: ${p._2}, ")
-      s"$body where ${cons.substring(0, cons.length() - 2)}"
-    }
+    val cons = typeVars.foldLeft("")((s, v) => {
+      val c = v.getConstraint()
+      if (c.isEmpty()) s else s"$s$c, "
+    })
+
+    if (cons.isEmpty()) body
+    else s"$body where ${cons.substring(0, cons.length() - 2)}"
   }
 }
 
