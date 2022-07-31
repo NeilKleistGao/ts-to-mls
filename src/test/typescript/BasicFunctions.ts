@@ -45,3 +45,7 @@ function fail() : never {
 function create(): object {
     return {v: 0};
 }
+
+function pa(x: ((number))): number {
+    return x + 42;
+}
