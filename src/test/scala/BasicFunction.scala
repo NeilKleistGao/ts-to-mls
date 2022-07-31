@@ -1,7 +1,6 @@
 import org.scalatest.funsuite.AnyFunSuite
 import ts2mls.TSProgram
 import ts2mls.types._
-import mlscript._
 
 class BasicFunction extends AnyFunSuite {
   test("Basic Function") {
@@ -21,6 +20,8 @@ class BasicFunction extends AnyFunSuite {
   }
 
   test("Basic Convert") {
+    import mlscript._
+
     val program = TSProgram(Seq("src/test/typescript/BasicFunctions.ts"))
 
     program.getMLSType("hello") match {

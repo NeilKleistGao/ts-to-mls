@@ -20,6 +20,7 @@ object Converter {
     case TSFunctionType(params, res, constraint) =>
       if (params.length == 0) new Function(primitiveName("void"), convert(res))
       else params.foldRight[Type](convert(res))((tst, mlst) => new Function(convert(tst), mlst))
+    case TSUnionType(lhs, rhs) => new Union(convert(lhs), convert(rhs))
     case _ => new TypeName("") // TODO:
   }
 }

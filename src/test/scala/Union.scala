@@ -11,4 +11,25 @@ class Union extends AnyFunSuite {
     assert(TypeCompare(program.>("get"), "(number[] | string[]) => void"))
     assert(TypeCompare(program.>("get2"), "([string, string] | [number, string]) => string"))
   }
+
+  test("Union Convert") {
+    import mlscript._
+
+    val program = TSProgram(Seq("src/test/typescript/Union.ts"))
+
+    program.getMLSType("test") match {
+      case Function(lhs, rhs) => {
+        rhs match {
+          case Union(lhs, rhs) => {
+            lhs match {
+              case TypeName(name) if (name.equals("string")) => assert(true)
+              case _ => assert(false)
+            }
+          }
+          case _ => assert(false)
+        }
+      }
+      case _ => assert(false)
+    }
+  }
 }
