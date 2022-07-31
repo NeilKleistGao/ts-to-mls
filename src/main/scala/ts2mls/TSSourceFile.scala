@@ -20,12 +20,12 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     }
     else if (nodeObject.isClassDeclaration) {
       val className = nodeObject.symbol.escapedName
-      val typeInfo = parseClassMembers(nodeObject)(global)
+      val typeInfo = parseMembers(nodeObject, true)(global)
       global.put(className, typeInfo)
     }
     else if (nodeObject.isInterfaceDeclaration) {
       val iName = nodeObject.symbol.escapedName
-      val typeInfo = parseInterfaceMembers(nodeObject)(global)
+      val typeInfo = parseMembers(nodeObject, false)(global)
       global.put(iName, typeInfo)
     }
     else if (nodeObject.isNamespace) {
@@ -157,18 +157,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     }
   }
 
-  private def parseClassMembers(node: TSNodeObject)(implicit ns: TSNamespace): TSClassType = {
-    val name = node.symbol.escapedName
-    val members = node.symbol.valueDeclaration.members
-    val mList = getClassMembersType(members)
-    new TSClassType(name, mList, getTypeConstraints(node), getInheritList(node))
-  }
-
-  private def parseInterfaceMembers(node: TSNodeObject)(implicit ns: TSNamespace): TSInterfaceType = {
+  private def parseMembers(node: TSNodeObject, isClass: Boolean)(implicit ns: TSNamespace): TSFieldType = {
     val name = node.symbol.escapedName
     val members = node.members
-    val pList = getInterfacePropertiesType(members)
-    new TSInterfaceType(name, pList, getTypeConstraints(node), getInheritList(node))
+    if (isClass) TSClassType(name, getClassMembersType(members), getTypeConstraints(node), getInheritList(node))
+    else TSInterfaceType(name, getInterfacePropertiesType(members), getTypeConstraints(node), getInheritList(node))
   }
 
   private def parseNamespaceExports(it: TSSymbolIter)(implicit ns: TSNamespace): Unit = {
@@ -183,11 +176,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         parseNamespaceExports(it)
       }
       else if (!node.isToken && node.isClassDeclaration) {
-        ns.put(name, parseClassMembers(node))
+        ns.put(name, parseMembers(node, true))
         parseNamespaceExports(it)
       }
       else if (!node.isToken && node.isInterfaceDeclaration) {
-        ns.put(name, parseInterfaceMembers(node))
+        ns.put(name, parseMembers(node, false))
         parseNamespaceExports(it)
       }
       else if (!node.isToken && node.isNamespace) {
