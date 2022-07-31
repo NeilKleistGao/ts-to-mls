@@ -7,6 +7,18 @@ abstract class TSType {
   def >(fieldName: String): TSType = throw new java.lang.Exception("Field is not allowed.")
 }
 
+case class TSTypeVariable(name: String, constraints: List[TSType]) extends TSType {
+  override def toString(): String = name
+
+  def getConstraints(): String = {
+    val res = constraints.foldLeft("")((s, c) => {
+      s"$s$name <: $c, "
+    })
+
+    res.substring(0, res.length() - 2)
+  }
+}
+
 case class TSNamedType(typeName: String) extends TSType {
   override def toString(): String = typeName
 }
