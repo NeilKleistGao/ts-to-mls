@@ -11,10 +11,10 @@ abstract class TSType {
 case class TSTypeVariable(name: String, constraint: Option[TSType]) extends TSType {
   override val priority = 0
 
-  override def toString(): String = name
+  override def toString(): String = s"$name'"
 
   def getConstraint(): String = constraint match {
-    case Some(t) => s"$name <: $t"
+    case Some(t) => s"$name' <: $t"
     case _ => ""
   }
 }

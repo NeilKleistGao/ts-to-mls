@@ -7,3 +7,9 @@ class Student {
     addScore(sub: string, score: number) {}
     isFriend(other: Student) { return true; }
 }
+
+class Foo<T extends Student> {
+    constructor() {}
+
+    bar(x: T) {}
+}
