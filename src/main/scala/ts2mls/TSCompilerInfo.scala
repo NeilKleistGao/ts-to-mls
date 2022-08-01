@@ -87,6 +87,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val elements = TSTokenArray(node.elements)
   lazy val typeToken = TSTokenObject(node.selectDynamic("type")) // for interfaces
   lazy val questionToken = TSTokenObject(node.questionToken)
+  lazy val initializer = TSTokenObject(node.initializer)
 
   def getReturnTypeOfSignature()(implicit checker: TSTypeChecker): TSTypeObject = {
     val signature = checker.getSignatureFromDeclaration(node)

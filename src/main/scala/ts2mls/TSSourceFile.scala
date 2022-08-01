@@ -60,8 +60,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         }
       }
       
-      if (node.questionToken.isUndefined) res
-      else TSUnionType(res, TSNamedType("undefined"))
+      if (node.questionToken.isUndefined && node.initializer.isUndefined) res
+      else res match {
+        case TSNamedType(name) if (name.equals("undefined")) => res
+        case _ => TSUnionType(res, TSNamedType("undefined"))
+      }
     }
     case obj: TSTypeObject => {
       val dec = obj.declaration
