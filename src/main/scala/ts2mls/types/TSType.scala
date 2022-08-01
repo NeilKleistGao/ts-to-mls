@@ -34,7 +34,7 @@ case class TSTupleType(types: List[TSType]) extends TSType {
 }
 
 case class TSFunctionType(params: List[TSType], res: TSType, typeVars: List[TSTypeVariable]) extends TSType {
-  override val priority = 2
+  override val priority = 1
   override def toString(): String = {
     val rhs = if (res.priority < priority && res.priority > 0) s"($res)" else res.toString()
     val body = 
@@ -99,9 +99,10 @@ case class TSArrayType(eleType: TSType) extends TSType {
 }
 
 abstract class TSStructuralType(lhs: TSType, rhs: TSType, notion: String) extends TSType {
-  override val priority = 1
+  override val priority = 2
 
-  override def toString(): String = s"$lhs $notion ${if (rhs.priority == priority) s"($rhs)" else s"$rhs"}"
+  override def toString(): String =
+    s"$lhs $notion ${if (rhs.priority <= priority && rhs.priority > 0) s"($rhs)" else s"$rhs"}"
 }
 
 case class TSUnionType(lhs: TSType, rhs: TSType) extends TSStructuralType(lhs, rhs, "|")

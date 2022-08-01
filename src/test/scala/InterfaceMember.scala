@@ -13,7 +13,16 @@ class InterfaceMember extends AnyFunSuite {
 
     assert(TypeCompare(program.>("II").>("test"), "(T') => number"))
 
-    assert(TypeCompare(program.>("create"), "{v: number}"))
+    // Should we consider it as an optional field?
+    assert(TypeCompare(program.>("create"), "{v: number | undefined}"))
     assert(TypeCompare(program.>("get"), "({t: string}) => string"))
+
+    assert(TypeCompare(program.>("IEvent").>("callback"), "(number) => void"))
+
+    assert(TypeCompare(program.>("SearchFunc").>("__call"), "(string, string) => boolean"))
+    assert(TypeCompare(program.>("StringArray").>("__index"), "(number) => string"))
+    assert(TypeCompare(program.>("Counter").>("__call"), "(number) => string"))
+    assert(TypeCompare(program.>("Counter").>("interval"), "number"))
+    assert(TypeCompare(program.>("Counter").>("reset"), "void"))
   }
 }

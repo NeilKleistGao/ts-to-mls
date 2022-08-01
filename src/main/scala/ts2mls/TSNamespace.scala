@@ -23,6 +23,9 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
   override def >>(name: String): TSNamespace = subSpace.getOrElse(name, throw new java.lang.Exception(s"namespace $name not found."))
 
   override def toString(): String = s"namespace $name"
+
+  def containsMember(name: String): Boolean = 
+    if (parent.isEmpty) members.contains(name) else (members.contains(name) || parent.get.containsMember(name))
 }
 
 object TSNamespace {
