@@ -107,3 +107,12 @@ abstract class TSStructuralType(lhs: TSType, rhs: TSType, notion: String) extend
 
 case class TSUnionType(lhs: TSType, rhs: TSType) extends TSStructuralType(lhs, rhs, "|")
 case class TSIntersectionType(lhs: TSType, rhs: TSType) extends TSStructuralType(lhs, rhs, "&")
+
+case class TSApplicationType(base: String, applied: List[TSType]) extends TSType {
+  override val priority = 0
+
+  override def toString(): String = {
+    val appBody = applied.foldLeft("")((body, app) => s"$body, $app")
+    s"$base<${appBody.substring(2)}>"
+  }
+}
