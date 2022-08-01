@@ -6,5 +6,5 @@ interface IFoo {
 }
 
 interface II<T extends number> {
-    test(x: T): number
+    test: (x: T) => number
 }
