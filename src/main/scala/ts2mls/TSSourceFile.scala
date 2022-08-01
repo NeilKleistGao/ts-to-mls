@@ -47,6 +47,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (typeNode.isUnionTypeNode) getStructuralType(typeNode.types, None, true)
       else if (typeNode.isIntersectionTypeNode) getStructuralType(typeNode.types, None, false)
       else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
+      else if (!node.typeName.isUndefined) TSTypeVariable(node.typeName.escapedText, None)
       else getNamedType(node.symbol)
     }
     case obj: TSTypeObject => {
@@ -57,6 +58,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (obj.isUnionType) getStructuralType(obj.types, None, true)
       else if (obj.isIntersectionType) getStructuralType(obj.types, None, false)
       else if (obj.isArrayType) TSArrayType(getObjectType(obj.resolvedTypeArguments.head()))
+      else if (!obj.symbol.isUndefined) TSTypeVariable(obj.symbol.escapedName, None)
       else TSNamedType(obj.intrinsicName)
     }
   }
@@ -87,23 +89,23 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     TSFunctionType(pList, getObjectType(res), getTypeConstraints(node))
   }
 
-  private def getStructuralType(types: TSTokenArray, prev: Option[TSStructuralType], isUnion: Boolean): TSStructuralType = prev match {
+  private def getStructuralType(types: TSNodeArray, prev: Option[TSStructuralType], isUnion: Boolean): TSStructuralType = prev match {
     case None => {
       val fst = types.head()
       val snd = types.head()
       if (isUnion)
-        getStructuralType(types, Some(TSUnionType(getObjectType(fst.getTypeFromTypeNode), getObjectType(snd.getTypeFromTypeNode))), isUnion)
+        getStructuralType(types, Some(TSUnionType(getObjectType(fst), getObjectType(snd))), isUnion)
       else
-        getStructuralType(types, Some(TSIntersectionType(getObjectType(fst.getTypeFromTypeNode), getObjectType(snd.getTypeFromTypeNode))), isUnion)
+        getStructuralType(types, Some(TSIntersectionType(getObjectType(fst), getObjectType(snd))), isUnion)
     }
     case _ => {
       val t = types.head()
       if (t.isUndefined) prev.get
       else 
         if (isUnion)
-          getStructuralType(types, Some(TSUnionType(prev.get, getObjectType(t.getTypeFromTypeNode))), isUnion)
+          getStructuralType(types, Some(TSUnionType(prev.get, getObjectType(t))), isUnion)
         else
-          getStructuralType(types, Some(TSIntersectionType(prev.get, getObjectType(t.getTypeFromTypeNode))), isUnion)
+          getStructuralType(types, Some(TSIntersectionType(prev.get, getObjectType(t))), isUnion)
     }
   }
 
@@ -142,7 +144,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   private def getInheritList(list: TSNodeArray)(implicit ns: TSNamespace): List[TSType] = {
     val tail = list.tail()
     if (tail.isUndefined) List()
-    else getInheritList(list) :+ ns.>(tail.types.head().expression.escapedText)
+    else getInheritList(list) :+ ns.>(tail.typesToken.head().expression.escapedText)
   }
 
   private def getInheritList(node: TSNodeObject)(implicit ns: TSNamespace): List[TSType] = {
