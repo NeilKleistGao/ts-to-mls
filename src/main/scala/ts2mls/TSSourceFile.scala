@@ -44,8 +44,8 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       if (typeNode.isEnumTypeNode) TSNamedType(typeNode.typeName.escapedText)
       else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
       else if (typeNode.isTupleTypeNode) TSTupleType(getTupleElements(typeNode.elements))
-      else if (typeNode.isUnionTypeNode) getStructuralType(typeNode.types, None, true)
-      else if (typeNode.isIntersectionTypeNode) getStructuralType(typeNode.types, None, false)
+      else if (typeNode.isUnionTypeNode) getUnionType(typeNode.typesToken, None)
+      else if (typeNode.isIntersectionTypeNode) getIntersectionType(typeNode.types, None)
       else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
       else if (!node.typeName.isUndefined) TSTypeVariable(node.typeName.escapedText, None)
       else getNamedType(node.symbol)
@@ -89,23 +89,29 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     TSFunctionType(pList, getObjectType(res), getTypeConstraints(node))
   }
 
-  private def getStructuralType(types: TSNodeArray, prev: Option[TSStructuralType], isUnion: Boolean): TSStructuralType = prev match {
+  private def getUnionType(types: TSTokenArray, prev: Option[TSUnionType]): TSUnionType = prev match {
     case None => {
       val fst = types.head()
       val snd = types.head()
-      if (isUnion)
-        getStructuralType(types, Some(TSUnionType(getObjectType(fst), getObjectType(snd))), isUnion)
-      else
-        getStructuralType(types, Some(TSIntersectionType(getObjectType(fst), getObjectType(snd))), isUnion)
+      getUnionType(types, Some(TSUnionType(getObjectType(fst.getTypeFromTypeNode), getObjectType(snd.getTypeFromTypeNode))))
     }
     case _ => {
       val t = types.head()
       if (t.isUndefined) prev.get
-      else 
-        if (isUnion)
-          getStructuralType(types, Some(TSUnionType(prev.get, getObjectType(t))), isUnion)
-        else
-          getStructuralType(types, Some(TSIntersectionType(prev.get, getObjectType(t))), isUnion)
+      else getUnionType(types, Some(TSUnionType(prev.get, getObjectType(t.getTypeFromTypeNode))))
+    }
+  }
+
+  private def getIntersectionType(types: TSNodeArray, prev: Option[TSIntersectionType]): TSIntersectionType = prev match {
+    case None => {
+      val fst = types.head()
+      val snd = types.head()
+      getIntersectionType(types, Some(TSIntersectionType(getObjectType(fst), getObjectType(snd))))
+    }
+    case _ => {
+      val t = types.head()
+      if (t.isUndefined) prev.get
+      else getIntersectionType(types, Some(TSIntersectionType(prev.get, getObjectType(t))))
     }
   }
 

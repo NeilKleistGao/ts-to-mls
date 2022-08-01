@@ -80,7 +80,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val constraint: TSTokenObject = TSTokenObject(node.constraint)
   lazy val members = TSNodeArray(node.members)
   lazy val types = TSNodeArray(node.types)
-  lazy val typesToken = TSTokenArray(node.types) // for inherit
+  lazy val typesToken = TSTokenArray(node.types) // for inherit and union
   lazy val elementType = TSTokenObject(node.elementType)
   lazy val heritageClauses = TSNodeArray(node.heritageClauses)
   lazy val elements = TSTokenArray(node.elements)
