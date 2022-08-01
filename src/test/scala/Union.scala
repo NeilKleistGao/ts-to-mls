@@ -24,7 +24,7 @@ class Union extends AnyFunSuite {
           case Union(lhs2, rhs2) => {
             lhs2 match {
               case Union(lhs3, rhs3) => lhs3 match {
-                case TypeName(name) if (name.equals("string")) => assert(true)
+                case TypeName(name) => assert(name.equals("string"))
                 case _ => assert(false)
               }
               case _ => assert(false)

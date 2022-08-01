@@ -28,12 +28,12 @@ class BasicFunction extends AnyFunSuite {
     program.getMLSType("hello") match {
       case Function(lhs, rhs) => {
         rhs match {
-          case TypeName(name) if (name.equals("unit")) => assert(true)
+          case TypeName(name) => assert(name.equals("unit"))
           case _ => assert(false)
         }
 
         lhs match {
-          case TypeName(name) if (name.equals("unit")) => assert(true)
+          case TypeName(name) => assert(name.equals("unit"))
           case _ => assert(false)
         }
       }
@@ -43,7 +43,7 @@ class BasicFunction extends AnyFunSuite {
     program.getMLSType("add") match {
       case Function(lhs, rhs) => {
         lhs match {
-          case TypeName(name) if (name.equals("number")) => assert(true)
+          case TypeName(name) => assert(name.equals("number"))
           case _ => assert(false)
         }
 

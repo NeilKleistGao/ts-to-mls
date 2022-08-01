@@ -18,7 +18,7 @@ class HighOrderFunc extends AnyFunSuite {
     program.getMLSType("h1") match {
       case Function(lhs, rhs) => lhs match {
         case Function(lhs2, rhs2) => rhs2 match {
-          case TypeName(name) if (name.equals("number")) => assert(true)
+          case TypeName(name) => assert(name.equals("number"))
           case _ => assert(false)
         }
         case _ => assert(false)
