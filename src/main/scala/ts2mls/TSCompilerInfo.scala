@@ -11,6 +11,7 @@ object TypeScript {
   private lazy val ts = g.require("typescript")
 
   lazy val typeFlagsUnion = ts.TypeFlags.Union.asInstanceOf[Int]
+  lazy val typeFlagsInter = ts.TypeFlags.Intersection.asInstanceOf[Int]
 
   def isToken(node: js.Dynamic): Boolean = ts.isToken(node)
   def isFunctionDeclaration(node: js.Dynamic): Boolean = ts.isFunctionDeclaration(node)
@@ -23,6 +24,7 @@ object TypeScript {
   def isNamespaceDeclaration(node: js.Dynamic): Boolean = ts.isModuleDeclaration(node)
   def isTupleTypeNode(node: js.Dynamic): Boolean = ts.isTupleTypeNode(node)
   def isUnionTypeNode(node: js.Dynamic): Boolean = ts.isUnionTypeNode(node)
+  def isIntersectionTypeNode(node: js.Dynamic): Boolean = ts.isIntersectionTypeNode(node)
 
   def forEachChild(root: js.Dynamic, func: js.Dynamic => Unit): Unit = ts.forEachChild(root, func)
   def createProgram(filenames: Seq[String]): js.Dynamic = ts.createProgram(filenames.toJSArray, js.Dictionary("maxNodeModuleJsDepth" -> 0))
@@ -67,6 +69,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val isNamespace: Boolean = !isUndefined && TypeScript.isNamespaceDeclaration(node)
   lazy val isTupleTypeNode: Boolean = !isUndefined && TypeScript.isTupleTypeNode(node)
   lazy val isUnionTypeNode: Boolean = !isUndefined && TypeScript.isUnionTypeNode(node)
+  lazy val isIntersectionTypeNode: Boolean = !isUndefined && TypeScript.isIntersectionTypeNode(node)
   lazy val isEnumTypeNode: Boolean = !isUndefined && !typeName.isUndefined
   lazy val flags: Int = node.flags.asInstanceOf[Int]
 
@@ -120,6 +123,7 @@ class TSTypeObject(obj: js.Dynamic) extends TSAny(obj) with TSTypeSource {
   lazy val isArrayType: Boolean = obj.checker.isArrayType(obj)
   lazy val isEnumType: Boolean = !aliasSymbol.isUndefined
   lazy val isUnionType: Boolean = flags == TypeScript.typeFlagsUnion
+  lazy val isIntersectionType: Boolean = flags == TypeScript.typeFlagsInter
   lazy val declaration: TSNodeObject = if (symbol.isUndefined) TSNodeObject(obj.symbol) else symbol.getFirstDeclaration()
 }
 
