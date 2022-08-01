@@ -16,5 +16,7 @@ class InterfaceMember extends AnyFunSuite {
     // Should we consider it as an optional field?
     assert(TypeCompare(program.>("create"), "{v: number | undefined}"))
     assert(TypeCompare(program.>("get"), "({t: string}) => string"))
+
+    assert(TypeCompare(program.>("IEvent").>("callback"), "(number) => void"))
   }
 }

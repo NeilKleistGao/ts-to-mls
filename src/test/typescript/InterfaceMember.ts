@@ -1,18 +1,22 @@
 interface IFoo {
-    a: string
-    b: (x: number) => number
-    c: () => boolean
-    d: (x: string) => void
+  a: string
+  b: (x: number) => number
+  c: () => boolean
+  d: (x: string) => void
 }
 
 interface II<T extends number> {
-    test: (x: T) => number
+  test: (x: T) => number
 }
 
 function create() {
-    return {v: 114};
+  return {v: 114};
 }
 
 function get(x: {t: string}): string {
-    return x.t;
+  return x.t;
+}
+
+interface IEvent {
+  callback(this: IEvent): (x: number) => void;
 }
