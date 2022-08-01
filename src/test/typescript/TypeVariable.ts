@@ -7,3 +7,7 @@ class CC<T extends string> {
 
     print(s: T) { console.log(s) }
 }
+
+function con<U, T extends U>(t: T): U {
+    return t;
+}

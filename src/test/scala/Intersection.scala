@@ -5,8 +5,8 @@ import ts2mls.types._
 class Intersection extends AnyFunSuite {
   test("Intersection") {
     val program = TSProgram(Seq("src/test/typescript/Intersection.ts"))
-    assert(TypeCompare(program.>("extend"), "(T, U) => (T & U)"))
-    assert(TypeCompare(program.>("foo"), "(T & U) => void"))
+    assert(TypeCompare(program.>("extend"), "(T', U') => (T' & U')"))
+    assert(TypeCompare(program.>("foo"), "(T' & U') => void"))
   }
 
   test("Intersection Convert") {
@@ -18,12 +18,12 @@ class Intersection extends AnyFunSuite {
         case Inter(lhs, rhs) => {
           // TODO: use named types rather than type variables temporarily
           lhs match {
-            case TypeName(name) => assert(name.equals("T"))
+            case TypeName(name) => assert(name.equals("T'"))
             case _ => assert(false)
           }
 
           rhs match {
-            case TypeName(name) => assert(name.equals("U"))
+            case TypeName(name) => assert(name.equals("U'"))
             case _ => assert(false)
           }
         }

@@ -4,3 +4,7 @@ interface IFoo {
     c: () => boolean
     d: (x: string) => void
 }
+
+interface II<T extends number> {
+    test: (x: T) => number
+}

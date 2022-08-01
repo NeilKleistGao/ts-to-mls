@@ -9,6 +9,8 @@ class ClassMember extends AnyFunSuite {
     assert(TypeCompare(cls.>("getID"), "number"))
     assert(TypeCompare(cls.>("addScore"), "(string, number) => void"))
     assert(TypeCompare(cls.>("isFriend"), "(Student) => boolean"))
+
+    assert(TypeCompare(program.>("Foo").>("bar"), "(T') => void"))
   }
 
   test("Inherit") {

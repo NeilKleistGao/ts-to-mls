@@ -8,13 +8,13 @@ abstract class TSType {
   def >(fieldName: String): TSType = throw new java.lang.Exception("Field is not allowed.")
 }
 
-case class TSTypeVariable(name: String, constraint: Option[TSType]) extends TSType {
+case class TSTypeVariable(val name: String, constraint: Option[TSType]) extends TSType {
   override val priority = 0
 
-  override def toString(): String = name
+  override def toString(): String = s"$name'"
 
   def getConstraint(): String = constraint match {
-    case Some(t) => s"$name <: $t"
+    case Some(t) => s"$name' <: $t"
     case _ => ""
   }
 }
