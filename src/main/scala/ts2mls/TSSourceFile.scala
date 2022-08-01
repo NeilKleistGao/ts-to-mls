@@ -141,7 +141,12 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     val pList = if (params.isUndefined) List() else getFunctionParametersType(params)(ntv)
     val res = node.getReturnTypeOfSignature()
 
-    TSFunctionType(pList, getObjectType(res)(ntv), constraints)
+    // TODO: remove this spetial judgement
+    if (node.`type`.isUndefined || node.`type`.typeName.isUndefined || node.`type`.typeArguments.isUndefined)
+      TSFunctionType(pList, getObjectType(res)(ntv), constraints)
+    else
+      TSFunctionType(pList, TSApplicationType(node.`type`.typeName.escapedText,
+        getApplicationArguments(node.`type`.typeArguments)(ntv)), constraints)
   }
 
   private def getUnionType(types: TSTokenArray, prev: Option[TSUnionType])(implicit tv: Map[String, TSTypeVariable]): TSUnionType = prev match {
