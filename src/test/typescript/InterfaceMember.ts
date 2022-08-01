@@ -24,3 +24,7 @@ interface IEvent {
 interface SearchFunc {
   (source: string, subString: string): boolean;
 }
+
+interface StringArray {
+  [index: number]: string;
+}

@@ -20,5 +20,6 @@ class InterfaceMember extends AnyFunSuite {
     assert(TypeCompare(program.>("IEvent").>("callback"), "(number) => void"))
 
     assert(TypeCompare(program.>("SearchFunc").>("__call"), "(string, string) => boolean"))
+    assert(TypeCompare(program.>("StringArray").>("__index"), "(number) => string"))
   }
 }
