@@ -8,5 +8,8 @@ class Optional extends AnyFunSuite {
     assert(TypeCompare(program.>("buildName"), "(string, string | undefined) => string"))
     assert(TypeCompare(program.>("buildName2"), "(string, string | undefined) => string"))
     assert(TypeCompare(program.>("buildName3"), "(string, any[]) => string"))
+
+    assert(TypeCompare(program.>("SquareConfig").>("color"), "string | undefined"))
+    assert(TypeCompare(program.>("SquareConfig").>("width"), "number | undefined"))
   }
 }

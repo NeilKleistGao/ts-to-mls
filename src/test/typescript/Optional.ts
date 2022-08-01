@@ -10,3 +10,8 @@ function buildName3(firstName: string, ...lastName) {
     console.log(lastName)
     return firstName;
 }
+
+interface SquareConfig {
+    color?: string;
+    width?: number;
+}
