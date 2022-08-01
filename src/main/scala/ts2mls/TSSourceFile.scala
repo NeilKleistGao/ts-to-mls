@@ -50,6 +50,8 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (typeNode.isIntersectionTypeNode) getIntersectionType(typeNode.types, None)
       else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
       else if (!node.typeName.isUndefined) TSTypeVariable(node.typeName.escapedText, None)
+      else if (!typeNode.isUndefined && !typeNode.members.isUndefined)
+        TSInterfaceType("", getInterfacePropertiesType(typeNode.members), List(), List())
       else {
         val name = node.symbol.getType()
         if (tv.contains(name)) tv(name)
@@ -64,7 +66,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (obj.isUnionType) getStructuralType(obj.types, None, true)
       else if (obj.isIntersectionType) getStructuralType(obj.types, None, false)
       else if (obj.isArrayType) TSArrayType(getObjectType(obj.resolvedTypeArguments.head()))
-      else if (!obj.symbol.isUndefined) TSTypeVariable(obj.symbol.escapedName, None)
+      else if (!obj.symbol.isUndefined) {
+        val symDec = obj.symbol.valueDeclaration
+        if (symDec.isUndefined || symDec.properties.isUndefined) TSTypeVariable(obj.symbol.escapedName, None)
+        else TSInterfaceType("", getInterfacePropertiesType(symDec.properties), List(), List())
+      }
       else 
         if (tv.contains(obj.intrinsicName)) tv(obj.intrinsicName)
         else TSNamedType(obj.intrinsicName)
@@ -190,8 +196,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      val typeObject = tail.typeToken.getTypeFromTypeNode
-      getInterfacePropertiesType(list) ++ Map(name -> getObjectType(typeObject))
+      getInterfacePropertiesType(list) ++ Map(name -> getObjectType(tail))
     }
   }
 
