@@ -28,3 +28,9 @@ interface SearchFunc {
 interface StringArray {
   [index: number]: string;
 }
+
+interface Counter {
+  (start: number): string;
+  interval: number;
+  reset(): void;
+}
