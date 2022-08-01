@@ -10,7 +10,7 @@ interface II<T extends number> {
 }
 
 function create() {
-    return {v: 0};
+    return {v: 114};
 }
 
 function get(x: {t: string}): string {

@@ -75,8 +75,11 @@ case class TSInterfaceType(name: String, members: Map[String, TSType], typeVars:
   override val priority = 0
 
   override def toString(): String = {
-    val memString = members.foldLeft("")((str, it) => str + s"\n\t${it._1}: ${it._2.toString()}")
-    val body = s"interface $name {$memString\n}"
+    val s = if (name.isEmpty()) ", " else "\n\t"
+    val memString = members.foldLeft("")((str, it) => str + s"$s${it._1}: ${it._2.toString()}")
+    val body =
+      if (name.isEmpty()) s"{${memString.substring(2)}}"
+      else s"interface $name {$memString\n}"
 
     val cons = typeVars.foldLeft("")((s, v) => {
       val c = v.getConstraint()

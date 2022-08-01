@@ -44,7 +44,7 @@ object TSTypeChecker {
 }
 
 class TSSymbolObject(sym: js.Dynamic) extends TSAny(sym) {
-  private lazy val declarations = TSNodeArray(sym.declarations)
+  lazy val declaration = if (js.isUndefined(sym)) TSNodeObject(sym) else getFirstDeclaration
   lazy val escapedName: String = sym.escapedName.toString
   lazy val valueDeclaration: TSNodeObject = TSNodeObject(sym.valueDeclaration)
   lazy val exports = TSSymbolIter(sym.exports.entries())
@@ -79,6 +79,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val typeParameters = TSNodeArray(node.typeParameters)
   lazy val constraint: TSTokenObject = TSTokenObject(node.constraint)
   lazy val members = TSNodeArray(node.members)
+  lazy val properties =  TSNodeArray(node.properties)
   lazy val types = TSNodeArray(node.types)
   lazy val typesToken = TSTokenArray(node.types) // for inherit and union
   lazy val elementType = TSTokenObject(node.elementType)

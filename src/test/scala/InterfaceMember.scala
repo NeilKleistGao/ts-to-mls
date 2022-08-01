@@ -12,5 +12,8 @@ class InterfaceMember extends AnyFunSuite {
     assert(TypeCompare(program.>("IFoo").>("d"), "(string) => void"))
 
     assert(TypeCompare(program.>("II").>("test"), "(T') => number"))
+
+    assert(TypeCompare(program.>("create"), "{v: number}"))
+    assert(TypeCompare(program.>("get"), "({t: string}) => string"))
   }
 }
