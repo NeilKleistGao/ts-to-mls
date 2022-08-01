@@ -5,7 +5,7 @@ import ts2mls.types._
 class Intersection extends AnyFunSuite {
   test("Intersection") {
     val program = TSProgram(Seq("src/test/typescript/Intersection.ts"))
-    assert(TypeCompare(program.>("extend"), "(T', U') => (T' & U')"))
+    assert(TypeCompare(program.>("extend"), "(T', U') => T' & U'"))
     assert(TypeCompare(program.>("foo"), "(T' & U') => void"))
   }
 
