@@ -54,6 +54,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
           else TSNamedType(name)
         }
         else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
+        else if (node.isFunctionLike) getFunctionType(node)
         else if (typeNode.isTupleTypeNode) TSTupleType(getTupleElements(typeNode.elements))
         else if (typeNode.isUnionTypeNode) getUnionType(typeNode.typesToken, None)
         else if (typeNode.isIntersectionTypeNode) getIntersectionType(typeNode.types, None)

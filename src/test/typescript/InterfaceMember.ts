@@ -20,3 +20,7 @@ function get(x: {t: string}): string {
 interface IEvent {
   callback(this: IEvent): (x: number) => void;
 }
+
+interface SearchFunc {
+  (source: string, subString: string): boolean;
+}
