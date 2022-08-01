@@ -16,7 +16,14 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (nodeObject.isFunctionDeclaration) {
       val funcName = nodeObject.symbol.escapedName
       val typeInfo = getFunctionType(nodeObject)(Map())
-      global.put(funcName, typeInfo)
+      if (!global.containsMember(funcName)) global.put(funcName, typeInfo)
+      else global.>(funcName) match {
+        case old: TSFunctionType if (nodeObject.body.isUndefined) =>
+          global.put(funcName, TSIntersectionType(old, typeInfo))
+        case old: TSIntersectionType if (nodeObject.body.isUndefined) =>
+          global.put(funcName, TSIntersectionType(old, typeInfo))
+        case _ => {}
+      }
     }
     else if (nodeObject.isClassDeclaration) {
       val className = nodeObject.symbol.escapedName
@@ -35,6 +42,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   }
 
   TypeScript.forEachChild(sf, visit)
+
 
   private def getObjectType(node: TSTypeSource)(implicit tv: Map[String, TSTypeVariable]): TSType = node match {
     case node: TSNodeObject => {
@@ -193,8 +201,17 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      if (tail.isMethodDeclaration && !name.equals("__constructor"))
-        getClassMembersType(list) ++ Map(name -> getFunctionType(tail))
+      if (tail.isMethodDeclaration && !name.equals("__constructor")) {
+        val other = getClassMembersType(list)
+        val func = getFunctionType(tail)
+        if (!other.contains(name)) other ++ Map(name -> func)
+        else other(name) match {
+          case old: TSFunctionType if (tail.body.isUndefined) =>
+            other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
+          case old: TSIntersectionType if (tail.body.isUndefined) =>
+            other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
+        }
+      }
       else getClassMembersType(list)
     }
   }
@@ -226,7 +243,15 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       val node = data._2.getFirstDeclaration()
 
       if (!node.isToken && node.isFunctionDeclaration) {
-        ns.put(name, getFunctionType(node)(Map()))
+        val func = getFunctionType(node)(Map())
+        if (!ns.containsMember(name)) ns.put(name, func)
+        else ns.>(name) match {
+          case old: TSFunctionType if (node.body.isUndefined) =>
+            ns.put(name, TSIntersectionType(old, func))
+          case old: TSIntersectionType if (node.body.isUndefined) =>
+            ns.put(name, TSIntersectionType(old, func))
+        }
+
         parseNamespaceExports(it)
       }
       else if (!node.isToken && node.isClassDeclaration) {
