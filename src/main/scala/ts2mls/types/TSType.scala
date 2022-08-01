@@ -95,8 +95,11 @@ case class TSArrayType(eleType: TSType) extends TSType {
     else s"$eleType[]"
 }
 
-case class TSUnionType(lhs: TSType, rhs: TSType) extends TSType {
+abstract class TSStructuralType(lhs: TSType, rhs: TSType, notion: String) extends TSType {
   override val priority = 1
 
-  override def toString(): String = s"$lhs | ${if (rhs.priority == priority) s"($rhs)" else s"$rhs"}"
+  override def toString(): String = s"$lhs $notion ${if (rhs.priority == priority) s"($rhs)" else s"$rhs"}"
 }
+
+case class TSUnionType(lhs: TSType, rhs: TSType) extends TSStructuralType(lhs, rhs, "|")
+case class TSIntersectionType(lhs: TSType, rhs: TSType) extends TSStructuralType(lhs, rhs, "&")

@@ -44,8 +44,10 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       if (typeNode.isEnumTypeNode) TSNamedType(typeNode.typeName.escapedText)
       else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
       else if (typeNode.isTupleTypeNode) TSTupleType(getTupleElements(typeNode.elements))
-      else if (typeNode.isUnionTypeNode) getUnionType(typeNode.types, None)
+      else if (typeNode.isUnionTypeNode) getUnionType(typeNode.typesToken, None)
+      else if (typeNode.isIntersectionTypeNode) getIntersectionType(typeNode.types, None)
       else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
+      else if (!node.typeName.isUndefined) TSTypeVariable(node.typeName.escapedText, None)
       else getNamedType(node.symbol)
     }
     case obj: TSTypeObject => {
@@ -53,8 +55,10 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       if (obj.isEnumType) TSNamedType(obj.aliasSymbol.escapedName)
       else if (dec.isFunctionLike) getFunctionType(dec)
       else if (obj.isTupleType) TSTupleType(getTupleElements(obj.resolvedTypeArguments))
-      else if (obj.isUnionType) getUnionType(obj.types, None)
+      else if (obj.isUnionType) getStructuralType(obj.types, None, true)
+      else if (obj.isIntersectionType) getStructuralType(obj.types, None, false)
       else if (obj.isArrayType) TSArrayType(getObjectType(obj.resolvedTypeArguments.head()))
+      else if (!obj.symbol.isUndefined) TSTypeVariable(obj.symbol.escapedName, None)
       else TSNamedType(obj.intrinsicName)
     }
   }
@@ -89,8 +93,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     case None => {
       val fst = types.head()
       val snd = types.head()
-      val u = TSUnionType(getObjectType(fst.getTypeFromTypeNode), getObjectType(snd.getTypeFromTypeNode))
-      getUnionType(types, Some(u))
+      getUnionType(types, Some(TSUnionType(getObjectType(fst.getTypeFromTypeNode), getObjectType(snd.getTypeFromTypeNode))))
     }
     case _ => {
       val t = types.head()
@@ -99,17 +102,36 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     }
   }
 
-  private def getUnionType(types: TSTypeArray, prev: Option[TSUnionType]): TSUnionType = prev match {
+  private def getIntersectionType(types: TSNodeArray, prev: Option[TSIntersectionType]): TSIntersectionType = prev match {
     case None => {
       val fst = types.head()
       val snd = types.head()
-      val u = TSUnionType(getObjectType(fst), getObjectType(snd))
-      getUnionType(types, Some(u))
+      getIntersectionType(types, Some(TSIntersectionType(getObjectType(fst), getObjectType(snd))))
     }
     case _ => {
       val t = types.head()
       if (t.isUndefined) prev.get
-      else getUnionType(types, Some(TSUnionType(prev.get, getObjectType(t))))
+      else getIntersectionType(types, Some(TSIntersectionType(prev.get, getObjectType(t))))
+    }
+  }
+
+  private def getStructuralType(types: TSTypeArray, prev: Option[TSStructuralType], isUnion: Boolean): TSStructuralType = prev match {
+    case None => {
+      val fst = types.head()
+      val snd = types.head()
+      if (isUnion)
+        getStructuralType(types, Some(TSUnionType(getObjectType(fst), getObjectType(snd))), isUnion)
+      else
+        getStructuralType(types, Some(TSIntersectionType(getObjectType(fst), getObjectType(snd))), isUnion)
+    }
+    case _ => {
+      val t = types.head()
+      if (t.isUndefined) prev.get
+      else 
+        if (isUnion)
+          getStructuralType(types, Some(TSUnionType(prev.get, getObjectType(t))), isUnion)
+        else
+          getStructuralType(types, Some(TSIntersectionType(prev.get, getObjectType(t))), isUnion)
     }
   }
 
@@ -128,7 +150,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   private def getInheritList(list: TSNodeArray)(implicit ns: TSNamespace): List[TSType] = {
     val tail = list.tail()
     if (tail.isUndefined) List()
-    else getInheritList(list) :+ ns.>(tail.types.head().expression.escapedText)
+    else getInheritList(list) :+ ns.>(tail.typesToken.head().expression.escapedText)
   }
 
   private def getInheritList(node: TSNodeObject)(implicit ns: TSNamespace): List[TSType] = {

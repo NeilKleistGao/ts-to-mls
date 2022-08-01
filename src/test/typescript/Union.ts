@@ -18,3 +18,7 @@ function get(arr: number[] | string[]) {
 function get2(t: [string, string] | [number, string]): string {
     return t[1];
 }
+
+function typeVar<T, U>(x: T | U): T | U {
+    return x
+}

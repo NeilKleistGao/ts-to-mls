@@ -10,6 +10,7 @@ class Union extends AnyFunSuite {
     assert(TypeCompare(program.>("run"), "((number) => number | (number) => string) => any"))
     assert(TypeCompare(program.>("get"), "(number[] | string[]) => void"))
     assert(TypeCompare(program.>("get2"), "([string, string] | [number, string]) => string"))
+    assert(TypeCompare(program.>("typeVar"), "(T | U) => (T | U)"))
   }
 
   test("Union Convert") {
