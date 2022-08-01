@@ -38,25 +38,30 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
 
   private def getObjectType(node: TSTypeSource)(implicit tv: Map[String, TSTypeVariable]): TSType = node match {
     case node: TSNodeObject => {
-      val typeNode = node.`type`
-      if (typeNode.hasTypeName) {
-        val name = typeNode.typeName.escapedText
-        if (tv.contains(name)) tv(name)
-        else TSNamedType(name)
+      val res = {
+        val typeNode = node.`type`
+        if (typeNode.hasTypeName) {
+          val name = typeNode.typeName.escapedText
+          if (tv.contains(name)) tv(name)
+          else TSNamedType(name)
+        }
+        else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
+        else if (typeNode.isTupleTypeNode) TSTupleType(getTupleElements(typeNode.elements))
+        else if (typeNode.isUnionTypeNode) getUnionType(typeNode.typesToken, None)
+        else if (typeNode.isIntersectionTypeNode) getIntersectionType(typeNode.types, None)
+        else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
+        else if (!node.typeName.isUndefined) TSTypeVariable(node.typeName.escapedText, None)
+        else if (!typeNode.isUndefined && !typeNode.members.isUndefined)
+          TSInterfaceType("", getInterfacePropertiesType(typeNode.members), List(), List())
+        else {
+          val name = node.symbol.getType()
+          if (tv.contains(name)) tv(name)
+          else TSNamedType(name)
+        }
       }
-      else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
-      else if (typeNode.isTupleTypeNode) TSTupleType(getTupleElements(typeNode.elements))
-      else if (typeNode.isUnionTypeNode) getUnionType(typeNode.typesToken, None)
-      else if (typeNode.isIntersectionTypeNode) getIntersectionType(typeNode.types, None)
-      else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
-      else if (!node.typeName.isUndefined) TSTypeVariable(node.typeName.escapedText, None)
-      else if (!typeNode.isUndefined && !typeNode.members.isUndefined)
-        TSInterfaceType("", getInterfacePropertiesType(typeNode.members), List(), List())
-      else {
-        val name = node.symbol.getType()
-        if (tv.contains(name)) tv(name)
-        else TSNamedType(name)
-      }
+      
+      if (node.questionToken.isUndefined) res
+      else TSUnionType(res, TSNamedType("undefined"))
     }
     case obj: TSTypeObject => {
       val dec = obj.declaration
