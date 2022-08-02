@@ -17,5 +17,12 @@ class ClassMember extends AnyFunSuite {
     val program = TSProgram(Seq("src/test/typescript/Inherit.ts"))
     val cls: TSType = program.>("B")
     assert(TypeCompare(cls.>("foo"), "void"))
+
+    program.>("D") match {
+      case TSClassType(_, _, _, parents) => assert(TypeCompare(parents(0), "class C<number>"))
+    }
+
+    assert(TypeCompare(program.>("D").>("set"), "(number) => void"))
+    assert(TypeCompare(program.>("D").>("get"), "number"))
   }
 }

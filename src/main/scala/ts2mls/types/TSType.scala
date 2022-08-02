@@ -107,3 +107,40 @@ abstract class TSStructuralType(lhs: TSType, rhs: TSType, notion: String) extend
 
 case class TSUnionType(lhs: TSType, rhs: TSType) extends TSStructuralType(lhs, rhs, "|")
 case class TSIntersectionType(lhs: TSType, rhs: TSType) extends TSStructuralType(lhs, rhs, "&")
+
+case class TSApplicationType(base: TSType, applied: List[TSType]) extends TSType {
+  override val priority = 0
+
+  override def toString(): String = {
+    val appBody = applied.foldLeft("")((body, app) => s"$body, $app")
+    s"$base<${appBody.substring(2)}>"
+  }
+
+  private lazy val applicationMap = base match {
+    case TSClassType(_, _, typeVars, _) =>
+      typeVars.zip(applied).foldLeft(Map[String, TSType]())((mp, v) => mp ++ Map(v._1.name -> v._2))
+    case TSInterfaceType(_, _, typeVars, _) =>
+      typeVars.zip(applied).foldLeft(Map[String, TSType]())((mp, v) => mp ++ Map(v._1.name -> v._2))
+    case _ => Map[String, TSType]()
+  }
+
+  private def replace(t: TSType): TSType = t match {
+    case TSTypeVariable(name, _) => applicationMap(name)
+    case TSTupleType(types) => TSTupleType(types.map((s) => replace(s)))
+    case TSFunctionType(params, res, cons) =>
+      TSFunctionType(params.map((p) => replace(p)), replace(res), cons)
+    case TSClassType(n, members, tv, c) =>
+      TSClassType(n, members.map[String, TSType]((m) => (m._1, replace(m._2))), tv, c)
+    case TSInterfaceType(n, members, tv, c) =>
+      TSInterfaceType(n, members.map[String, TSType]((m) => (m._1, replace(m._2))), tv, c)
+    case TSArrayType(elementType) => TSArrayType(replace(elementType))
+    case TSUnionType(lhs, rhs) => TSUnionType(replace(lhs), replace(rhs))
+    case TSIntersectionType(lhs, rhs) => TSIntersectionType(replace(lhs), replace(rhs))
+    case _ => t
+  }
+
+  override def >(fieldName: String): TSType = base match {
+    case f: TSFieldType => replace(f.>(fieldName))
+    case _ => throw new java.lang.Exception("Field is not allowed.")
+  }
+}

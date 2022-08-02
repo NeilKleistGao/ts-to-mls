@@ -27,7 +27,8 @@ object TypeScript {
   def isIntersectionTypeNode(node: js.Dynamic): Boolean = ts.isIntersectionTypeNode(node)
 
   def forEachChild(root: js.Dynamic, func: js.Dynamic => Unit): Unit = ts.forEachChild(root, func)
-  def createProgram(filenames: Seq[String]): js.Dynamic = ts.createProgram(filenames.toJSArray, js.Dictionary("maxNodeModuleJsDepth" -> 0))
+  def createProgram(filenames: Seq[String]): js.Dynamic = 
+    ts.createProgram(filenames.toJSArray, js.Dictionary("maxNodeModuleJsDepth" -> 0, "target" -> ts.ScriptTarget.ES5, "module" -> ts.ModuleKind.CommonJS))
 }
 
 class TSTypeChecker(checker: js.Dynamic) {
@@ -89,6 +90,8 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val questionToken = TSTokenObject(node.questionToken)
   lazy val initializer = TSTokenObject(node.initializer)
   lazy val body = TSNodeObject(node.body)
+  lazy val typeArguments = TSTokenArray(node.typeArguments)
+  lazy val expression: TSIdentifierObject = TSIdentifierObject(node.expression)
 
   def getReturnTypeOfSignature()(implicit checker: TSTypeChecker): TSTypeObject = {
     val signature = checker.getSignatureFromDeclaration(node)
