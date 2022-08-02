@@ -28,8 +28,7 @@ object Converter {
     case _ => new TypeName("") // TODO: more types support
   }
 
-  // TODO: only for intersection test
-  private def convertTypeVariable(tstv: TSTypeVariable): Type = TypeName(tstv.toString())
+  private def convertTypeVariable(tstv: TSTypeVariable) = TypeVar(Right(tstv.name), None)
 
   private def convertTuple(types: List[TSType]): mlscript.Tuple =
     mlscript.Tuple(types.map((t) => None -> convertField(t)))

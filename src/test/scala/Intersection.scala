@@ -16,14 +16,13 @@ class Intersection extends AnyFunSuite {
     program.getMLSType("foo") match {
       case Function(p, r) => p match {
         case Inter(lhs, rhs) => {
-          // TODO: use named types rather than type variables temporarily
           lhs match {
-            case TypeName(name) => assert(name.equals("T'"))
+            case v: TypeVar => assert(v.toString().equals("T"))
             case _ => assert(false)
           }
 
           rhs match {
-            case TypeName(name) => assert(name.equals("U'"))
+            case v: TypeVar => assert(v.toString().equals("U"))
             case _ => assert(false)
           }
         }
