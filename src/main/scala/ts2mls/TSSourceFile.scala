@@ -62,7 +62,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         if (typeNode.hasTypeName) {
           val name = typeNode.typeName.escapedText
           if (!typeNode.typeArguments.isUndefined)
-            TSApplicationType(name, getApplicationArguments(typeNode.typeArguments))
+            TSApplicationType(TSNamedType(name), getApplicationArguments(typeNode.typeArguments))
           else if (tv.contains(name)) tv(name)
           else TSNamedType(name)
         }
@@ -97,7 +97,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (obj.isUnionType) getStructuralType(obj.types, None, true)
       else if (obj.isIntersectionType) getStructuralType(obj.types, None, false)
       else if (obj.isArrayType) TSArrayType(getObjectType(args.head()))
-      else if (!args.isUndefined) TSApplicationType(obj.symbol.escapedName, getApplicationArguments(args))
+      else if (!args.isUndefined) TSApplicationType(TSNamedType(obj.symbol.escapedName), getApplicationArguments(args))
       else if (!obj.symbol.isUndefined) {
           val symDec = obj.symbol.valueDeclaration
           if (symDec.isUndefined || symDec.properties.isUndefined) TSTypeVariable(obj.symbol.escapedName, None)
@@ -141,11 +141,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     val pList = if (params.isUndefined) List() else getFunctionParametersType(params)(ntv)
     val res = node.getReturnTypeOfSignature()
 
-    // TODO: remove this spetial judgement
+    // TODO: remove this special judgement
     if (node.`type`.isUndefined || node.`type`.typeName.isUndefined || node.`type`.typeArguments.isUndefined)
       TSFunctionType(pList, getObjectType(res)(ntv), constraints)
     else
-      TSFunctionType(pList, TSApplicationType(node.`type`.typeName.escapedText,
+      TSFunctionType(pList, TSApplicationType(TSNamedType(node.`type`.typeName.escapedText),
         getApplicationArguments(node.`type`.typeArguments)(ntv)), constraints)
   }
 
@@ -210,7 +210,16 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   private def getInheritList(list: TSNodeArray)(implicit ns: TSNamespace): List[TSType] = {
     val tail = list.tail()
     if (tail.isUndefined) List()
-    else getInheritList(list) :+ ns.>(tail.typesToken.head().expression.escapedText)
+    else {
+      val parent = tail.types.head()
+      val name = parent.expression.escapedText
+      if (parent.typeArguments.isUndefined)
+        getInheritList(list) :+ ns.>(name)
+      else {
+        val app = getApplicationArguments(parent.typeArguments)(Map())
+        getInheritList(list) :+ TSApplicationType(ns.>(name), app)
+      }
+    }
   }
 
   private def getInheritList(node: TSNodeObject)(implicit ns: TSNamespace): List[TSType] = {
