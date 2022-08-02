@@ -17,12 +17,12 @@ class Intersection extends AnyFunSuite {
       case Function(p, r) => p match {
         case Inter(lhs, rhs) => {
           lhs match {
-            case v: TypeVar => assert(v.toString().equals("T"))
+            case TypeName(name) => assert(name.equals("T"))
             case _ => assert(false)
           }
 
           rhs match {
-            case v: TypeVar => assert(v.toString().equals("U"))
+            case TypeName(name) => assert(name.equals("U"))
             case _ => assert(false)
           }
         }
