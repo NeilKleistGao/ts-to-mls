@@ -2,7 +2,8 @@ package mlscript
 
 import mlscript.utils._, shorthands._
 
-// from https://github.com/hkust-taco/mlscript/blob/mlscript/shared/src/main/scala/mlscript/syntax.scala#L92
+// from https://github.com/hkust-taco/mlscript/blob/mlscript/shared/src/main/scala/mlscript/syntax.scala
+// only for the test
 // Types
 
 sealed abstract class Type

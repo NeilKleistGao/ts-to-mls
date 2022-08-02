@@ -23,9 +23,21 @@ object Converter {
     case TSUnionType(lhs, rhs) => Union(convert(lhs), convert(rhs))
     case TSIntersectionType(lhs, rhs) => Inter(convert(lhs), convert(rhs))
     case v: TSTypeVariable => convertTypeVariable(v)
+    case TSTupleType(lst) => convertTuple(lst)
     case _ => new TypeName("") // TODO: more types support
   }
 
   // TODO: only for intersection test
   private def convertTypeVariable(tstv: TSTypeVariable): Type = TypeName(tstv.toString())
+
+  private def convertTuple(types: List[TSType]): mlscript.Tuple =
+    mlscript.Tuple(types.map((t) => None -> convertField(t)))
+
+  private def convertField(tst: TSType): Field = {
+    val t = convert(tst)
+    t match {
+      case Function(lhs, rhs) => Field(Some(lhs), rhs)
+      case _ => Field(None, t) 
+    }
+  }
 }
