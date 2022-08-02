@@ -24,6 +24,7 @@ object Converter {
     case TSIntersectionType(lhs, rhs) => Inter(convert(lhs), convert(rhs))
     case v: TSTypeVariable => convertTypeVariable(v)
     case TSTupleType(lst) => convertTuple(lst)
+    case TSArrayType(elementType) => Function(TypeName("int"), convert(elementType))
     case _ => new TypeName("") // TODO: more types support
   }
 

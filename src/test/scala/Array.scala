@@ -9,4 +9,28 @@ class Array extends AnyFunSuite {
     assert(TypeCompare(program.>("getZero3"), "number[]"))
     assert(TypeCompare(program.>("first2"), "(((number) => number)[]) => (number) => number"))
   }
+
+  test("Array Convert") {
+    import mlscript._
+
+    val program = TSProgram(Seq("src/test/typescript/Array.ts"))
+
+    program.getMLSType("getZero3") match {
+      case Function(p, r) => r match {
+        case Function(index, t) => {
+          index match {
+            case TypeName(name) => assert(name.equals("int"))
+            case _ => assert(false)
+          }
+
+          t match {
+            case TypeName(name) => assert(name.equals("number"))
+            case _ => assert(false)
+          }
+        }
+        case _ => assert(false)
+      }
+      case _ => assert(false)
+    }
+  }
 }
