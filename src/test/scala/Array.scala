@@ -17,17 +17,7 @@ class Array extends AnyFunSuite {
 
     program.getMLSType("getZero3") match {
       case Function(p, r) => r match {
-        case Function(index, t) => {
-          index match {
-            case TypeName(name) => assert(name.equals("int"))
-            case _ => assert(false)
-          }
-
-          t match {
-            case TypeName(name) => assert(name.equals("number"))
-            case _ => assert(false)
-          }
-        }
+        case TypeName(name) => assert(name.equals("MutArray"))
         case _ => assert(false)
       }
       case _ => assert(false)
