@@ -41,6 +41,16 @@ function conv(x: {y: number}): [{y: number}, {z: string}] {
     return [x, {z: x.y.toString()}];
 }
 
+
+class A {
+    x: number
+}
+class B {}
+
+function swap(x: [A, B]): [B, A] {
+    return [x[1], x[0]];
+}
+
 class FFF<T> {
     constructor() {}
     fff(x: T) {}

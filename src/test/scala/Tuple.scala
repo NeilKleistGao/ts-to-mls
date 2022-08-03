@@ -15,6 +15,7 @@ class Tuple extends AnyFunSuite {
     assert(TypeCompare(program.>("ex"), "(T', U') => [T', U', T' & U']"))
     assert(TypeCompare(program.>("foo"), "([T' & U']) => void"))
     assert(TypeCompare(program.>("conv"), "({y: number}) => [{y: number}, {z: string}]"))
+    assert(TypeCompare(program.>("swap"), "([{x: number}, {}]) => [B, A]"))
     assert(TypeCompare(program.>("fff"), "(FFF<string>, string) => void"))
     assert(TypeCompare(program.>("getFFF"), "FFF<number>"))
   }
