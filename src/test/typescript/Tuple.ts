@@ -30,3 +30,7 @@ function s(flag: boolean): [string | number, number | boolean] {
 function ex<T, U>(x: T, y: U): [T, U, T & U] {
     return [x, y , <T & U>{}];
 }
+
+function conv(x: {y: number}): [{y: number}, {z: string}] {
+    return [x, {z: x.y.toString()}];
+}
