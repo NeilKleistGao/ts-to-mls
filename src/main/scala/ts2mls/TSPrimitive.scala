@@ -9,15 +9,14 @@ class TSAny(v: js.Dynamic) {
 }
 
 abstract class TSArray[T <: TSAny](arr: js.Dynamic) extends TSAny(arr) {
-  def head(): T = ???
-  def tail(): T = ???
+  def get(index: Int): T = ???
   def empty(): Boolean = length() == 0
   def length(): Int = arr.length.asInstanceOf[Int]
 }
 
 class TSNodeArray(arr: js.Dynamic) extends TSArray[TSNodeObject](arr) {
-  override def head(): TSNodeObject = TSNodeObject(arr.shift())
-  override def tail(): TSNodeObject = TSNodeObject(arr.pop())
+
+  override def get(index: Int) = TSNodeObject(arr.selectDynamic(index.toString))
 }
 
 object TSNodeArray {
@@ -25,8 +24,8 @@ object TSNodeArray {
 }
 
 class TSSymbolArray(arr: js.Dynamic) extends TSArray[TSSymbolObject](arr) {
-  override def head(): TSSymbolObject = TSSymbolObject(arr.shift())
-  override def tail(): TSSymbolObject = TSSymbolObject(arr.pop())
+
+  override def get(index: Int) = TSSymbolObject(arr.selectDynamic(index.toString))
 }
 
 object TSSymbolArray {
@@ -34,8 +33,8 @@ object TSSymbolArray {
 }
 
 class TSTokenArray(arr: js.Dynamic) extends TSArray[TSTokenObject](arr) {
-  override def head(): TSTokenObject = TSTokenObject(arr.shift())
-  override def tail(): TSTokenObject = TSTokenObject(arr.pop())
+
+  override def get(index: Int) = TSTokenObject(arr.selectDynamic(index.toString))
 }
 
 object TSTokenArray {
@@ -43,8 +42,8 @@ object TSTokenArray {
 }
 
 class TSTypeArray(arr: js.Dynamic) extends TSArray[TSTypeObject](arr) {
-  override def head(): TSTypeObject = TSTypeObject(arr.shift())
-  override def tail(): TSTypeObject = TSTypeObject(arr.pop())
+
+  override def get(index: Int) = TSTypeObject(arr.selectDynamic(index.toString))
 }
 
 object TSTypeArray {

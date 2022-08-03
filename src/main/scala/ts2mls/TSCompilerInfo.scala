@@ -116,7 +116,7 @@ class TSTokenObject(token: js.Dynamic) extends TSAny(token) {
   // sometimes the element may be a node actually.
   // thank you, MICROSOFT!
   def isActualNode() = token.constructor.name.toString.equals("NodeObject")
-  def getNode() = TSNodeObject(token)
+  val node = TSNodeObject(token)
 }
 
 object TSTokenObject {
