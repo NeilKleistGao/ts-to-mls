@@ -18,6 +18,10 @@ function twoFunctions(ff: [(x: number) => number, (x: number) => number], x: num
     return ff[0](x) + ff[1](x);
 }
 
+function tupleIt(x: string): [() => string] {
+    return [function() { return x }]
+}
+
 function s(flag: boolean): [string | number, number | boolean] {
     if (flag) {
         return ["abc", 12];
@@ -31,9 +35,12 @@ function ex<T, U>(x: T, y: U): [T, U, T & U] {
     return [x, y , <T & U>{}];
 }
 
+function foo<T, U>(x: [T & U]) {}
+
 function conv(x: {y: number}): [{y: number}, {z: string}] {
     return [x, {z: x.y.toString()}];
 }
+
 
 class A {
     x: number
@@ -42,4 +49,16 @@ class B {}
 
 function swap(x: [A, B]): [B, A] {
     return [x[1], x[0]];
+
+class FFF<T> {
+    constructor() {}
+    fff(x: T) {}
+}
+
+function fff(p: FFF<string>, s: string) {
+    p.fff(s);
+}
+
+function getFFF(): FFF<number> {
+    return new FFF<number>();
 }
