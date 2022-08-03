@@ -31,6 +31,11 @@ function s(flag: boolean): [string | number, number | boolean] {
     }
 }
 
+function s2(t: [boolean, string | number]): string | number {
+    if (t[0]) return t[1]
+    else return 0
+}
+
 function ex<T, U>(x: T, y: U): [T, U, T & U] {
     return [x, y , <T & U>{}];
 }
@@ -40,7 +45,6 @@ function foo<T, U>(x: [T & U]) {}
 function conv(x: {y: number}): [{y: number}, {z: string}] {
     return [x, {z: x.y.toString()}];
 }
-
 
 class A {
     x: number
