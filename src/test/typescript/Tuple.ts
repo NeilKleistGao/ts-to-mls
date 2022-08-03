@@ -49,6 +49,7 @@ class B {}
 
 function swap(x: [A, B]): [B, A] {
     return [x[1], x[0]];
+}
 
 class FFF<T> {
     constructor() {}

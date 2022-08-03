@@ -202,7 +202,6 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   private def getTupleElements(elements: TSTokenArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): List[TSType] = {
     val tail = elements.get(elements.length - index - 1)
     if (tail.isUndefined) List()
-    else if (tail.isActualNode) getTupleElements(elements, index + 1) :+ getObjectType(tail.node)
     else getTupleElements(elements, index + 1) :+ getObjectType(tail.getTypeFromTypeNode)
   }
 
