@@ -35,7 +35,9 @@ function conv(x: {y: number}): [{y: number}, {z: string}] {
     return [x, {z: x.y.toString()}];
 }
 
-class A {}
+class A {
+    x: number
+}
 class B {}
 
 function swap(x: [A, B]): [B, A] {

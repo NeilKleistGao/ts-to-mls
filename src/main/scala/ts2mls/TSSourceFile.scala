@@ -104,7 +104,8 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
             TSInterfaceType("", getInterfacePropertiesType(symDec.properties), List(), List())
           else if (!dec.isUndefined && !dec.members.isUndefined)
             TSInterfaceType("", getInterfacePropertiesType(dec.members), List(), List())
-          else TSTypeVariable(obj.symbol.escapedName, None)
+          else if (tv.contains(obj.symbol.escapedName)) tv(obj.symbol.escapedName)
+          else TSNamedType(obj.symbol.escapedName)
       }
       else {
         if (tv.contains(obj.intrinsicName)) tv(obj.intrinsicName)
