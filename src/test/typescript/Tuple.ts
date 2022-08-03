@@ -40,3 +40,16 @@ function foo<T, U>(x: [T & U]) {}
 function conv(x: {y: number}): [{y: number}, {z: string}] {
     return [x, {z: x.y.toString()}];
 }
+
+class FFF<T> {
+    constructor() {}
+    fff(x: T) {}
+}
+
+function fff(p: FFF<string>, s: string) {
+    p.fff(s);
+}
+
+function getFFF(): FFF<number> {
+    return new FFF<number>();
+}
