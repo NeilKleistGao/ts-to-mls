@@ -13,6 +13,7 @@ class Tuple extends AnyFunSuite {
     assert(TypeCompare(program.>("s"), "(boolean) => [string | number, number | false | true]"))
     assert(TypeCompare(program.>("ex"), "(T', U') => [T', U', T' & U']"))
     assert(TypeCompare(program.>("conv"), "({y: number}) => [{y: number}, {z: string}]"))
+    assert(TypeCompare(program.>("swap"), "([{}, {}]) => [B, A]"))
   }
 
   test("Tuple Convert") {

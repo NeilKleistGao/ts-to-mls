@@ -34,3 +34,10 @@ function ex<T, U>(x: T, y: U): [T, U, T & U] {
 function conv(x: {y: number}): [{y: number}, {z: string}] {
     return [x, {z: x.y.toString()}];
 }
+
+class A {}
+class B {}
+
+function swap(x: [A, B]): [B, A] {
+    return [x[1], x[0]];
+}
