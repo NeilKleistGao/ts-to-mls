@@ -13,8 +13,7 @@ class Tuple extends AnyFunSuite {
     assert(TypeCompare(program.>("s"), "(boolean) => [string | number, number | false | true]"))
     assert(TypeCompare(program.>("ex"), "(T', U') => [T', U', T' & U']"))
     assert(TypeCompare(program.>("conv"), "({y: number}) => [{y: number}, {z: string}]"))
-    System.out.println(s"rua: ${program.>("swap")}")
-    assert(TypeCompare(program.>("swap"), "([{x: number}, {}]) => [{}, {x: number}]"))
+    assert(TypeCompare(program.>("swap"), "([A, B]) => [B, A]"))
   }
 
   test("Tuple Convert") {

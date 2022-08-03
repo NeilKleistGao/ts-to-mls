@@ -72,8 +72,9 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         else if (typeNode.isUnionTypeNode) getUnionType(typeNode.typesToken, None)
         else if (typeNode.isIntersectionTypeNode) getIntersectionType(typeNode.types, None)
         else if (typeNode.isArrayTypeNode) TSArrayType(getObjectType(typeNode.elementType.getTypeFromTypeNode))
-        else if (!node.typeName.isUndefined) TSTypeVariable(node.typeName.escapedText, None)
-        else if (!typeNode.isUndefined && !typeNode.members.isUndefined)
+        else if (!node.typeName.isUndefined)
+          tv.getOrElse(node.typeName.escapedText, TSNamedType(node.typeName.escapedText))
+        else if (!typeNode.isUndefined && !typeNode.members.isUndefined && typeNode.members.length > 0)
           TSInterfaceType("", getInterfacePropertiesType(typeNode.members), List(), List())
         else {
           val name = node.symbol.getType()
@@ -100,12 +101,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (!args.isUndefined) TSApplicationType(TSNamedType(obj.symbol.escapedName), getApplicationArguments(args))
       else if (!obj.symbol.isUndefined) {
           val symDec = obj.symbol.valueDeclaration
-          if (!symDec.isUndefined && !symDec.properties.isUndefined)
+          if (!symDec.isUndefined && !symDec.properties.isUndefined && symDec.properties.length > 0)
             TSInterfaceType("", getInterfacePropertiesType(symDec.properties), List(), List())
-          else if (!dec.isUndefined && !dec.members.isUndefined)
+          else if (!dec.isUndefined && !dec.members.isUndefined && dec.members.length > 0)
             TSInterfaceType("", getInterfacePropertiesType(dec.members), List(), List())
-          else if (tv.contains(obj.symbol.escapedName)) tv(obj.symbol.escapedName)
-          else TSNamedType(obj.symbol.escapedName)
+          else tv.getOrElse(obj.symbol.escapedName, TSNamedType(obj.symbol.escapedName)) 
       }
       else {
         if (tv.contains(obj.intrinsicName)) tv(obj.intrinsicName)
@@ -202,6 +202,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
   private def getTupleElements(elements: TSTokenArray)(implicit tv: Map[String, TSTypeVariable]): List[TSType] = {
     val tail = elements.tail()
     if (tail.isUndefined) List()
+    else if (tail.isActualNode) getTupleElements(elements) :+ getObjectType(tail.getNode)
     else getTupleElements(elements) :+ getObjectType(tail.getTypeFromTypeNode)
   }
 
