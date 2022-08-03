@@ -12,6 +12,7 @@ class Tuple extends AnyFunSuite {
     assert(TypeCompare(program.>("twoFunctions"), "([(number) => number, (number) => number], number) => number"))
     assert(TypeCompare(program.>("tupleIt"), "(string) => [string]"))
     assert(TypeCompare(program.>("s"), "(boolean) => [string | number, number | false | true]"))
+    assert(TypeCompare(program.>("s2"), "([boolean, string | number]) => string | number"))
     assert(TypeCompare(program.>("ex"), "(T', U') => [T', U', T' & U']"))
     assert(TypeCompare(program.>("foo"), "([T' & U']) => void"))
     assert(TypeCompare(program.>("conv"), "({y: number}) => [{y: number}, {z: string}]"))
