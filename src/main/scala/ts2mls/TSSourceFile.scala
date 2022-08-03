@@ -100,8 +100,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (!args.isUndefined) TSApplicationType(TSNamedType(obj.symbol.escapedName), getApplicationArguments(args))
       else if (!obj.symbol.isUndefined) {
           val symDec = obj.symbol.valueDeclaration
-          if (symDec.isUndefined || symDec.properties.isUndefined) TSTypeVariable(obj.symbol.escapedName, None)
-          else TSInterfaceType("", getInterfacePropertiesType(symDec.properties), List(), List())
+          if (!symDec.isUndefined && !symDec.properties.isUndefined)
+            TSInterfaceType("", getInterfacePropertiesType(symDec.properties), List(), List())
+          else if (!dec.isUndefined && !dec.members.isUndefined)
+            TSInterfaceType("", getInterfacePropertiesType(dec.members), List(), List())
+          else TSTypeVariable(obj.symbol.escapedName, None)
       }
       else {
         if (tv.contains(obj.intrinsicName)) tv(obj.intrinsicName)
