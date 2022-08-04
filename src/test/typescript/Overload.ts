@@ -50,4 +50,11 @@ function id(x: N): N;
 
 function id(x) { return x; }
 
-id({foo: function(x: boolean): void {}})
+id({foo: function(x: boolean): void {}}) // it works
+
+function tst(x: {z: number}): {y: string};
+function tst(x: {z: boolean}): {y: string};
+
+function tst(x) {
+  return {y: x.z.toString()}
+}
