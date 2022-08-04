@@ -33,7 +33,8 @@ object Converter {
     case TSIntersectionType(lhs, rhs) => Inter(convert(lhs), convert(rhs))
     case v: TSTypeVariable => convertTypeVariable(v)
     case TSTupleType(lst) => convertTuple(lst)
-    case TSArrayType(elementType) => TypeName("MutArray")
+    case TSArrayType(_) => TypeName("MutArray")
+    case TSEnumType(_) => TypeName("int")
     case _ => throw new java.lang.Exception("Unknown TypeScript Type") // TODO: more types support
   }
 
