@@ -19,3 +19,10 @@ function create(x: boolean): () => boolean;
 function create(x) {
   return function() { return x; }
 }
+
+function g0(x: string[]): string;
+function g0(x: object[]): object;
+
+function g0(x) {
+  return x[0];
+}
