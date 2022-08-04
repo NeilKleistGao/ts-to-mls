@@ -49,3 +49,5 @@ function create(): object {
 function pa(x: ((number))): number {
     return x + 42;
 }
+
+function wtf(x: unknown) {}

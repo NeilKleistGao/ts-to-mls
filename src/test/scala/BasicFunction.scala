@@ -18,6 +18,7 @@ class BasicFunction extends AnyFunSuite {
     assert(TypeCompare(program.>("fail"), "never"))
     assert(TypeCompare(program.>("create"), "object"))
     assert(TypeCompare(program.>("pa"), "(number) => number"))
+    assert(TypeCompare(program.>("wtf"), "(unknown) => void"))
   }
 
   test("Basic Convert") {
@@ -66,6 +67,14 @@ class BasicFunction extends AnyFunSuite {
           case Top => assert(true)
           case _ => assert(false)
         }
+      }
+      case _ => assert(false)
+    }
+
+    program.getMLSType("wtf") match {
+      case Function(p, r) => p match {
+        case Top => assert(true)
+        case _ => assert(false)
       }
       case _ => assert(false)
     }
