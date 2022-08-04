@@ -239,6 +239,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
             other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
           case old: TSIntersectionType if (tail.body.isUndefined) =>
             other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
+          case _ => other
         }
       }
       else getClassMembersType(list, index + 1)
