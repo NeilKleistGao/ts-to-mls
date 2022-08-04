@@ -64,7 +64,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
           if (!typeNode.typeArguments.isUndefined)
             TSApplicationType(TSNamedType(name), getApplicationArguments(typeNode.typeArguments, 0))
           else if (tv.contains(name)) tv(name)
-          else TSNamedType(name)
+          else TSEnumType(name)
         }
         else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
         else if (node.isFunctionLike) getFunctionType(node)
@@ -92,7 +92,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     case obj: TSTypeObject => {
       val dec = obj.declaration
       val args = obj.resolvedTypeArguments
-      if (obj.isEnumType) TSNamedType(obj.aliasSymbol.escapedName)
+      if (obj.isEnumType) TSEnumType(obj.aliasSymbol.escapedName)
       else if (dec.isFunctionLike) getFunctionType(dec)
       else if (obj.isTupleType) TSTupleType(getTupleElements(args, 0))
       else if (obj.isUnionType) getStructuralType(obj.types, None, true, 0)

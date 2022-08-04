@@ -25,6 +25,12 @@ case class TSNamedType(typeName: String) extends TSType {
   override def toString(): String = typeName
 }
 
+case class TSEnumType(name: String) extends TSType {
+  override val priority = 0
+
+  override def toString(): String = name
+}
+
 case class TSTupleType(types: List[TSType]) extends TSType {
   override val priority = 0
   override def toString(): String = {
