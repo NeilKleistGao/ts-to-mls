@@ -18,6 +18,11 @@ class Overload extends AnyFunSuite {
 
     assert(TypeCompare(program.>("tst"), "({z: number}) => {y: string} & (({z: boolean}) => {y: string})"))
     assert(TypeCompare(program.>("op"), "(number, number | undefined) => void & ((number, boolean | undefined) => void)"))
+    assert(TypeCompare(program.>("swap"), "([number, string]) => [string, number] & (([string, number]) => [number, string])"))
+    assert(TypeCompare(program.>("u"), "(number | boolean) => string & ((object) => string | object)"))
+    assert(TypeCompare(program.>("doSome"), "(T' & U') => T' & U' & ((string) => never)"))
+
+    assert(TypeCompare(program.>("bar"), "(G<string>) => G<string> & ((G<number>) => G<number>) & ((G<boolean>) => G<boolean>)"))
   }
 }
 

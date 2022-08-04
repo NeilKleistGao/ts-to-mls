@@ -63,3 +63,39 @@ function op(x: number, y?: number): void;
 function op(x: number, y?: boolean): void;
 
 function op(x, y) {}
+
+function swap(x: [number, string]): [string, number];
+function swap(x: [string, number]): [number, string];
+
+function swap(x) {
+  return [x[1], x[0]];
+}
+
+function u(x: number | boolean): string;
+function u(x: object): string | object;
+
+function u(x) {
+  return x.toString();
+}
+
+function doSome<T, U>(x: T & U): T & U;
+function doSome<T, U>(x: string): never;
+
+function doSome<T, U>(x) {
+  if (typeof x == "string") {
+    while (true);
+  }
+  else {
+    return x;
+  }
+}
+
+class G<T> {}
+
+function bar(x: G<string>): G<string>;
+function bar(x: G<number>): G<number>;
+function bar(x: G<boolean>): G<boolean>;
+
+function bar(x) {
+  return x;
+}
