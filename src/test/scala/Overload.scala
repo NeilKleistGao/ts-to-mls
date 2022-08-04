@@ -13,6 +13,8 @@ class Overload extends AnyFunSuite {
     assert(TypeCompare(program.>("create"), "(number) => number & ((boolean) => boolean)"))
     assert(TypeCompare(program.>("g0"), "(string[]) => string & ((object[]) => object)"))
     assert(TypeCompare(program.>("db"), "(number) => number[] & ((object) => object[])"))
+
+    assert(TypeCompare(program.>("id"), "(M) => {foo: (any) => any} & ((N) => {})"))
   }
 }
 

@@ -42,3 +42,12 @@ function db(x: object): object[];
 function db(x) {
   return [x, x];
 }
+
+class N {}
+
+function id(x: M): M;
+function id(x: N): N;
+
+function id(x) { return x; }
+
+id({foo: function(x: boolean): void {}})
