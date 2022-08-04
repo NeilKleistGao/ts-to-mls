@@ -8,6 +8,7 @@ object Converter {
     "number" -> TypeName("number"),
     "string" -> TypeName("string"),
     "any" -> Top,
+    "unknown" -> Top,
     "void" -> TypeName("unit"),
     "null" -> TypeName("null"),
     "undefined" -> TypeName("undefined"),
