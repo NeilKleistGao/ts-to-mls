@@ -26,3 +26,10 @@ function g0(x: object[]): object;
 function g0(x) {
   return x[0];
 }
+
+function db(x: number): number[];
+function db(x: object): object[];
+
+function db(x) {
+  return [x, x];
+}
