@@ -58,3 +58,8 @@ function tst(x: {z: boolean}): {y: string};
 function tst(x) {
   return {y: x.z.toString()}
 }
+
+function op(x: number, y?: number): void;
+function op(x: number, y?: boolean): void;
+
+function op(x, y) {}
