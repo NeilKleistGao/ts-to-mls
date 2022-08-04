@@ -6,6 +6,15 @@ function f(x) {
   else return "->" + x;
 }
 
+class M {
+  foo(x: number): number;
+  foo(x: string): string;
+
+  foo(x) {
+    return x;
+  }
+}
+
 function app(f: (x: number) => void, x: number): void;
 function app(f: (x: string) => void, x: string): void;
 
