@@ -12,3 +12,10 @@ function app(f: (x: string) => void, x: string): void;
 function app(f, x): void {
   f(x)
 }
+
+function create(x: number): () => number;
+function create(x: boolean): () => boolean;
+
+function create(x) {
+  return function() { return x; }
+}

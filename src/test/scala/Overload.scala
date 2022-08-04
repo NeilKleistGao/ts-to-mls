@@ -7,6 +7,7 @@ class Overload extends AnyFunSuite {
     val program = TSProgram(Seq("src/test/typescript/Overload.ts"))
     assert(TypeCompare(program.>("f"), "(number) => number & ((string) => string)"))
     assert(TypeCompare(program.>("app"), "((number) => void, number) => void & (((string) => void, string) => void)"))
+    assert(TypeCompare(program.>("create"), "(number) => number & ((boolean) => boolean)"))
   }
 }
 
