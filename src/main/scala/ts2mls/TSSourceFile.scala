@@ -225,7 +225,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     else getInheritList(node.heritageClauses, 0)
   }
 
-  private def getClassMembersType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSType] = {
+  private def getClassMembersType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSMemberType] = {
     val tail = list.get(list.length - index - 1)
     if (tail.isUndefined) Map()
     else {
@@ -235,16 +235,16 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         val mem = getObjectType(tail)
         mem match {
           case func: TSFunctionType => {
-            if (!other.contains(name)) other ++ Map(name -> func)
-            else other(name) match {
+            if (!other.contains(name)) other ++ Map(name -> TSMemberType(func))
+            else other(name).base match {
               case old: TSFunctionType if (tail.body.isUndefined) =>
-                other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
+                other.removed(name) ++ Map(name -> TSMemberType(TSIntersectionType(old, func)))
               case old: TSIntersectionType if (tail.body.isUndefined) =>
-                other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
+                other.removed(name) ++ Map(name -> TSMemberType(TSIntersectionType(old, func)))
               case _ => other
             }
           }
-          case _ => other ++ Map(name -> mem)
+          case _ => other ++ Map(name -> TSMemberType(mem))
         }
         
       }
@@ -252,12 +252,12 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     }
   }
 
-  private def getInterfacePropertiesType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSType] = {
+  private def getInterfacePropertiesType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSMemberType] = {
     val tail = list.get(list.length - index - 1)
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      getInterfacePropertiesType(list, index + 1) ++ Map(name -> getObjectType(tail))
+      getInterfacePropertiesType(list, index + 1) ++ Map(name -> TSMemberType(getObjectType(tail)))
     }
   }
 

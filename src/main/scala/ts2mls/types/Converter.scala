@@ -32,6 +32,7 @@ object Converter {
     case TSTupleType(lst) => convertTuple(lst)
     case TSArrayType(_) => TypeName("MutArray")
     case TSEnumType(_) => TypeName("int")
+    case TSMemberType(base, modifier) => convert(base)
     case TSInterfaceType(_, members, typeVars, parents) => {
       val int = convertRecord(members)
       val cons = convertConstrianedList(typeVars)
