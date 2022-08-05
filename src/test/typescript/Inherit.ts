@@ -1,20 +1,20 @@
 class A {
-    constructor() {}
+  constructor() {}
 
-    foo() {
-        console.log("foo")
-    }
+  foo() {
+      console.log("foo")
+  }
 }
 
 class B extends A {}
 
 class C<T> {
-    constructor() {}
+  constructor() {}
 
-    private t: T
+  private t: T
 
-    set(x: T) { this.t = x; }
-    get() { return this.t; } 
+  set(x: T) { this.t = x; }
+  get() { return this.t; } 
 }
 
 class D extends C<number> {
