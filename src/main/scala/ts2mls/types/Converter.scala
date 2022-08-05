@@ -33,16 +33,8 @@ object Converter {
     case TSArrayType(_) => TypeName("MutArray")
     case TSEnumType(_) => TypeName("int")
     case TSMemberType(base, modifier) => convert(base)
-    case TSInterfaceType(_, members, typeVars, parents) => {
-      val int = convertRecord(members)
-      val cons = convertConstrianedList(typeVars)
-      val typedInt = if (cons.isEmpty) int else Constrained(int, cons)
-      
-      parents.foldLeft(typedInt)((t, p) => convert(p) match {
-        case r: Record => WithExtension(t, r)
-        case _ => t
-      })
-    }
+    case TSInterfaceType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
+    case TSClassType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
     case _ => throw new java.lang.Exception("Unknown TypeScript Type") // TODO: more types support
   }
 
@@ -69,8 +61,20 @@ object Converter {
     }
   }
 
-  private def convertRecord(members: Map[String, TSType]) =
-    Record(members.toList.foldLeft(List[(Var, Field)]())((list, m) => {
-      list :+ (Var(m._1), convertField(m._2))
+  private def convertRecord(members: Map[String, TSMemberType]): Record =
+    Record(members.toList.foldLeft(List[(Var, Field)]())((list, m) => m._2.modifier match {
+      case Public => list :+ (Var(m._1), convertField(m._2))
+      case _ => list
     }))
+
+  private def convertRecord(members: Map[String, TSMemberType], typeVars: List[TSTypeVariable], parents: List[TSType]): Type = {
+    val rec: Record = convertRecord(members)
+    val cons = convertConstrianedList(typeVars)
+    val typedInt = if (cons.isEmpty) rec else Constrained(rec, cons)
+    
+    parents.foldLeft(typedInt)((t, p) => convert(p) match {
+      case r: Record => WithExtension(t, r)
+      case _ => t
+    })
+  }
 }

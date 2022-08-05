@@ -28,4 +28,22 @@ class ClassMember extends AnyFunSuite {
     assert(TypeCompare(program.>("D").>("set"), "(number) => void"))
     assert(TypeCompare(program.>("D").>("get"), "number"))
   }
+
+  test("Class Convert") {
+    import mlscript._
+
+    val program = TSProgram(Seq("src/test/typescript/ClassMember.ts"))
+
+    program.getMLSType("EZ") match {
+      case Record(members) => {
+        assert(members.length == 1)
+
+        members(0)._1 match {
+          case Var(name) => assert(name.equals("inc"))
+          case _ => assert(false)
+        }
+      }
+      case _ => assert(false)
+    }
+  }
 }
