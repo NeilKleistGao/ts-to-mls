@@ -39,3 +39,7 @@ interface Simple {
   a: number
   b: (x: boolean) => string
 }
+
+interface Simple2<T extends number> {
+  abc: T
+}

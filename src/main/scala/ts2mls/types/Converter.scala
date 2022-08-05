@@ -22,11 +22,7 @@ object Converter {
       val func = 
         if (params.length == 0) Function(primitiveName("void"), convert(res))
         else params.foldRight[Type](convert(res))((tst, mlst) => Function(convert(tst), mlst))
-      val consList = constraint.foldLeft(List[(TypeVar, Bounds)]())((lst, v) => convertConstrained(v) match {
-        case Some(bd) => lst :+ (TypeVar(Right(v.name), None) -> bd)
-        case _ => lst
-      })
-
+      val consList = convertConstrianedList(constraint)
       if (consList.length == 0) func
       else Constrained(func, consList)
     }
@@ -38,7 +34,9 @@ object Converter {
     case TSEnumType(_) => TypeName("int")
     case TSInterfaceType(_, members, typeVars, parents) => {
       val int = convertRecord(members)
-      int
+      val cons = convertConstrianedList(typeVars)
+      val typedInt = if (cons.isEmpty) int else Constrained(int, cons)
+      typedInt
     }
     case _ => throw new java.lang.Exception("Unknown TypeScript Type") // TODO: more types support
   }
@@ -48,6 +46,12 @@ object Converter {
     case Some(v) => Some(Bounds(Bot, convert(v)))
     case _ => None
   }
+
+  private def convertConstrianedList(typeVars: List[TSTypeVariable]) =
+    typeVars.foldLeft(List[(TypeVar, Bounds)]())((lst, v) => convertConstrained(v) match {
+        case Some(bd) => lst :+ (TypeVar(Right(v.name), None) -> bd)
+        case _ => lst
+      })
 
   private def convertTuple(types: List[TSType]): mlscript.Tuple =
     mlscript.Tuple(types.map((t) => None -> convertField(t)))

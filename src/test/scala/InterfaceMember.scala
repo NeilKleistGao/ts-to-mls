@@ -71,5 +71,21 @@ class InterfaceMember extends AnyFunSuite {
       } 
       case _ => assert(false)
     }
+
+    program.getMLSType("Simple2") match {
+      case Constrained(base, where) => {
+        base match {
+          case Record(members) => members(0)._2 match {
+            case Field(in, out) => out match {
+              case TypeName(name) => assert(name.equals("T"))
+              case _ => assert(false)
+            }
+            case _ => assert(false)
+          }
+          case _ => assert(false)
+        }
+      }
+      case _ => assert(false)
+    }
   }
 }
