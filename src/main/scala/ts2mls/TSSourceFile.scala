@@ -225,33 +225,46 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     else getInheritList(node.heritageClauses, 0)
   }
 
-  private def getClassMembersType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSType] = {
+  private def getClassMembersType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSMemberType] = {
     val tail = list.get(list.length - index - 1)
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      if (tail.isMethodDeclaration && !name.equals("__constructor")) {
+      if (!name.equals("__constructor")) {
         val other = getClassMembersType(list, index + 1)
-        val func = getFunctionType(tail)
-        if (!other.contains(name)) other ++ Map(name -> func)
-        else other(name) match {
-          case old: TSFunctionType if (tail.body.isUndefined) =>
-            other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
-          case old: TSIntersectionType if (tail.body.isUndefined) =>
-            other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
-          case _ => other
+        val mem = getObjectType(tail)
+
+        val modifier = if (tail.modifiers.isUndefined) Public
+          else tail.modifiers.foldLeft[TSAccessModifier](Public)((m, t) =>
+            if (t.isPrivate) Private
+            else if (t.isProtected) Protected
+            else m
+          )
+
+        mem match {
+          case func: TSFunctionType => {
+            if (!other.contains(name)) other ++ Map(name -> TSMemberType(func, modifier))
+            else other(name).base match {
+              case old: TSFunctionType if (tail.body.isUndefined) =>
+                other.removed(name) ++ Map(name -> TSMemberType(TSIntersectionType(old, func), modifier))
+              case old: TSIntersectionType if (tail.body.isUndefined) =>
+                other.removed(name) ++ Map(name -> TSMemberType(TSIntersectionType(old, func), modifier))
+              case _ => other
+            }
+          }
+          case _ => other ++ Map(name -> TSMemberType(mem, modifier))
         }
       }
       else getClassMembersType(list, index + 1)
     }
   }
 
-  private def getInterfacePropertiesType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSType] = {
+  private def getInterfacePropertiesType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSMemberType] = {
     val tail = list.get(list.length - index - 1)
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      getInterfacePropertiesType(list, index + 1) ++ Map(name -> getObjectType(tail))
+      getInterfacePropertiesType(list, index + 1) ++ Map(name -> TSMemberType(getObjectType(tail)))
     }
   }
 
