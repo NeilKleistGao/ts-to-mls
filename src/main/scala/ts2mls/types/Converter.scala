@@ -36,6 +36,10 @@ object Converter {
     case TSTupleType(lst) => convertTuple(lst)
     case TSArrayType(_) => TypeName("MutArray")
     case TSEnumType(_) => TypeName("int")
+    case TSInterfaceType(_, members, typeVars, parents) => {
+      val int = convertRecord(members)
+      int
+    }
     case _ => throw new java.lang.Exception("Unknown TypeScript Type") // TODO: more types support
   }
 
@@ -55,4 +59,9 @@ object Converter {
       case _ => Field(None, t) 
     }
   }
+
+  private def convertRecord(members: Map[String, TSType]) =
+    Record(members.toList.foldLeft(List[(Var, Field)]())((list, m) => {
+      list :+ (Var(m._1), convertField(m._2))
+    }))
 }

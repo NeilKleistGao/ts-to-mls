@@ -25,4 +25,51 @@ class InterfaceMember extends AnyFunSuite {
     assert(TypeCompare(program.>("Counter").>("interval"), "number"))
     assert(TypeCompare(program.>("Counter").>("reset"), "void"))
   }
+
+  test("Interface Convert") {
+    import mlscript._
+
+    val program = TSProgram(Seq("src/test/typescript/InterfaceMember.ts"))
+
+    program.getMLSType("Simple") match {
+      case Record(fields) => {
+        fields(0)._1 match {
+          case Var(name) => assert(name.equals("a"))
+          case _ => assert(false)
+        }
+
+        fields(0)._2 match {
+          case Field(in, out) => out match {
+            case TypeName(name) => assert(name.equals("number"))
+            case _ => assert(false)
+          } 
+          case _ => assert(false)
+        }
+
+        fields(1)._1 match {
+          case Var(name) => assert(name.equals("b"))
+          case _ => assert(false)
+        }
+
+        fields(1)._2 match {
+          case Field(in, out) => {
+            in match {
+              case Some(p) => p match {
+                case TypeName(name) => assert(name.equals("bool"))
+                case _ => assert(false)
+              }
+              case _ => assert(false)
+            }
+
+            out match {
+              case TypeName(name) => assert(name.equals("string"))
+              case _ => assert(false)
+            } 
+          }
+          case _ => assert(false)
+        }
+      } 
+      case _ => assert(false)
+    }
+  }
 }

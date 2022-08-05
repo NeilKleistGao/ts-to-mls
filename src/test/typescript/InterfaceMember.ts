@@ -34,3 +34,8 @@ interface Counter {
   interval: number;
   reset(): void;
 }
+
+interface Simple {
+  a: number
+  b: (x: boolean) => string
+}
