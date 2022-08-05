@@ -36,7 +36,11 @@ object Converter {
       val int = convertRecord(members)
       val cons = convertConstrianedList(typeVars)
       val typedInt = if (cons.isEmpty) int else Constrained(int, cons)
-      typedInt
+      
+      parents.foldLeft(typedInt)((t, p) => convert(p) match {
+        case r: Record => WithExtension(t, r)
+        case _ => t
+      })
     }
     case _ => throw new java.lang.Exception("Unknown TypeScript Type") // TODO: more types support
   }

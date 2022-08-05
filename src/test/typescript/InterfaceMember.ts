@@ -43,3 +43,5 @@ interface Simple {
 interface Simple2<T extends number> {
   abc: T
 }
+
+interface Next extends Simple {}

@@ -87,5 +87,23 @@ class InterfaceMember extends AnyFunSuite {
       }
       case _ => assert(false)
     }
+
+    program.getMLSType("Next") match {
+      case WithExtension(base, record) => {
+        base match {
+          case r: Record => assert(true)
+          case _ => assert(false)
+        }
+
+        record match {
+          case Record(m) => m(0)._1 match {
+            case Var(name) => assert(name.equals("a"))
+            case _ => assert(false)
+          }
+          case _ => assert(false)
+        }
+      }
+      case _ => assert(false)
+    }
   }
 }
