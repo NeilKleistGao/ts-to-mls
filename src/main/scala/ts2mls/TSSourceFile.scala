@@ -230,17 +230,23 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      if (tail.isMethodDeclaration && !name.equals("__constructor")) {
+      if (!name.equals("__constructor")) {
         val other = getClassMembersType(list, index + 1)
-        val func = getFunctionType(tail)
-        if (!other.contains(name)) other ++ Map(name -> func)
-        else other(name) match {
-          case old: TSFunctionType if (tail.body.isUndefined) =>
-            other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
-          case old: TSIntersectionType if (tail.body.isUndefined) =>
-            other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
-          case _ => other
+        val mem = getObjectType(tail)
+        mem match {
+          case func: TSFunctionType => {
+            if (!other.contains(name)) other ++ Map(name -> func)
+            else other(name) match {
+              case old: TSFunctionType if (tail.body.isUndefined) =>
+                other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
+              case old: TSIntersectionType if (tail.body.isUndefined) =>
+                other.removed(name) ++ Map(name -> TSIntersectionType(old, func))
+              case _ => other
+            }
+          }
+          case _ => other ++ Map(name -> mem)
         }
+        
       }
       else getClassMembersType(list, index + 1)
     }
