@@ -233,20 +233,27 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       if (!name.equals("__constructor")) {
         val other = getClassMembersType(list, index + 1)
         val mem = getObjectType(tail)
+
+        val modifier = if (tail.modifiers.isUndefined) Public
+          else tail.modifiers.foldLeft[TSAccessModifier](Public)((m, t) =>
+            if (t.isPrivate) Private
+            else if (t.isProtected) Protected
+            else m
+          )
+
         mem match {
           case func: TSFunctionType => {
-            if (!other.contains(name)) other ++ Map(name -> TSMemberType(func))
+            if (!other.contains(name)) other ++ Map(name -> TSMemberType(func, modifier))
             else other(name).base match {
               case old: TSFunctionType if (tail.body.isUndefined) =>
-                other.removed(name) ++ Map(name -> TSMemberType(TSIntersectionType(old, func)))
+                other.removed(name) ++ Map(name -> TSMemberType(TSIntersectionType(old, func), modifier))
               case old: TSIntersectionType if (tail.body.isUndefined) =>
-                other.removed(name) ++ Map(name -> TSMemberType(TSIntersectionType(old, func)))
+                other.removed(name) ++ Map(name -> TSMemberType(TSIntersectionType(old, func), modifier))
               case _ => other
             }
           }
-          case _ => other ++ Map(name -> TSMemberType(mem))
+          case _ => other ++ Map(name -> TSMemberType(mem, modifier))
         }
-        
       }
       else getClassMembersType(list, index + 1)
     }

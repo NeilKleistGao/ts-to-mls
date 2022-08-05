@@ -12,6 +12,11 @@ abstract class TSArray[T <: TSAny](arr: js.Dynamic) extends TSAny(arr) {
   def get(index: Int): T = ???
   def empty(): Boolean = length() == 0
   def length(): Int = arr.length.asInstanceOf[Int]
+
+  def foldLeft[U](init: U, index: Int = 0)(implicit f: (U, T) => U): U = {
+    if (index < length) foldLeft(f(init, get(index)), index + 1)
+    else init
+  }
 }
 
 class TSNodeArray(arr: js.Dynamic) extends TSArray[TSNodeObject](arr) {
