@@ -44,5 +44,23 @@ class TypeVariable extends AnyFunSuite {
       }
       case _ => assert(false)
     }
+
+    program.getMLSType("getStringPrinter") match {
+      case Function(p, r) => r match {
+        case AppliedType(base, applied) => {
+          base match {
+            case TypeName(name) => assert(name.equals("Printer"))
+          }
+
+          assert(applied.length == 1)
+          applied(0) match {
+            case TypeName(name) => assert(name.equals("string"))
+            case _ => assert(false)
+          }
+        }
+        case _ => assert(false)
+      } 
+      case _ => assert(false)
+    }
   }
 }

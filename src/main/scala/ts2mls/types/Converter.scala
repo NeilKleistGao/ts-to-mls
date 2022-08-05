@@ -35,7 +35,11 @@ object Converter {
     case TSMemberType(base, modifier) => convert(base)
     case TSInterfaceType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
     case TSClassType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
-    case _ => throw new java.lang.Exception("Unknown TypeScript Type") // TODO: more types support
+    case TSApplicationType(base, applied) => base match {
+      case TSNamedType(name) => AppliedType(TypeName(name), applied.map((ts) => convert(ts)))
+      case _ => throw new java.lang.Exception(s"Wrong Base Type in TSApplicationType: $base") // TODO: can we find the name?
+    }
+    case _ => throw new java.lang.Exception("Unknown TypeScript Type")
   }
 
   private def convertTypeVariable(tstv: TSTypeVariable) = TypeName(tstv.name)
