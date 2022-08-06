@@ -107,8 +107,16 @@ case class TSArrayType(eleType: TSType) extends TSType {
 abstract class TSStructuralType(lhs: TSType, rhs: TSType, notion: String) extends TSType {
   override val priority = 2
 
-  override def toString(): String =
-    s"$lhs $notion ${if (rhs.priority <= priority && rhs.priority > 0) s"($rhs)" else s"$rhs"}"
+  override def toString(): String = {
+    val slhs = lhs match {
+      case f: TSFunctionType => s"($f)"
+      case _ => lhs.toString()
+    }
+
+    val srhs = if (rhs.priority <= priority && rhs.priority > 0) s"($rhs)" else s"$rhs"
+
+    s"$slhs $notion $srhs"
+  }
 }
 
 case class TSUnionType(lhs: TSType, rhs: TSType) extends TSStructuralType(lhs, rhs, "|")
