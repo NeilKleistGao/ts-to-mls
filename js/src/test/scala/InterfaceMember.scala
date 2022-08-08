@@ -4,7 +4,7 @@ import ts2mls.types._
 
 class InterfaceMember extends AnyFunSuite {
   test("Interface Member") {
-    val program = TSProgram(Seq("src/test/typescript/InterfaceMember.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/InterfaceMember.ts"))
     assert(TypeCompare(program.>("IFoo"), "interface IFoo {\n\ta: string\n\tb: (number) => number\n\tc: boolean\n\td: (string) => void\n}"))
     assert(TypeCompare(program.>("IFoo").>("a"), "string"))
     assert(TypeCompare(program.>("IFoo").>("b"), "(number) => number"))
@@ -29,7 +29,7 @@ class InterfaceMember extends AnyFunSuite {
   test("Interface Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("src/test/typescript/InterfaceMember.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/InterfaceMember.ts"))
 
     program.getMLSType("Simple") match {
       case Record(fields) => {

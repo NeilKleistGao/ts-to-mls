@@ -4,7 +4,7 @@ import ts2mls.types._
 
 class ClassMember extends AnyFunSuite {
   test("Class Member") {
-    val program = TSProgram(Seq("src/test/typescript/ClassMember.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/ClassMember.ts"))
     val cls: TSType = program.>("Student")
     assert(TypeCompare(cls.>("getID"), "number"))
     assert(TypeCompare(cls.>("addScore"), "(string, number) => void"))
@@ -17,7 +17,7 @@ class ClassMember extends AnyFunSuite {
   }
 
   test("Inherit") {
-    val program = TSProgram(Seq("src/test/typescript/Inherit.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/Inherit.ts"))
     val cls: TSType = program.>("B")
     assert(TypeCompare(cls.>("foo"), "void"))
 
@@ -32,7 +32,7 @@ class ClassMember extends AnyFunSuite {
   test("Class Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("src/test/typescript/ClassMember.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/ClassMember.ts"))
 
     program.getMLSType("EZ") match {
       case Record(members) => {
@@ -48,7 +48,7 @@ class ClassMember extends AnyFunSuite {
   }
 
   test("Static Members") {
-    val program = TSProgram(Seq("src/test/typescript/ClassMember.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/ClassMember.ts"))
 
     program.>("Outer") match {
       case cls: TSClassType => {
