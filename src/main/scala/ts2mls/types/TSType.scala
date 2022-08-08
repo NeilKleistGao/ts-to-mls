@@ -60,7 +60,7 @@ case class TSFunctionType(params: List[TSType], res: TSType, typeVars: List[TSTy
   }
 }
 
-case class TSClassType(name: String, members: Map[String, TSMemberType], typeVars: List[TSTypeVariable], parents: List[TSType])
+case class TSClassType(name: String, members: Map[String, TSMemberType], statics: Map[String, TSMemberType], typeVars: List[TSTypeVariable], parents: List[TSType])
   extends TSFieldType(members, parents) {
   override val priority = 0
 
@@ -74,6 +74,9 @@ case class TSClassType(name: String, members: Map[String, TSMemberType], typeVar
     if (cons.isEmpty()) body
     else s"$body where ${cons.substring(0, cons.length() - 2)}"
   }
+
+  def >>(name: String): TSMemberType =
+    statics.getOrElse(name, throw new java.lang.Exception(s"static $name not found."))
 }
 
 case class TSInterfaceType(name: String, members: Map[String, TSMemberType], typeVars: List[TSTypeVariable], parents: List[TSType])
@@ -131,7 +134,7 @@ case class TSApplicationType(base: TSType, applied: List[TSType]) extends TSType
   }
 
   private lazy val applicationMap = base match {
-    case TSClassType(_, _, typeVars, _) =>
+    case TSClassType(_, _, _, typeVars, _) =>
       typeVars.zip(applied).foldLeft(Map[String, TSType]())((mp, v) => mp ++ Map(v._1.name -> v._2))
     case TSInterfaceType(_, _, typeVars, _) =>
       typeVars.zip(applied).foldLeft(Map[String, TSType]())((mp, v) => mp ++ Map(v._1.name -> v._2))
@@ -143,8 +146,11 @@ case class TSApplicationType(base: TSType, applied: List[TSType]) extends TSType
     case TSTupleType(types) => TSTupleType(types.map((s) => replace(s)))
     case TSFunctionType(params, res, cons) =>
       TSFunctionType(params.map((p) => replace(p)), replace(res), cons)
-    case TSClassType(n, members, tv, c) =>
-      TSClassType(n, members.map[String, TSMemberType]((m) => (m._1, TSMemberType(replace(m._2.base), m._2.modifier))), tv, c)
+    case TSClassType(n, members, statics, tv, c) =>
+      TSClassType(n,
+       members.map[String, TSMemberType]((m) => (m._1, TSMemberType(replace(m._2.base), m._2.modifier))),
+       statics.map[String, TSMemberType]((m) => (m._1, TSMemberType(replace(m._2.base), m._2.modifier))),
+       tv, c)
     case TSInterfaceType(n, members, tv, c) =>
       TSInterfaceType(n, members.map[String, TSMemberType]((m) => (m._1, TSMemberType(replace(m._2.base)))), tv, c)
     case TSArrayType(elementType) => TSArrayType(replace(elementType))

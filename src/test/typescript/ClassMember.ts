@@ -30,4 +30,4 @@ class Outer {
   static Inner = class Inner {
    a: number
   } 
- }
+}

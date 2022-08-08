@@ -14,6 +14,7 @@ object TypeScript {
   lazy val typeFlagsInter = ts.TypeFlags.Intersection.asInstanceOf[Int]
   lazy val syntaxKindPrivate = ts.SyntaxKind.PrivateKeyword.asInstanceOf[Int]
   lazy val syntaxKindProtected = ts.SyntaxKind.ProtectedKeyword.asInstanceOf[Int]
+  lazy val syntaxKindStatic = ts.SyntaxKind.StaticKeyword.asInstanceOf[Int]
 
   def isToken(node: js.Dynamic): Boolean = ts.isToken(node)
   def isFunctionDeclaration(node: js.Dynamic): Boolean = ts.isFunctionDeclaration(node)
@@ -91,6 +92,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val typeToken = TSTokenObject(node.selectDynamic("type")) // for interfaces
   lazy val questionToken = TSTokenObject(node.questionToken)
   lazy val initializer = TSTokenObject(node.initializer)
+  lazy val initializerNode = TSNodeObject(node.initializer) // for inner class
   lazy val body = TSNodeObject(node.body)
   lazy val typeArguments = TSTokenArray(node.typeArguments)
   lazy val expression: TSIdentifierObject = TSIdentifierObject(node.expression)
@@ -116,6 +118,7 @@ class TSTokenObject(token: js.Dynamic) extends TSAny(token) {
   lazy val expression = TSIdentifierObject(token.expression)
   lazy val isPrivate = kind == TypeScript.syntaxKindPrivate
   lazy val isProtected = kind == TypeScript.syntaxKindProtected
+  lazy val isStatic = kind == TypeScript.syntaxKindStatic
 
   def getTypeFromTypeNode()(implicit checker: TSTypeChecker): TSTypeObject = checker.getTypeFromTypeNode(token)
 }

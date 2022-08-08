@@ -22,7 +22,7 @@ class ClassMember extends AnyFunSuite {
     assert(TypeCompare(cls.>("foo"), "void"))
 
     program.>("D") match {
-      case TSClassType(_, _, _, parents) => assert(TypeCompare(parents(0), "class C<number>"))
+      case TSClassType(_, _, _, _, parents) => assert(TypeCompare(parents(0), "class C<number>"))
     }
 
     assert(TypeCompare(program.>("D").>("set"), "(number) => void"))
@@ -45,5 +45,19 @@ class ClassMember extends AnyFunSuite {
       }
       case _ => assert(false)
     }
+  }
+
+  test("Static Members") {
+    val program = TSProgram(Seq("src/test/typescript/ClassMember.ts"))
+
+    program.>("Outer") match {
+      case cls: TSClassType => {
+        val inner = cls.>>("Inner").base
+        assert(TypeCompare(inner, "class Inner"))
+        assert(TypeCompare(inner.>("a"), "number"))
+      }
+      case _ => assert(false)
+    }
+    
   }
 }

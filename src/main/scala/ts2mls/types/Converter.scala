@@ -34,7 +34,7 @@ object Converter {
     case TSEnumType(_) => TypeName("int")
     case TSMemberType(base, modifier) => convert(base)
     case TSInterfaceType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
-    case TSClassType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
+    case TSClassType(_, members, _, typeVars, parents) => convertRecord(members, typeVars, parents)
     case TSApplicationType(base, applied) => base match {
       case TSNamedType(name) => AppliedType(TypeName(name), applied.map((ts) => convert(ts)))
       case _ => throw new java.lang.Exception(s"Wrong Base Type in TSApplicationType: $base") // TODO: can we find the name?

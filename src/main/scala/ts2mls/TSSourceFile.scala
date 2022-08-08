@@ -225,14 +225,21 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     else getInheritList(node.heritageClauses, 0)
   }
 
-  private def getClassMembersType(list: TSNodeArray, index: Int)(implicit tv: Map[String, TSTypeVariable]): Map[String, TSMemberType] = {
+  private def getClassMembersType(list: TSNodeArray, index: Int, requireStatic: Boolean)(implicit ns: TSNamespace, tv: Map[String, TSTypeVariable]): Map[String, TSMemberType] = {
     val tail = list.get(list.length - index - 1)
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      if (!name.equals("__constructor")) {
-        val other = getClassMembersType(list, index + 1)
-        val mem = getObjectType(tail)
+      val other = getClassMembersType(list, index + 1, requireStatic)
+
+      val isStatic = if (tail.modifiers.isUndefined) false
+        else tail.modifiers.foldLeft(false)((s, t) => t.isStatic)
+
+      if (!name.equals("__constructor") && isStatic == requireStatic) {
+        val initializer = tail.initializerNode
+        val mem =
+          if (initializer.isUndefined || initializer.members.isUndefined) getObjectType(tail)
+          else parseMembers(initializer, true)
 
         val modifier = if (tail.modifiers.isUndefined) Public
           else tail.modifiers.foldLeft[TSAccessModifier](Public)((m, t) =>
@@ -255,7 +262,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
           case _ => other ++ Map(name -> TSMemberType(mem, modifier))
         }
       }
-      else getClassMembersType(list, index + 1)
+      else other
     }
   }
 
@@ -274,7 +281,9 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     val constraints = getTypeConstraints(node)(Map())
     val tvMap = constaintsListToMap(constraints)
 
-    if (isClass) TSClassType(name, getClassMembersType(members, 0)(tvMap), constraints, getInheritList(node))
+    if (isClass) {
+      TSClassType(name, getClassMembersType(members, 0, false)(ns, tvMap), getClassMembersType(members, 0, true)(ns, tvMap), constraints, getInheritList(node))
+    }
     else TSInterfaceType(name, getInterfacePropertiesType(members, 0)(tvMap), constraints, getInheritList(node))
   }
 
