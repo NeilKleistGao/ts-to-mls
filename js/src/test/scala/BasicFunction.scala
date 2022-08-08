@@ -4,27 +4,27 @@ import ts2mls.types._
 
 class BasicFunction extends AnyFunSuite {
   test("Basic Function") {
-    val program = TSProgram(Seq("js/src/test/typescript/BasicFunctions.ts"))
-    assert(TypeCompare(program.>("hello"), "void"))
-    assert(TypeCompare(program.>("add"), "(number, number) => number"))
-    assert(TypeCompare(program.>("sub"), "(number, number) => number"))
-    assert(TypeCompare(program.>("foo"), "number"))
-    assert(TypeCompare(program.>("id"), "(any) => any"))
-    assert(TypeCompare(program.>("odd"), "(number) => boolean"))
-    assert(TypeCompare(program.>("isnull"), "(any) => boolean"))
-    assert(TypeCompare(program.>("bar"), "any"))
-    assert(TypeCompare(program.>("nu"), "(null) => null"))
-    assert(TypeCompare(program.>("un"), "(undefined) => undefined"))
-    assert(TypeCompare(program.>("fail"), "never"))
-    assert(TypeCompare(program.>("create"), "object"))
-    assert(TypeCompare(program.>("pa"), "(number) => number"))
-    assert(TypeCompare(program.>("wtf"), "(unknown) => void"))
+    val program = TSProgram(BasicFunction.testFiles)
+    assert(TSTypeTest(program.>("hello"), "void"))
+    assert(TSTypeTest(program.>("add"), "(number, number) => number"))
+    assert(TSTypeTest(program.>("sub"), "(number, number) => number"))
+    assert(TSTypeTest(program.>("foo"), "number"))
+    assert(TSTypeTest(program.>("id"), "(any) => any"))
+    assert(TSTypeTest(program.>("odd"), "(number) => boolean"))
+    assert(TSTypeTest(program.>("isnull"), "(any) => boolean"))
+    assert(TSTypeTest(program.>("bar"), "any"))
+    assert(TSTypeTest(program.>("nu"), "(null) => null"))
+    assert(TSTypeTest(program.>("un"), "(undefined) => undefined"))
+    assert(TSTypeTest(program.>("fail"), "never"))
+    assert(TSTypeTest(program.>("create"), "object"))
+    assert(TSTypeTest(program.>("pa"), "(number) => number"))
+    assert(TSTypeTest(program.>("wtf"), "(unknown) => void"))
   }
 
   test("Basic Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("js/src/test/typescript/BasicFunctions.ts"))
+    val program = TSProgram(BasicFunction.testFiles)
 
     program.getMLSType("hello") match {
       case Function(lhs, rhs) => {
@@ -79,4 +79,8 @@ class BasicFunction extends AnyFunSuite {
       case _ => assert(false)
     }
   } 
+}
+
+object BasicFunction {
+  private val testFiles = TSTypeTest.tsPathes(Seq("BasicFunctions.ts"))
 }

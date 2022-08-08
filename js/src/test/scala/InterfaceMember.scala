@@ -4,32 +4,32 @@ import ts2mls.types._
 
 class InterfaceMember extends AnyFunSuite {
   test("Interface Member") {
-    val program = TSProgram(Seq("js/src/test/typescript/InterfaceMember.ts"))
-    assert(TypeCompare(program.>("IFoo"), "interface IFoo {\n\ta: string\n\tb: (number) => number\n\tc: boolean\n\td: (string) => void\n}"))
-    assert(TypeCompare(program.>("IFoo").>("a"), "string"))
-    assert(TypeCompare(program.>("IFoo").>("b"), "(number) => number"))
-    assert(TypeCompare(program.>("IFoo").>("c"), "boolean"))
-    assert(TypeCompare(program.>("IFoo").>("d"), "(string) => void"))
+    val program = TSProgram(InterfaceMember.testFiles)
+    assert(TSTypeTest(program.>("IFoo"), "interface IFoo {\n\ta: string\n\tb: (number) => number\n\tc: boolean\n\td: (string) => void\n}"))
+    assert(TSTypeTest(program.>("IFoo").>("a"), "string"))
+    assert(TSTypeTest(program.>("IFoo").>("b"), "(number) => number"))
+    assert(TSTypeTest(program.>("IFoo").>("c"), "boolean"))
+    assert(TSTypeTest(program.>("IFoo").>("d"), "(string) => void"))
 
-    assert(TypeCompare(program.>("II").>("test"), "(T') => number"))
+    assert(TSTypeTest(program.>("II").>("test"), "(T') => number"))
 
     // Should we consider it as an optional field?
-    assert(TypeCompare(program.>("create"), "{v: number | undefined}"))
-    assert(TypeCompare(program.>("get"), "({t: string}) => string"))
+    assert(TSTypeTest(program.>("create"), "{v: number | undefined}"))
+    assert(TSTypeTest(program.>("get"), "({t: string}) => string"))
 
-    assert(TypeCompare(program.>("IEvent").>("callback"), "(number) => void"))
+    assert(TSTypeTest(program.>("IEvent").>("callback"), "(number) => void"))
 
-    assert(TypeCompare(program.>("SearchFunc").>("__call"), "(string, string) => boolean"))
-    assert(TypeCompare(program.>("StringArray").>("__index"), "(number) => string"))
-    assert(TypeCompare(program.>("Counter").>("__call"), "(number) => string"))
-    assert(TypeCompare(program.>("Counter").>("interval"), "number"))
-    assert(TypeCompare(program.>("Counter").>("reset"), "void"))
+    assert(TSTypeTest(program.>("SearchFunc").>("__call"), "(string, string) => boolean"))
+    assert(TSTypeTest(program.>("StringArray").>("__index"), "(number) => string"))
+    assert(TSTypeTest(program.>("Counter").>("__call"), "(number) => string"))
+    assert(TSTypeTest(program.>("Counter").>("interval"), "number"))
+    assert(TSTypeTest(program.>("Counter").>("reset"), "void"))
   }
 
   test("Interface Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("js/src/test/typescript/InterfaceMember.ts"))
+    val program = TSProgram(InterfaceMember.testFiles)
 
     program.getMLSType("Simple") match {
       case Record(fields) => {
@@ -106,4 +106,8 @@ class InterfaceMember extends AnyFunSuite {
       case _ => assert(false)
     }
   }
+}
+
+object InterfaceMember {
+  private val testFiles = TSTypeTest.tsPathes(Seq("InterfaceMember.ts"))
 }

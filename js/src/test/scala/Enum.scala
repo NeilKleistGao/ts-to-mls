@@ -4,8 +4,12 @@ import ts2mls.types._
 
 class Enum extends AnyFunSuite {
   test("Enum") {
-    val program = TSProgram(Seq("js/src/test/typescript/Enum.ts"))
-    assert(TypeCompare(program.>("pass"), "(Color) => boolean"))
-    assert(TypeCompare(program.>("stop"), "Color"))
+    val program = TSProgram(Enum.testFiles)
+    assert(TSTypeTest(program.>("pass"), "(Color) => boolean"))
+    assert(TSTypeTest(program.>("stop"), "Color"))
   }
+}
+
+object Enum {
+  private val testFiles = TSTypeTest.tsPathes(Seq("Enum.ts"))
 }

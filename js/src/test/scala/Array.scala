@@ -4,16 +4,16 @@ import ts2mls.types._
 
 class Array extends AnyFunSuite {
   test("Array") {
-    val program = TSProgram(Seq("js/src/test/typescript/Array.ts"))
-    assert(TypeCompare(program.>("first"), "(string[]) => string"))
-    assert(TypeCompare(program.>("getZero3"), "number[]"))
-    assert(TypeCompare(program.>("first2"), "(((number) => number)[]) => (number) => number"))
+    val program = TSProgram(Array.testFiles)
+    assert(TSTypeTest(program.>("first"), "(string[]) => string"))
+    assert(TSTypeTest(program.>("getZero3"), "number[]"))
+    assert(TSTypeTest(program.>("first2"), "(((number) => number)[]) => (number) => number"))
   }
 
   test("Array Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("js/src/test/typescript/Array.ts"))
+    val program = TSProgram(Array.testFiles)
 
     program.getMLSType("getZero3") match {
       case Function(p, r) => r match {
@@ -23,4 +23,8 @@ class Array extends AnyFunSuite {
       case _ => assert(false)
     }
   }
+}
+
+object Array {
+  private val testFiles = TSTypeTest.tsPathes(Seq("Array.ts"))
 }

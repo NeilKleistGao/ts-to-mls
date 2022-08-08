@@ -4,15 +4,15 @@ import ts2mls.types._
 
 class Intersection extends AnyFunSuite {
   test("Intersection") {
-    val program = TSProgram(Seq("js/src/test/typescript/Intersection.ts"))
-    assert(TypeCompare(program.>("extend"), "(T', U') => T' & U'"))
-    assert(TypeCompare(program.>("foo"), "(T' & U') => void"))
+    val program = TSProgram(Intersection.testFiles)
+    assert(TSTypeTest(program.>("extend"), "(T', U') => T' & U'"))
+    assert(TSTypeTest(program.>("foo"), "(T' & U') => void"))
   }
 
   test("Intersection Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("js/src/test/typescript/Intersection.ts"))
+    val program = TSProgram(Intersection.testFiles)
     program.getMLSType("foo") match {
       case Function(p, r) => p match {
         case Inter(lhs, rhs) => {
@@ -32,3 +32,6 @@ class Intersection extends AnyFunSuite {
   }
 }
 
+object Intersection {
+  private val testFiles = TSTypeTest.tsPathes(Seq("Intersection.ts"))
+}

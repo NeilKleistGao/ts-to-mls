@@ -4,19 +4,19 @@ import ts2mls.types._
 
 class TypeVariable extends AnyFunSuite {
   test("Type Variable") {
-    val program = TSProgram(Seq("js/src/test/typescript/TypeVariable.ts"))
+    val program = TSProgram(TypeVariable.testFiles)
 
-    assert(TypeCompare(program.>("inc"), "(T') => number where T' <: number"))
-    assert(TypeCompare(program.>("CC"), "class CC where T' <: string"))
+    assert(TSTypeTest(program.>("inc"), "(T') => number where T' <: number"))
+    assert(TSTypeTest(program.>("CC"), "class CC where T' <: string"))
 
-    assert(TypeCompare(program.>("setStringPrinter"), "(Printer<string>) => void"))
-    assert(TypeCompare(program.>("getStringPrinter"), "Printer<string>"))
+    assert(TSTypeTest(program.>("setStringPrinter"), "(Printer<string>) => void"))
+    assert(TSTypeTest(program.>("getStringPrinter"), "Printer<string>"))
   }
 
   test("Type Variable Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("js/src/test/typescript/TypeVariable.ts"))
+    val program = TSProgram(TypeVariable.testFiles)
 
     program.getMLSType("inc") match {
       case Constrained(base, list) => {
@@ -63,4 +63,8 @@ class TypeVariable extends AnyFunSuite {
       case _ => assert(false)
     }
   }
+}
+
+object TypeVariable {
+  private val testFiles = TSTypeTest.tsPathes(Seq("TypeVariable.ts"))
 }

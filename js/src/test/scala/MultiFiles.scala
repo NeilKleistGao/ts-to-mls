@@ -4,8 +4,12 @@ import ts2mls.types._
 
 class MultiFiles extends AnyFunSuite {
   test("Multiple Files") {
-    val program = TSProgram(Seq("js/src/test/typescript/Multi1.ts", "js/src/test/typescript/Multi2.ts"))
-    assert(TypeCompare(program.>("multi1"), "(number) => number"))
-    assert(TypeCompare(program.>("multi2"), "(string) => string"))
+    val program = TSProgram(MultiFiles.testFiles)
+    assert(TSTypeTest(program.>("multi1"), "(number) => number"))
+    assert(TSTypeTest(program.>("multi2"), "(string) => string"))
   }
+}
+
+object MultiFiles {
+  private val testFiles = TSTypeTest.tsPathes(Seq("Multi1.ts", "Multi2.ts"))
 }

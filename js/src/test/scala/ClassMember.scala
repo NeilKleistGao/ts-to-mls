@@ -4,35 +4,35 @@ import ts2mls.types._
 
 class ClassMember extends AnyFunSuite {
   test("Class Member") {
-    val program = TSProgram(Seq("js/src/test/typescript/ClassMember.ts"))
+    val program = TSProgram(ClassMember.classMemberFiles)
     val cls: TSType = program.>("Student")
-    assert(TypeCompare(cls.>("getID"), "number"))
-    assert(TypeCompare(cls.>("addScore"), "(string, number) => void"))
-    assert(TypeCompare(cls.>("isFriend"), "(Student) => boolean"))
-    assert(TypeCompare(cls.>("name"), "string"))
-    assert(TypeCompare(cls.>("a"), "- number"))
-    assert(TypeCompare(cls.>("b"), "o string"))
+    assert(TSTypeTest(cls.>("getID"), "number"))
+    assert(TSTypeTest(cls.>("addScore"), "(string, number) => void"))
+    assert(TSTypeTest(cls.>("isFriend"), "(Student) => boolean"))
+    assert(TSTypeTest(cls.>("name"), "string"))
+    assert(TSTypeTest(cls.>("a"), "- number"))
+    assert(TSTypeTest(cls.>("b"), "o string"))
 
-    assert(TypeCompare(program.>("Foo").>("bar"), "(T') => void"))
+    assert(TSTypeTest(program.>("Foo").>("bar"), "(T') => void"))
   }
 
   test("Inherit") {
-    val program = TSProgram(Seq("js/src/test/typescript/Inherit.ts"))
+    val program = TSProgram(ClassMember.inheritFiles)
     val cls: TSType = program.>("B")
-    assert(TypeCompare(cls.>("foo"), "void"))
+    assert(TSTypeTest(cls.>("foo"), "void"))
 
     program.>("D") match {
-      case TSClassType(_, _, _, _, parents) => assert(TypeCompare(parents(0), "class C<number>"))
+      case TSClassType(_, _, _, _, parents) => assert(TSTypeTest(parents(0), "class C<number>"))
     }
 
-    assert(TypeCompare(program.>("D").>("set"), "(number) => void"))
-    assert(TypeCompare(program.>("D").>("get"), "number"))
+    assert(TSTypeTest(program.>("D").>("set"), "(number) => void"))
+    assert(TSTypeTest(program.>("D").>("get"), "number"))
   }
 
   test("Class Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("js/src/test/typescript/ClassMember.ts"))
+    val program = TSProgram(ClassMember.classMemberFiles)
 
     program.getMLSType("EZ") match {
       case Record(members) => {
@@ -48,16 +48,20 @@ class ClassMember extends AnyFunSuite {
   }
 
   test("Static Members") {
-    val program = TSProgram(Seq("js/src/test/typescript/ClassMember.ts"))
+    val program = TSProgram(ClassMember.classMemberFiles)
 
     program.>("Outer") match {
       case cls: TSClassType => {
         val inner = cls.>>("Inner").base
-        assert(TypeCompare(inner, "class Inner"))
-        assert(TypeCompare(inner.>("a"), "number"))
+        assert(TSTypeTest(inner, "class Inner"))
+        assert(TSTypeTest(inner.>("a"), "number"))
       }
       case _ => assert(false)
     }
-    
   }
+}
+
+object ClassMember {
+  private val classMemberFiles = TSTypeTest.tsPathes(Seq("ClassMember.ts"))
+  private val inheritFiles = TSTypeTest.tsPathes(Seq("Inherit.ts"))
 }
