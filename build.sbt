@@ -1,7 +1,5 @@
 ThisBuild / scalaVersion := "2.13.8"
 
-// enablePlugins(ScalaJSPlugin)
-
 lazy val root = project.in(file("."))
   .aggregate(ts2mlsJS, ts2mlsJVM)
   .settings(
