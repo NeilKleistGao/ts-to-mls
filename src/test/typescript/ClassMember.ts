@@ -25,3 +25,9 @@ class EZ {
   private foo() {}
   protected bar: undefined
 }
+
+class Outer {
+  static Inner = class Inner {
+   a: number
+  } 
+ }
