@@ -4,7 +4,7 @@ import ts2mls.types._
 
 class Tuple extends AnyFunSuite {
   test("Tuple") {
-    val program = TSProgram(Seq("src/test/typescript/Tuple.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/Tuple.ts"))
     assert(TypeCompare(program.>("key"), "([string, boolean]) => string"))
     assert(TypeCompare(program.>("value"), "([string, boolean]) => boolean"))
     assert(TypeCompare(program.>("third"), "([number, number, number]) => number"))
@@ -24,7 +24,7 @@ class Tuple extends AnyFunSuite {
   test("Tuple Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("src/test/typescript/Tuple.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/Tuple.ts"))
 
     program.getMLSType("key") match {
       case Function(p, r) => p match {

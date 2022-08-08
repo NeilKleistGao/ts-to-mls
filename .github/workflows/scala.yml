@@ -23,4 +23,4 @@ jobs:
     - name: Install TypeScript
       run: npm install
     - name: Run tests
-      run: sbt test
+      run: sbt ts2mlsJS/test

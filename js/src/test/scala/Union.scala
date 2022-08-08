@@ -4,7 +4,7 @@ import ts2mls.types._
 
 class Union extends AnyFunSuite {
   test("Union") {
-    val program = TSProgram(Seq("src/test/typescript/Union.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/Union.ts"))
     assert(TypeCompare(program.>("getString"), "(string | number | boolean) => string"))
     assert(TypeCompare(program.>("test"), "(boolean) => string | number"))
     assert(TypeCompare(program.>("run"), "(((number) => number) | ((number) => string)) => any"))
@@ -16,7 +16,7 @@ class Union extends AnyFunSuite {
   test("Union Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("src/test/typescript/Union.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/Union.ts"))
 
     program.getMLSType("getString") match {
       case Function(lhs, rhs) => {

@@ -4,7 +4,7 @@ import ts2mls.types._
 
 class BasicFunction extends AnyFunSuite {
   test("Basic Function") {
-    val program = TSProgram(Seq("src/test/typescript/BasicFunctions.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/BasicFunctions.ts"))
     assert(TypeCompare(program.>("hello"), "void"))
     assert(TypeCompare(program.>("add"), "(number, number) => number"))
     assert(TypeCompare(program.>("sub"), "(number, number) => number"))
@@ -24,7 +24,7 @@ class BasicFunction extends AnyFunSuite {
   test("Basic Convert") {
     import mlscript._
 
-    val program = TSProgram(Seq("src/test/typescript/BasicFunctions.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/BasicFunctions.ts"))
 
     program.getMLSType("hello") match {
       case Function(lhs, rhs) => {

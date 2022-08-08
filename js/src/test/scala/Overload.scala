@@ -4,7 +4,7 @@ import ts2mls.types._
 
 class Overload extends AnyFunSuite {
   test("Overload") {
-    val program = TSProgram(Seq("src/test/typescript/Overload.ts"))
+    val program = TSProgram(Seq("js/src/test/typescript/Overload.ts"))
     assert(TypeCompare(program.>("f"), "((number) => number) & ((string) => string)"))
 
     assert(TypeCompare(program.>("M").>("foo"), "((number) => number) & ((string) => string)"))
