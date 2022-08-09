@@ -1,42 +1,42 @@
-//│ hello:
-//│ unit -> unit
-
 //│ add:
 //│ number -> number -> number
 
 //│ sub:
 //│ number -> number -> number
 
-//│ foo:
-//│ unit -> number
-
-//│ id:
-//│ anything -> anything
-
-//│ odd:
-//│ number -> bool
-
 //│ isnull:
 //│ anything -> bool
-
-//│ bar:
-//│ unit -> anything
 
 //│ nu:
 //│ null -> null
 
-//│ un:
-//│ undefined -> undefined
+//│ foo:
+//│ unit -> number
 
-//│ fail:
-//│ unit -> nothing
+//│ wtf:
+//│ anything -> unit
 
-//│ create:
-//│ unit -> {}
+//│ odd:
+//│ number -> bool
 
 //│ pa:
 //│ number -> number
 
-//│ wtf:
-//│ anything -> unit
+//│ fail:
+//│ unit -> nothing
+
+//│ bar:
+//│ unit -> anything
+
+//│ create:
+//│ unit -> {}
+
+//│ un:
+//│ undefined -> undefined
+
+//│ id:
+//│ anything -> anything
+
+//│ hello:
+//│ unit -> unit
 

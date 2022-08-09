@@ -27,21 +27,7 @@ class BasicFunction extends AnyFunSuite {
     val program = TSProgram(BasicFunction.testFiles)
     var writer = DecWriter(BasicFunction.diffFile)
 
-    writer.output("hello", program.getMLSType("hello").show)
-    writer.output("add", program.getMLSType("add").show)
-    writer.output("sub", program.getMLSType("sub").show)
-    writer.output("foo", program.getMLSType("foo").show)
-    writer.output("id", program.getMLSType("id").show)
-    writer.output("odd", program.getMLSType("odd").show)
-    writer.output("isnull", program.getMLSType("isnull").show)
-    writer.output("bar", program.getMLSType("bar").show)
-    writer.output("nu", program.getMLSType("nu").show)
-    writer.output("un", program.getMLSType("un").show)
-    writer.output("fail", program.getMLSType("fail").show)
-    writer.output("create", program.getMLSType("create").show)
-    writer.output("pa", program.getMLSType("pa").show)
-    writer.output("wtf", program.getMLSType("wtf").show)
-
+    program.visit(writer)
     writer.close
   }
 }
