@@ -10,7 +10,8 @@ lazy val root = project.in(file("."))
 lazy val ts2mls = crossProject(JSPlatform, JVMPlatform).in(file("."))
   .settings(
     name := "ts2mls",
-    scalaVersion := "2.13.8"
+    scalaVersion := "2.13.8",
+    libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.14"
   )
   .jvmSettings()
   .jsSettings(
