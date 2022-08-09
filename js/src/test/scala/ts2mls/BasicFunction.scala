@@ -23,66 +23,74 @@ class BasicFunction extends AnyFunSuite {
     assert(TSTypeTest(program.>("wtf"), "(unknown) => void"))
   }
 
-  test("Basic Convert") {
-    import mlscript._
+  // test("Basic Convert") {
+  //   import mlscript._
 
+  //   val program = TSProgram(BasicFunction.testFiles)
+
+  //   program.getMLSType("hello") match {
+  //     case Function(lhs, rhs) => {
+  //       rhs match {
+  //         case TypeName(name) => assert(name.equals("unit"))
+  //         case _ => assert(false)
+  //       }
+
+  //       lhs match {
+  //         case TypeName(name) => assert(name.equals("unit"))
+  //         case _ => assert(false)
+  //       }
+  //     }
+  //     case _ => assert(false)
+  //   }
+
+  //   program.getMLSType("add") match {
+  //     case Function(lhs, rhs) => {
+  //       lhs match {
+  //         case TypeName(name) => assert(name.equals("number"))
+  //         case _ => assert(false)
+  //       }
+
+  //       rhs match {
+  //         case Function(lhs2, rhs2) => assert(true)
+  //         case _ => assert(false)
+  //       }
+  //     }
+  //     case _ => assert(false)
+  //   }
+
+  //   program.getMLSType("id") match {
+  //     case Function(lhs, rhs) => {
+  //       lhs match {
+  //         case Top => assert(true)
+  //         case _ => assert(false)
+  //       }
+
+  //       rhs match {
+  //         case Top => assert(true)
+  //         case _ => assert(false)
+  //       }
+  //     }
+  //     case _ => assert(false)
+  //   }
+
+  //   program.getMLSType("wtf") match {
+  //     case Function(p, r) => p match {
+  //       case Top => assert(true)
+  //       case _ => assert(false)
+  //     }
+  //     case _ => assert(false)
+  //   }
+  // }
+
+  test("Basic Function Declaration Generation") {
     val program = TSProgram(BasicFunction.testFiles)
+    var writer = DecWriter(BasicFunction.diffFile)
 
-    program.getMLSType("hello") match {
-      case Function(lhs, rhs) => {
-        rhs match {
-          case TypeName(name) => assert(name.equals("unit"))
-          case _ => assert(false)
-        }
-
-        lhs match {
-          case TypeName(name) => assert(name.equals("unit"))
-          case _ => assert(false)
-        }
-      }
-      case _ => assert(false)
-    }
-
-    program.getMLSType("add") match {
-      case Function(lhs, rhs) => {
-        lhs match {
-          case TypeName(name) => assert(name.equals("number"))
-          case _ => assert(false)
-        }
-
-        rhs match {
-          case Function(lhs2, rhs2) => assert(true)
-          case _ => assert(false)
-        }
-      }
-      case _ => assert(false)
-    }
-
-    program.getMLSType("id") match {
-      case Function(lhs, rhs) => {
-        lhs match {
-          case Top => assert(true)
-          case _ => assert(false)
-        }
-
-        rhs match {
-          case Top => assert(true)
-          case _ => assert(false)
-        }
-      }
-      case _ => assert(false)
-    }
-
-    program.getMLSType("wtf") match {
-      case Function(p, r) => p match {
-        case Top => assert(true)
-        case _ => assert(false)
-      }
-      case _ => assert(false)
-    }
-  } 
+    writer.output(program.getMLSType("hello").show)
+  }
 }
 
 object BasicFunction {
   private val testFiles = TSTypeTest.tsPathes(Seq("BasicFunctions.ts"))
+  private val diffFile = TSTypeTest.diffPath("BasicFunctions.d.mls")
 }
