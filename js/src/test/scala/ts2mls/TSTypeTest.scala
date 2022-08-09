@@ -1,3 +1,5 @@
+package ts2mls
+
 import ts2mls.types._
 
 object TSTypeTest {
