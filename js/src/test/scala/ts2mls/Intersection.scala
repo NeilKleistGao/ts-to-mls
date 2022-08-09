@@ -11,29 +11,16 @@ class Intersection extends AnyFunSuite {
     assert(TSTypeTest(program.>("foo"), "(T' & U') => void"))
   }
 
-  test("Intersection Convert") {
-    import mlscript._
-
+  test("Intersection Declaration Generation") {
     val program = TSProgram(Intersection.testFiles)
-    program.getMLSType("foo") match {
-      case Function(p, r) => p match {
-        case Inter(lhs, rhs) => {
-          lhs match {
-            case TypeName(name) => assert(name.equals("T"))
-            case _ => assert(false)
-          }
+    var writer = DecWriter(Intersection.diffFile)
 
-          rhs match {
-            case TypeName(name) => assert(name.equals("U"))
-            case _ => assert(false)
-          }
-        }
-      }
-      case _ => assert(false)
-    }
+    program.visit(writer)
+    writer.close
   }
 }
 
 object Intersection {
   private val testFiles = TSTypeTest.tsPathes(Seq("Intersection.ts"))
+  private val diffFile = TSTypeTest.diffPath("Intersection.d.mls")
 }

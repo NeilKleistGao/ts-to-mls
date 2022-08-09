@@ -7,5 +7,5 @@ trait Module {
   def >(name: String): TSType = ???
   def >>(name: String): TSNamespace = ???
 
-  def visit(writer: DecWriter): Unit = ???
+  def visit(writer: DecWriter, prefix: String = ""): Unit = ???
 }

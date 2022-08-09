@@ -42,7 +42,7 @@ class TSProgram(filenames: Seq[String]) extends Module {
   
   def getMLSType(name: String) = TSProgram.getMLSType(this.>(name))
 
-  override def visit(writer: DecWriter): Unit = globalNamespace.visit(writer)
+  override def visit(writer: DecWriter, prefix: String): Unit = globalNamespace.visit(writer, prefix)
 }
 
 object TSProgram {

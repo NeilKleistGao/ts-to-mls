@@ -1,0 +1,9 @@
+//│ h1:
+//│ (number -> number) -> number -> number
+
+//│ h2:
+//│ string -> unit -> string
+
+//│ h3:
+//│ (number -> number) -> (number -> number) -> number -> number
+

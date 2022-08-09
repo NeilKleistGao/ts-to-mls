@@ -12,21 +12,16 @@ class Array extends AnyFunSuite {
     assert(TSTypeTest(program.>("first2"), "(((number) => number)[]) => (number) => number"))
   }
 
-  test("Array Convert") {
-    import mlscript._
-
+  test("Array Declaration Generation") {
     val program = TSProgram(Array.testFiles)
+    var writer = DecWriter(Array.diffFile)
 
-    program.getMLSType("getZero3") match {
-      case Function(p, r) => r match {
-        case TypeName(name) => assert(name.equals("MutArray"))
-        case _ => assert(false)
-      }
-      case _ => assert(false)
-    }
+    program.visit(writer)
+    writer.close
   }
 }
 
 object Array {
   private val testFiles = TSTypeTest.tsPathes(Seq("Array.ts"))
+  private val diffFile = TSTypeTest.diffPath("Array.d.mls")
 }

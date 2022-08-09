@@ -10,8 +10,17 @@ class MultiFiles extends AnyFunSuite {
     assert(TSTypeTest(program.>("multi1"), "(number) => number"))
     assert(TSTypeTest(program.>("multi2"), "(string) => string"))
   }
+
+  test("Multiple Files Declaration Generation") {
+    val program = TSProgram(MultiFiles.testFiles)
+    var writer = DecWriter(MultiFiles.diffFile)
+
+    program.visit(writer)
+    writer.close
+  }
 }
 
 object MultiFiles {
   private val testFiles = TSTypeTest.tsPathes(Seq("Multi1.ts", "Multi2.ts"))
+  private val diffFile = TSTypeTest.diffPath("MultiFiles.d.mls")
 }

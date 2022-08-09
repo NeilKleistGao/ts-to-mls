@@ -29,8 +29,8 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
   def containsMember(name: String): Boolean = 
     if (parent.isEmpty) members.contains(name) else (members.contains(name) || parent.get.containsMember(name))
 
-  override def visit(writer: DecWriter): Unit = {
-    // TODO: subspace
+  override def visit(writer: DecWriter, prefix: String): Unit = {
+    subSpace.foreach((p) => p._2.visit(writer, prefix + showPrefix))
     members.foreach((p) => writer.output(s"$showPrefix${p._1}", TSProgram.getMLSType(p._2).show))
   }
 }

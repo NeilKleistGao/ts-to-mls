@@ -10,8 +10,17 @@ class Enum extends AnyFunSuite {
     assert(TSTypeTest(program.>("pass"), "(Color) => boolean"))
     assert(TSTypeTest(program.>("stop"), "Color"))
   }
+
+  test("Enum Declaration Generation") {
+    val program = TSProgram(Enum.testFiles)
+    var writer = DecWriter(Enum.diffFile)
+
+    // program.visit(writer)
+    writer.close
+  }
 }
 
 object Enum {
   private val testFiles = TSTypeTest.tsPathes(Seq("Enum.ts"))
+  private val diffFile = TSTypeTest.diffPath("Enum.d.mls")
 }

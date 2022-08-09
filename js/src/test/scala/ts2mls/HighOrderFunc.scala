@@ -12,24 +12,16 @@ class HighOrderFunc extends AnyFunSuite {
     assert(TSTypeTest(program.>("h3"), "((number) => number, (number) => number) => (number) => number"))
   }
 
-  test("High Order Convert") {
-    import mlscript._
-
+  test("High Order Declaration Generation") {
     val program = TSProgram(HighOrderFunc.testFiles)
+    var writer = DecWriter(HighOrderFunc.diffFile)
 
-    program.getMLSType("h1") match {
-      case Function(lhs, rhs) => lhs match {
-        case Function(lhs2, rhs2) => rhs2 match {
-          case TypeName(name) => assert(name.equals("number"))
-          case _ => assert(false)
-        }
-        case _ => assert(false)
-      }
-      case _ => assert(false)
-    }
+    program.visit(writer)
+    writer.close
   }
 }
 
 object HighOrderFunc {
   private val testFiles = TSTypeTest.tsPathes(Seq("HighOrderFunc.ts"))
+  private val diffFile = TSTypeTest.diffPath("HighOrder.d.mls")
 }
