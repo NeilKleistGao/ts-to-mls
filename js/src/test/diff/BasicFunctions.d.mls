@@ -1,1 +1,42 @@
+//│ hello:
 //│ unit -> unit
+
+//│ add:
+//│ number -> number -> number
+
+//│ sub:
+//│ number -> number -> number
+
+//│ foo:
+//│ unit -> number
+
+//│ id:
+//│ anything -> anything
+
+//│ odd:
+//│ number -> bool
+
+//│ isnull:
+//│ anything -> bool
+
+//│ bar:
+//│ unit -> anything
+
+//│ nu:
+//│ null -> null
+
+//│ un:
+//│ undefined -> undefined
+
+//│ fail:
+//│ unit -> nothing
+
+//│ create:
+//│ unit -> {}
+
+//│ pa:
+//│ number -> number
+
+//│ wtf:
+//│ anything -> unit
+

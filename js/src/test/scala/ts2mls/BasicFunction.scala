@@ -23,70 +23,26 @@ class BasicFunction extends AnyFunSuite {
     assert(TSTypeTest(program.>("wtf"), "(unknown) => void"))
   }
 
-  // test("Basic Convert") {
-  //   import mlscript._
-
-  //   val program = TSProgram(BasicFunction.testFiles)
-
-  //   program.getMLSType("hello") match {
-  //     case Function(lhs, rhs) => {
-  //       rhs match {
-  //         case TypeName(name) => assert(name.equals("unit"))
-  //         case _ => assert(false)
-  //       }
-
-  //       lhs match {
-  //         case TypeName(name) => assert(name.equals("unit"))
-  //         case _ => assert(false)
-  //       }
-  //     }
-  //     case _ => assert(false)
-  //   }
-
-  //   program.getMLSType("add") match {
-  //     case Function(lhs, rhs) => {
-  //       lhs match {
-  //         case TypeName(name) => assert(name.equals("number"))
-  //         case _ => assert(false)
-  //       }
-
-  //       rhs match {
-  //         case Function(lhs2, rhs2) => assert(true)
-  //         case _ => assert(false)
-  //       }
-  //     }
-  //     case _ => assert(false)
-  //   }
-
-  //   program.getMLSType("id") match {
-  //     case Function(lhs, rhs) => {
-  //       lhs match {
-  //         case Top => assert(true)
-  //         case _ => assert(false)
-  //       }
-
-  //       rhs match {
-  //         case Top => assert(true)
-  //         case _ => assert(false)
-  //       }
-  //     }
-  //     case _ => assert(false)
-  //   }
-
-  //   program.getMLSType("wtf") match {
-  //     case Function(p, r) => p match {
-  //       case Top => assert(true)
-  //       case _ => assert(false)
-  //     }
-  //     case _ => assert(false)
-  //   }
-  // }
-
   test("Basic Function Declaration Generation") {
     val program = TSProgram(BasicFunction.testFiles)
     var writer = DecWriter(BasicFunction.diffFile)
 
-    writer.output(program.getMLSType("hello").show)
+    writer.output("hello", program.getMLSType("hello").show)
+    writer.output("add", program.getMLSType("add").show)
+    writer.output("sub", program.getMLSType("sub").show)
+    writer.output("foo", program.getMLSType("foo").show)
+    writer.output("id", program.getMLSType("id").show)
+    writer.output("odd", program.getMLSType("odd").show)
+    writer.output("isnull", program.getMLSType("isnull").show)
+    writer.output("bar", program.getMLSType("bar").show)
+    writer.output("nu", program.getMLSType("nu").show)
+    writer.output("un", program.getMLSType("un").show)
+    writer.output("fail", program.getMLSType("fail").show)
+    writer.output("create", program.getMLSType("create").show)
+    writer.output("pa", program.getMLSType("pa").show)
+    writer.output("wtf", program.getMLSType("wtf").show)
+
+    writer.close
   }
 }
 
