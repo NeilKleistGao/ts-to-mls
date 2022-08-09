@@ -4,9 +4,9 @@ import org.scalatest.funsuite.AnyFunSuite
 import ts2mls.TSProgram
 import ts2mls.types._
 
-class TupleTest extends AnyFunSuite {
+class Tuple extends AnyFunSuite {
   test("Tuple") {
-    val program = TSProgram(TupleTest.testFiles)
+    val program = TSProgram(Tuple.testFiles)
     assert(TSTypeTest(program.>("key"), "([string, boolean]) => string"))
     assert(TSTypeTest(program.>("value"), "([string, boolean]) => boolean"))
     assert(TSTypeTest(program.>("third"), "([number, number, number]) => number"))
@@ -23,41 +23,16 @@ class TupleTest extends AnyFunSuite {
     assert(TSTypeTest(program.>("getFFF"), "FFF<number>"))
   }
 
-  test("Tuple Convert") {
-    import mlscript._
+  test("Tuple Declaration Generation") {
+    val program = TSProgram(Tuple.testFiles)
+    var writer = DecWriter(Tuple.diffFile)
 
-    val program = TSProgram(TupleTest.testFiles)
-
-    program.getMLSType("key") match {
-      case Function(p, r) => p match {
-        case mlscript.Tuple(lst) => {
-          lst(0) match {
-            case None -> Field(in, out) => {
-              assert(in.isEmpty)
-              out match {
-                case TypeName(name) => assert(name.equals("string"))
-                case _ => assert(false)
-              }
-            }
-          }
-
-          lst(1) match {
-            case None -> Field(in, out) => {
-              assert(in.isEmpty)
-              out match {
-                case TypeName(name) => assert(name.equals("bool"))
-                case _ => assert(false)
-              }
-            }
-          }
-        }
-        case _ => assert(false)
-      } 
-      case _ => assert(false)
-    }
+    program.visit(writer)
+    writer.close
   }
 }
 
-object TupleTest {
+object Tuple {
   private val testFiles = TSTypeTest.tsPathes(Seq("Tuple.ts"))
+  private val diffFile = TSTypeTest.diffPath("Tuple.d.mls")
 }

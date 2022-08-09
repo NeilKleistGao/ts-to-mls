@@ -26,8 +26,17 @@ class Overload extends AnyFunSuite {
 
     assert(TSTypeTest(program.>("bar"), "((G<string>) => G<string>) & ((G<number>) => G<number>) & ((G<boolean>) => G<boolean>)"))
   }
+
+  test("Overload Declaration Generation") {
+    val program = TSProgram(Overload.testFiles)
+    var writer = DecWriter(Overload.diffFile)
+
+    program.visit(writer)
+    writer.close
+  }
 }
 
 object Overload {
   private val testFiles = TSTypeTest.tsPathes(Seq("Overload.ts"))
+  private val diffFile = TSTypeTest.diffPath("Overload.d.mls")
 }

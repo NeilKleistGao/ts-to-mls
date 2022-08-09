@@ -1,5 +1,7 @@
 package ts2mls.types
 
+import ts2mls.DecWriter
+
 abstract class TSAccessModifier
 case object Public extends TSAccessModifier
 case object Private extends TSAccessModifier {
@@ -30,4 +32,6 @@ abstract class TSFieldType(members: Map[String, TSMemberType], parents: List[TST
       case _ => throw new java.lang.Exception(s"Field \"$fieldName\" not found.")
     }
   }
+
+  def visit(writer: DecWriter, prefix: String): Unit = ???
 }

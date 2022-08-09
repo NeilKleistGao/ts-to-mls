@@ -1,0 +1,16 @@
+//│ class EZ 
+//│   inc: number -> number
+//│   foo: unit -> unit
+//│   bar: undefined
+//│ class Foo where 
+//│   bar: T -> unit
+//│ class Outer 
+//│ 	class Inner 
+//│ 	  a: number
+//│ class Student 
+//│   name: string
+//│   isFriend: Student -> bool
+//│   a: number
+//│   addScore: string -> number -> unit
+//│   b: string
+//│   getID: unit -> number

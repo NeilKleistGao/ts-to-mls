@@ -1,0 +1,28 @@
+//│ interface II where 
+//│ 	test: T -> number
+//│ interface Counter 
+//│ 	__call: number -> string
+//│ 	interval: number
+//│ 	reset: unit -> unit
+//│ interface IEvent 
+//│ 	callback: number -> unit
+//│ interface StringArray 
+//│ 	__index: number -> string
+//│ interface Simple2 where 
+//│ 	abc: T
+//│ get: {t: string} -> string
+//│ interface Next extends interface Simple {
+//│ 	a: number
+//│ 	b: (boolean) => string
+//│ }
+//│ create: unit -> {v: number | undefined}
+//│ interface SearchFunc 
+//│ 	__call: string -> string -> bool
+//│ interface Simple 
+//│ 	a: number
+//│ 	b: bool -> string
+//│ interface IFoo 
+//│ 	a: string
+//│ 	b: number -> number
+//│ 	c: unit -> bool
+//│ 	d: string -> unit

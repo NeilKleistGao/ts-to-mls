@@ -9,10 +9,10 @@ class DecWriter(filename: String) {
 
   private val out = DecWriter.fs.openSync(filename, "w+")
 
-  def output(name: String, value: String) = {
-    s"$name:\n$value".split('\n').foreach(l => DecWriter.fs.writeSync(out, s"$outputMarker$l\n"))
-    DecWriter.fs.writeSync(out, "\n")
-  }
+  def output(name: String, value: String): Unit = output(s"$name: $value")
+
+  def output(name: String): Unit =
+    s"$name".split('\n').foreach(l => DecWriter.fs.writeSync(out, s"$outputMarker$l\n"))
 
   def close(): Unit = DecWriter.fs.closeSync(out)
 }

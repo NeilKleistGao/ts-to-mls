@@ -15,58 +15,16 @@ class TypeVariable extends AnyFunSuite {
     assert(TSTypeTest(program.>("getStringPrinter"), "Printer<string>"))
   }
 
-  test("Type Variable Convert") {
-    import mlscript._
-
+  test("Type Variable Declaration Generation") {
     val program = TSProgram(TypeVariable.testFiles)
+    var writer = DecWriter(TypeVariable.diffFile)
 
-    program.getMLSType("inc") match {
-      case Constrained(base, list) => {
-        base match {
-          case Function(p, r) => p match {
-            case TypeName(name) => assert(name.equals("T"))
-            case _ => assert(false)
-          }
-          case _ => assert(false)
-        }
-
-        assert(list.length == 1)
-        list(0)._1 match {
-          case v: TypeVar => assert(v.toString().equals("T"))
-          case _ => assert(false)
-        }
-
-        list(0)._2 match {
-          case Bounds(lb, ub) => ub match {
-            case TypeName(name) => assert(name.equals("number"))
-            case _ => assert(false)
-          }
-          case _ => assert(false)
-        }
-      }
-      case _ => assert(false)
-    }
-
-    program.getMLSType("getStringPrinter") match {
-      case Function(p, r) => r match {
-        case AppliedType(base, applied) => {
-          base match {
-            case TypeName(name) => assert(name.equals("Printer"))
-          }
-
-          assert(applied.length == 1)
-          applied(0) match {
-            case TypeName(name) => assert(name.equals("string"))
-            case _ => assert(false)
-          }
-        }
-        case _ => assert(false)
-      } 
-      case _ => assert(false)
-    }
+    program.visit(writer)
+    writer.close
   }
 }
 
 object TypeVariable {
   private val testFiles = TSTypeTest.tsPathes(Seq("TypeVariable.ts"))
+  private val diffFile = TSTypeTest.diffPath("TypeVariable.d.mls")
 }

@@ -1,0 +1,16 @@
+//│ app: (number -> unit) -> number -> unit & (string -> unit) -> string -> unit
+//│ op: number -> (number | undefined) -> unit & number -> (bool | undefined) -> unit
+//│ swap: (number, string,) -> (string, number,) & (string, number,) -> (number, string,)
+//│ f: number -> number & string -> string
+//│ class G 
+//│ g0: MutArray -> string & MutArray -> {}
+//│ class M 
+//│   foo: number -> number & string -> string
+//│ class N 
+//│ bar: G[string] -> G[string] & G[number] -> G[number] & G[bool] -> G[bool]
+//│ tst: {z: number} -> {y: string} & {z: bool} -> {y: string}
+//│ u: (number | bool) -> string & {} -> (string | {})
+//│ doSome: (T & U) -> (T & U) & string -> nothing
+//│ create: number -> unit -> number & bool -> unit -> bool
+//│ id: M -> {mut foo: anything} & N -> {}
+//│ db: number -> MutArray & {} -> MutArray

@@ -31,22 +31,12 @@ class ClassMember extends AnyFunSuite {
     assert(TSTypeTest(program.>("D").>("get"), "number"))
   }
 
-  test("Class Convert") {
-    import mlscript._
-
+  test("Class Declaration Generation") {
     val program = TSProgram(ClassMember.classMemberFiles)
+    var writer = DecWriter(ClassMember.classMemberDiff)
 
-    program.getMLSType("EZ") match {
-      case Record(members) => {
-        assert(members.length == 1)
-
-        members(0)._1 match {
-          case Var(name) => assert(name.equals("inc"))
-          case _ => assert(false)
-        }
-      }
-      case _ => assert(false)
-    }
+    program.visit(writer)
+    writer.close
   }
 
   test("Static Members") {
@@ -61,9 +51,19 @@ class ClassMember extends AnyFunSuite {
       case _ => assert(false)
     }
   }
+
+  test("Inherit Declaration Generation") {
+    val program = TSProgram(ClassMember.inheritFiles)
+    var writer = DecWriter(ClassMember.inheritDiff)
+
+    program.visit(writer)
+    writer.close
+  }
 }
 
 object ClassMember {
   private val classMemberFiles = TSTypeTest.tsPathes(Seq("ClassMember.ts"))
   private val inheritFiles = TSTypeTest.tsPathes(Seq("Inherit.ts"))
+  private val classMemberDiff = TSTypeTest.diffPath("ClassMember.d.mls")
+  private val inheritDiff = TSTypeTest.diffPath("Inherit.d.mls")
 }
