@@ -1,4 +1,4 @@
-//│ N1.N2.fff: bool -> number
-//│ N1.class C 
-//│   f: unit -> unit
-//│ N1.f: anything -> number
+////| N1.N2.fff: bool -> number
+////| N1.class C 
+////|   f: unit -> unit
+////| N1.f: anything -> number

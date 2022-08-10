@@ -1,16 +1,16 @@
-//│ toStr: (number | bool | undefined) -> string
-//│ buildName: string -> (string | undefined) -> string
-//│ class B 
-//│ class ABC 
-//│ boo: (T & U | undefined) -> unit
-//│ buildName2: string -> (string | undefined) -> string
-//│ err: ((number, string,) | undefined) -> unit
-//│ testSquareConfig: (SquareConfig | undefined) -> unit
-//│ boom: (B[nothing] | undefined) -> anything
-//│ testABC: (ABC | undefined) -> unit
-//│ buildName3: string -> any[] -> string
-//│ interface SquareConfig 
-//│ 	color: string | undefined
-//│ 	width: number | undefined
-//│ getOrElse: (MutArray | undefined) -> {}
-//│ did: number -> (number -> number | undefined) -> number
+////| toStr: (number | bool | undefined) -> string
+////| buildName: string -> (string | undefined) -> string
+////| class B 
+////| class ABC 
+////| boo: (T & U | undefined) -> unit
+////| buildName2: string -> (string | undefined) -> string
+////| err: ((number, string,) | undefined) -> unit
+////| testSquareConfig: (SquareConfig | undefined) -> unit
+////| boom: (B[nothing] | undefined) -> anything
+////| testABC: (ABC | undefined) -> unit
+////| buildName3: string -> any[] -> string
+////| interface SquareConfig 
+////| 	color: string | undefined
+////| 	width: number | undefined
+////| getOrElse: (MutArray | undefined) -> {}
+////| did: number -> (number -> number | undefined) -> number

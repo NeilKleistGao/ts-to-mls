@@ -5,7 +5,7 @@ import js.Dynamic.{global => g}
 import js.DynamicImplicits._
 
 class DecWriter(filename: String) {
-  private val outputMarker = "//│ "
+  private val outputMarker = "////| "
 
   private val out = DecWriter.fs.openSync(filename, "w+")
 
