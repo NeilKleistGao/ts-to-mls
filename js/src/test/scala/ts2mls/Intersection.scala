@@ -5,12 +5,6 @@ import ts2mls.TSProgram
 import ts2mls.types._
 
 class Intersection extends AnyFunSuite {
-  test("Intersection") {
-    val program = TSProgram(Intersection.testFiles)
-    assert(TSTypeTest(program.>("extend"), "(T', U') => T' & U'"))
-    assert(TSTypeTest(program.>("foo"), "(T' & U') => void"))
-  }
-
   test("Intersection Declaration Generation") {
     val program = TSProgram(Intersection.testFiles)
     var writer = DecWriter(Intersection.diffFile)

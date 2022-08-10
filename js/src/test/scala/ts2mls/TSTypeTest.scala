@@ -7,8 +7,6 @@ object TSTypeTest {
   private val path = "js/src/test/typescript"
   private val dPath = "js/src/test/diff"
 
-  def apply(t: TSType, s: String): Boolean = t.toString.equals(s)
-
   def tsPath(filename: String) = s"$path/$filename"
 
   def tsPathes(filenames: Seq[String]) = filenames.map((fn) => tsPath(fn))
