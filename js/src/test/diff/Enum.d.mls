@@ -1,0 +1,2 @@
+////| stop: unit -> Color
+////| pass: Color -> bool

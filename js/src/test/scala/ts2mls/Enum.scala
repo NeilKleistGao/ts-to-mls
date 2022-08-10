@@ -9,7 +9,7 @@ class Enum extends AnyFunSuite {
     val program = TSProgram(Enum.testFiles)
     var writer = DecWriter(Enum.diffFile)
 
-    // program.visit(writer)
+    program.visit(writer)
     writer.close
   }
 }
