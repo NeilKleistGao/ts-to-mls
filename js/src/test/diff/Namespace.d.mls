@@ -1,5 +1,14 @@
+////| AA.class C 
+////| 	f: unit -> unit
+////| AA.f: anything -> string
+////| AA.interface I 
+////| AA.	f: unit -> number
 ////| [debug] N1.N2.fff: (boolean) => number
 ////| N1.N2.fff: bool -> number
 ////| N1.class C 
 ////| 	f: unit -> unit
 ////| N1.f: anything -> number
+////| [debug] f1: (undefined) => C
+////| f1: undefined -> C
+////| [debug] f2: (undefined) => C
+////| f2: undefined -> C
