@@ -32,6 +32,8 @@ object TypeScript {
   def forEachChild(root: js.Dynamic, func: js.Dynamic => Unit): Unit = ts.forEachChild(root, func)
   def createProgram(filenames: Seq[String]): js.Dynamic = 
     ts.createProgram(filenames.toJSArray, js.Dictionary("maxNodeModuleJsDepth" -> 0, "target" -> ts.ScriptTarget.ES5, "module" -> ts.ModuleKind.CommonJS))
+
+  def getJSDocTags(node: js.Dynamic): js.Dynamic = ts.getJSDocTags(node)
 }
 
 class TSTypeChecker(checker: js.Dynamic) {
@@ -98,6 +100,9 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val expression: TSIdentifierObject = TSIdentifierObject(node.expression)
   lazy val modifiers = TSTokenArray(node.modifiers)
 
+  private lazy val tagName =
+    if (isUndefined) TSIdentifierObject(node) else TSIdentifierObject(node.tagName)
+
   def getReturnTypeOfSignature()(implicit checker: TSTypeChecker): TSTypeObject = {
     val signature = checker.getSignatureFromDeclaration(node)
     TSTypeObject(checker.getReturnTypeOfSignature(signature))
@@ -107,6 +112,15 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
     if (t.isUndefined || t.`type`.isUndefined || t.`type`.isToken) t else t.`type`
 
   def `type`(): TSNodeObject = getTypeField(TSNodeObject(node.selectDynamic("type")))
+
+  def isDebugging(): Boolean = {
+    val tags = TSNodeArray(TypeScript.getJSDocTags(node))
+    if (!tags.isUndefined) {
+      val name = tags.get(0).tagName.escapedText
+      name.equals("debug")
+    }
+    else false
+  }
 }
 
 object TSNodeObject {
