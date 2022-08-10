@@ -1,10 +1,10 @@
 ////| class A 
-////|   x: number
+////| 	x: number
 ////| class B 
 ////| tupleIt: string -> (mut in unit out string,)
 ////| swap: ({x: number}, {},) -> (B, A,)
 ////| class FFF 
-////|   fff: T -> unit
+////| 	fff: T -> unit
 ////| fff: FFF[string] -> string -> unit
 ////| foo: (T & U) -> unit
 ////| vec2: number -> number -> (number, number,)

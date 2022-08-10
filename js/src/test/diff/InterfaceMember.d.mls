@@ -25,4 +25,5 @@
 ////| 	a: string
 ////| 	b: number -> number
 ////| 	c: unit -> bool
+////| [debug] d: (string) => void
 ////| 	d: string -> unit

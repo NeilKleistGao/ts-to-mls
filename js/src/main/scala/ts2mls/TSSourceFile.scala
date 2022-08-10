@@ -251,7 +251,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
             else m
           )
 
-        mem match {
+        val res = mem match {
           case func: TSFunctionType => {
             if (!other.contains(name)) other ++ Map(name -> TSMemberType(func, modifier))
             else other(name).base match {
@@ -264,6 +264,13 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
           }
           case _ => other ++ Map(name -> TSMemberType(mem, modifier))
         }
+
+        if (tail.isDebugging) {
+          val t = res(name)
+          t.dbg = true
+          res.removed(name) ++ Map(name -> t)
+        }
+        else res
       }
       else other
     }
@@ -274,7 +281,9 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      getInterfacePropertiesType(list, index + 1) ++ Map(name -> TSMemberType(getObjectType(tail)))
+      val nt = TSMemberType(getObjectType(tail))
+      if (tail.isDebugging) nt.dbg = true
+      getInterfacePropertiesType(list, index + 1) ++ Map(name -> nt)
     }
   }
 
@@ -322,6 +331,12 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         parseNamespaceExports(it)
       }
       else parseNamespaceExports(it)
+
+      if (node.isDebugging && !node.isNamespace) {
+        val t = ns.>(name)
+        t.dbg = true
+        ns.put(name, t)
+      }
     }
   }
 

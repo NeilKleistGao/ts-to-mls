@@ -33,11 +33,11 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
     subSpace.foreach((p) => p._2.visit(writer, prefix + showPrefix))
     members.foreach((p) => p._2 match {
       case t: TSFieldType => {
-        if (p._2.dbg) writer.output(s"[debug] ${prefix}$showPrefix${p._1}", p._2.toString)
+        if (p._2.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", p._2.toString)
         t.visit(writer, prefix + showPrefix)
       }
       case _ => {
-        if (p._2.dbg) writer.output(s"[debug] ${prefix}$showPrefix${p._1}", p._2.toString)
+        if (p._2.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", p._2.toString)
         writer.output(s"${prefix}$showPrefix${p._1}", TSProgram.getMLSType(p._2).show)
       }
     })

@@ -14,6 +14,8 @@ class DecWriter(filename: String) {
   def output(name: String): Unit =
     s"$name".split('\n').foreach(l => DecWriter.fs.writeSync(out, s"$outputMarker$l\n"))
 
+  def debug(name: String, value: String): Unit = output(s"[debug] $name: $value")
+
   def close(): Unit = DecWriter.fs.closeSync(out)
 }
 
