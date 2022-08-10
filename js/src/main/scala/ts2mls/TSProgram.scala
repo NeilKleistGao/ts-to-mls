@@ -8,6 +8,9 @@ import ts2mls.types._
 
 class TSProgram(filenames: Seq[String]) extends Module {
   private val program = TypeScript.createProgram(filenames)
+
+  filenames.foreach((fn) => if (!program.fileExists(fn)) throw new java.lang.Exception(s"file ${fn} doesn't exist."))
+
   implicit private val checker: TSTypeChecker = TSTypeChecker(program.getTypeChecker())
   val globalNamespace: TSNamespace = TSNamespace()
   private val sourceFiles: Map[String, TSSourceFile] = filenames.map(filename => {
