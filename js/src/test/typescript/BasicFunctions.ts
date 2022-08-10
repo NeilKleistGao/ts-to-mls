@@ -2,6 +2,9 @@ function hello() {
   console.log("hello")
 }
 
+/**
+ * @debug
+ */
 function add(x: number, y: number): number {
   return x + y
 }

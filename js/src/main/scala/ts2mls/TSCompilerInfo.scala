@@ -116,8 +116,8 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   def isDebugging(): Boolean = {
     val tags = TSNodeArray(TypeScript.getJSDocTags(node))
     if (!tags.isUndefined) {
-      val name = tags.get(0).tagName.escapedText
-      name.equals("debug")
+      val tag = tags.get(0).tagName
+      if (tag.isUndefined) false else tag.escapedText.equals("debug")
     }
     else false
   }

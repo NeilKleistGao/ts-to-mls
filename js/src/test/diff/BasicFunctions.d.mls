@@ -1,3 +1,4 @@
+////| [debug]add: (number, number) => number
 ////| add: number -> number -> number
 ////| sub: number -> number -> number
 ////| isnull: anything -> bool
