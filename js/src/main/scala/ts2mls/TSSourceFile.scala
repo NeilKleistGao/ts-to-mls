@@ -13,31 +13,34 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     val nodeObject = TSNodeObject(node)
     if (nodeObject.isToken) return
 
+    val name = if (nodeObject.symbol.isUndefined) "" else nodeObject.symbol.escapedName
     if (nodeObject.isFunctionDeclaration) {
-      val funcName = nodeObject.symbol.escapedName
       val typeInfo = getFunctionType(nodeObject)(Map())
-      if (!global.containsMember(funcName)) global.put(funcName, typeInfo)
-      else global.>(funcName) match {
+      if (!global.containsMember(name)) global.put(name, typeInfo)
+      else global.>(name) match {
         case old: TSFunctionType if (nodeObject.body.isUndefined) =>
-          global.put(funcName, TSIntersectionType(old, typeInfo))
+          global.put(name, TSIntersectionType(old, typeInfo))
         case old: TSIntersectionType if (nodeObject.body.isUndefined) =>
-          global.put(funcName, TSIntersectionType(old, typeInfo))
+          global.put(name, TSIntersectionType(old, typeInfo))
         case _ => {}
       }
     }
     else if (nodeObject.isClassDeclaration) {
-      val className = nodeObject.symbol.escapedName
       val typeInfo = parseMembers(nodeObject, true)(global)
-      global.put(className, typeInfo)
+      global.put(name, typeInfo)
     }
     else if (nodeObject.isInterfaceDeclaration) {
-      val iName = nodeObject.symbol.escapedName
       val typeInfo = parseMembers(nodeObject, false)(global)
-      global.put(iName, typeInfo)
+      global.put(name, typeInfo)
     }
     else if (nodeObject.isNamespace) {
-      val nsName = nodeObject.symbol.escapedName
       parseNamespace(nodeObject)(global)
+    }
+
+    if (nodeObject.isDebugging && !nodeObject.isNamespace) {
+      val t = global.>(name)
+      t.dbg = true
+      global.put(name, t)
     }
   }
 
@@ -248,7 +251,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
             else m
           )
 
-        mem match {
+        val res = mem match {
           case func: TSFunctionType => {
             if (!other.contains(name)) other ++ Map(name -> TSMemberType(func, modifier))
             else other(name).base match {
@@ -261,6 +264,13 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
           }
           case _ => other ++ Map(name -> TSMemberType(mem, modifier))
         }
+
+        if (tail.isDebugging) {
+          val t = res(name)
+          t.dbg = true
+          res.removed(name) ++ Map(name -> t)
+        }
+        else res
       }
       else other
     }
@@ -271,7 +281,9 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     if (tail.isUndefined) Map()
     else {
       val name = tail.symbol.escapedName
-      getInterfacePropertiesType(list, index + 1) ++ Map(name -> TSMemberType(getObjectType(tail)))
+      val nt = TSMemberType(getObjectType(tail))
+      if (tail.isDebugging) nt.dbg = true
+      getInterfacePropertiesType(list, index + 1) ++ Map(name -> nt)
     }
   }
 
@@ -319,6 +331,12 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         parseNamespaceExports(it)
       }
       else parseNamespaceExports(it)
+
+      if (node.isDebugging && !node.isNamespace) {
+        val t = ns.>(name)
+        t.dbg = true
+        ns.put(name, t)
+      }
     }
   }
 

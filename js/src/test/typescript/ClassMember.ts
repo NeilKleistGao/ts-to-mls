@@ -3,7 +3,12 @@ class Student {
 
   constructor() {}
 
+  
   getID() { return 114514; }
+
+  /**
+   * @debug
+   */
   addScore(sub: string, score: number) {}
   isFriend(other: Student) { return true; }
 

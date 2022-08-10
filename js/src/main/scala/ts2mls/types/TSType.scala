@@ -5,6 +5,7 @@ import ts2mls.DecWriter
 import ts2mls.TSProgram
 
 abstract class TSType {
+  var dbg = false
   val priority: Int = 0
   override def toString(): String = ???
   def >(fieldName: String): TSType = throw new java.lang.Exception("Field is not allowed.")
@@ -94,10 +95,19 @@ case class TSClassType(name: String, members: Map[String, TSMemberType], statics
 
     val subPrefix = if (prefix.startsWith("\t")) prefix else ""
 
-    members.foreach((p) => writer.output(s"$subPrefix  ${p._1}", TSProgram.getMLSType(p._2).show))
+    members.foreach((p) => {
+      if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
+      writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2).show)
+    })
     statics.foreach((p) => p._2.base match {
-      case t: TSFieldType => t.visit(writer, subPrefix + "\t")
-      case _ => writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2).show)
+      case t: TSFieldType => {
+        if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
+        t.visit(writer, subPrefix + "\t")
+      }
+      case _ => {
+        if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
+        writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2).show)
+      }
     })
   }
 }
@@ -134,7 +144,10 @@ case class TSInterfaceType(name: String, members: Map[String, TSMemberType], typ
 
     writer.output(s"${prefix}interface $name $full")
 
-    members.foreach((p) => writer.output(s"$prefix\t${p._1}", TSProgram.getMLSType(p._2).show))
+    members.foreach((p) => {
+      if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
+       writer.output(s"$prefix\t${p._1}", TSProgram.getMLSType(p._2).show)
+    })
   }
 }
 

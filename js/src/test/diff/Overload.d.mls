@@ -5,7 +5,7 @@
 ////| class G 
 ////| g0: MutArray -> string & MutArray -> {}
 ////| class M 
-////|   foo: number -> number & string -> string
+////| 	foo: number -> number & string -> string
 ////| class N 
 ////| bar: G[string] -> G[string] & G[number] -> G[number] & G[bool] -> G[bool]
 ////| tst: {z: number} -> {y: string} & {z: bool} -> {y: string}

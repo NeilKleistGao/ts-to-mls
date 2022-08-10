@@ -24,3 +24,5 @@ jobs:
       run: npm install
     - name: Run tests
       run: sbt ts2mlsJS/test
+    - name: Check no changes
+      run: git diff-files -p

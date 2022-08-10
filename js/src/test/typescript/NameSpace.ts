@@ -16,6 +16,9 @@ namespace N1 {
   }
 
   export namespace N2 {
+    /**
+     * @debug
+     */
     export function fff(x: boolean) {
       return 42;
     }
