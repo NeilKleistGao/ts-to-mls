@@ -1,6 +1,8 @@
 package ts2mls.types;
 
 import scala.collection.mutable.HashMap
+import ts2mls.DecWriter
+import ts2mls.TSProgram
 
 abstract class TSType {
   val priority: Int = 0
@@ -13,8 +15,8 @@ case class TSTypeVariable(val name: String, val constraint: Option[TSType]) exte
 
   override def toString(): String = s"$name'"
 
-  def getConstraint(): String = constraint match {
-    case Some(t) => s"$name' <: $t"
+  def getConstraint(ignoreTick: Boolean = false): String = constraint match {
+    case Some(t) => s"$name${if (ignoreTick) "" else "'"} <: $t"
     case _ => ""
   }
 }
@@ -77,6 +79,27 @@ case class TSClassType(name: String, members: Map[String, TSMemberType], statics
 
   def >>(name: String): TSMemberType =
     statics.getOrElse(name, throw new java.lang.Exception(s"static $name not found."))
+
+  override def visit(writer: DecWriter, prefix: String): Unit = {
+    val ext = parents.foldLeft("")((s, p) => s"$s$p, ")
+    val cons = typeVars.foldLeft("")((s, v) => {
+      val c = v.getConstraint(true)
+      if (c.isEmpty()) s else s"$s$c, "
+    })
+
+    val full = s"${if (ext.isEmpty()) "" else s"extends ${ext.substring(0, ext.length() - 2)}"}" + 
+      s"${if (cons.isEmpty()) "" else s"where ${cons.substring(0, ext.length() - 2)}"}"
+
+    writer.output(s"${prefix}class $name $full")
+
+    val subPrefix = if (prefix.startsWith("\t")) prefix else ""
+
+    members.foreach((p) => writer.output(s"$subPrefix  ${p._1}", TSProgram.getMLSType(p._2).show))
+    statics.foreach((p) => p._2.base match {
+      case t: TSFieldType => t.visit(writer, subPrefix + "\t")
+      case _ => writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2).show)
+    })
+  }
 }
 
 case class TSInterfaceType(name: String, members: Map[String, TSMemberType], typeVars: List[TSTypeVariable], parents: List[TSType])
@@ -97,6 +120,21 @@ case class TSInterfaceType(name: String, members: Map[String, TSMemberType], typ
 
     if (cons.isEmpty()) body
     else s"$body where ${cons.substring(0, cons.length() - 2)}"
+  }
+
+  override def visit(writer: DecWriter, prefix: String): Unit = {
+    val ext = parents.foldLeft("")((s, p) => s"$s$p, ")
+    val cons = typeVars.foldLeft("")((s, v) => {
+      val c = v.getConstraint(true)
+      if (c.isEmpty()) s else s"$s$c, "
+    })
+
+    val full = s"${if (ext.isEmpty()) "" else s"extends ${ext.substring(0, ext.length() - 2)}"}" + 
+      s"${if (cons.isEmpty()) "" else s"where ${cons.substring(0, ext.length() - 2)}"}"
+
+    writer.output(s"${prefix}interface $name $full")
+
+    members.foreach((p) => writer.output(s"$prefix\t${p._1}", TSProgram.getMLSType(p._2).show))
   }
 }
 

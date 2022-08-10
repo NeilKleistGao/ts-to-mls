@@ -17,7 +17,7 @@ object Converter {
   )
 
   def convert(tsType: TSType): Type = tsType match {
-    case TSNamedType(typeName) => primitiveName(typeName)
+    case TSNamedType(typeName) => primitiveName.getOrElse(typeName, TypeName(typeName))
     case TSFunctionType(params, res, constraint) => {
       val func = 
         if (params.length == 0) Function(primitiveName("void"), convert(res))

@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.fun": "typescript",
+        "*.mls": "typescript"
+    },
+    "typescript.validate.enable": false,
+    "files.watcherExclude": {
+        "**/target": true
+    },
+}

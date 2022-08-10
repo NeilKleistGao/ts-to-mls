@@ -40,9 +40,13 @@ class TSProgram(filenames: Seq[String]) extends Module {
     case _ => throw new java.lang.Exception(s"Symbol $symbol not found")
   }
   
-  def getMLSType(name: String) = Converter.convert(this.>(name))
+  def getMLSType(name: String) = TSProgram.getMLSType(this.>(name))
+
+  override def visit(writer: DecWriter, prefix: String): Unit = globalNamespace.visit(writer, prefix)
 }
 
 object TSProgram {
     def apply(filenames: Seq[String]) = new TSProgram(filenames)
+
+    def getMLSType(tp: TSType) = Converter.convert(tp)
 }

@@ -1,0 +1,12 @@
+////| class CC where 
+////|   print: T -> unit
+////| con: T -> U
+////|   where
+////|     'T <: U
+////| setStringPrinter: Printer[string] -> unit
+////| getStringPrinter: unit -> Printer[string]
+////| class Printer 
+////|   print: T -> unit
+////| inc: T -> number
+////|   where
+////|     'T <: number

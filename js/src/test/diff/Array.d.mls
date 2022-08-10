@@ -1,0 +1,3 @@
+////| getZero3: unit -> MutArray
+////| first2: MutArray -> number -> number
+////| first: MutArray -> string
