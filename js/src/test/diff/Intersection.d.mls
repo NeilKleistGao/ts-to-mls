@@ -1,4 +1,4 @@
-def extend: () -> (() -> ((() & ())))
+def extend[T, U]: (T) -> ((U) -> ((T) & (U)))
 
-def foo: (() & ()) -> ((unit))
+def foo[T, U]: ((T) & (U)) -> (unit)
 

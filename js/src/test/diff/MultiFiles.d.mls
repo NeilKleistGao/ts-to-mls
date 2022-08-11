@@ -2,9 +2,7 @@ def multi4: unit -> (unit)
 
 def multi3: unit -> (unit)
 
-def multi2: (string) -> ((string))
+def multi2: (string) -> (string)
 
-def multi1: (number) -> ((number))
+def multi1: (number) -> (number)
 
-// interface Base 
-// 	a: 

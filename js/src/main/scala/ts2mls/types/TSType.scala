@@ -42,7 +42,7 @@ case class TSTupleType(types: List[TSType]) extends TSType {
   }
 }
 
-case class TSFunctionType(params: List[TSType], res: TSType, typeVars: List[TSTypeVariable]) extends TSType {
+case class TSFunctionType(params: List[TSType], res: TSType, val typeVars: List[TSTypeVariable]) extends TSType {
   override val priority = 1
   override def toString(): String = {
     val rhs = if (res.priority < priority && res.priority > 0) s"($res)" else res.toString()
@@ -80,36 +80,6 @@ case class TSClassType(name: String, members: Map[String, TSMemberType], statics
 
   def >>(name: String): TSMemberType =
     statics.getOrElse(name, throw new java.lang.Exception(s"static $name not found."))
-
-  override def visit(writer: DecWriter, prefix: String): Unit = {
-    val ext = parents.foldLeft("")((s, p) => s"$s$p, ")
-    val cons = typeVars.foldLeft("")((s, v) => {
-      val c = v.getConstraint(true)
-      if (c.isEmpty()) s else s"$s$c, "
-    })
-
-    val full = s"${if (ext.isEmpty()) "" else s"extends ${ext.substring(0, ext.length() - 2)}"}" + 
-      s"${if (cons.isEmpty()) "" else s"where ${cons.substring(0, ext.length() - 2)}"}"
-
-    writer.output(s"${prefix}class $name $full")
-
-    val subPrefix = if (prefix.startsWith("\t")) prefix else ""
-
-    members.foreach((p) => {
-      if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
-      writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2))
-    })
-    statics.foreach((p) => p._2.base match {
-      case t: TSFieldType => {
-        if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
-        t.visit(writer, subPrefix + "\t")
-      }
-      case _ => {
-        if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
-        writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2))
-      }
-    })
-  }
 }
 
 case class TSInterfaceType(name: String, members: Map[String, TSMemberType], typeVars: List[TSTypeVariable], parents: List[TSType])
@@ -130,24 +100,6 @@ case class TSInterfaceType(name: String, members: Map[String, TSMemberType], typ
 
     if (cons.isEmpty()) body
     else s"$body where ${cons.substring(0, cons.length() - 2)}"
-  }
-
-  override def visit(writer: DecWriter, prefix: String): Unit = {
-    val ext = parents.foldLeft("")((s, p) => s"$s$p, ")
-    val cons = typeVars.foldLeft("")((s, v) => {
-      val c = v.getConstraint(true)
-      if (c.isEmpty()) s else s"$s$c, "
-    })
-
-    val full = s"${if (ext.isEmpty()) "" else s"extends ${ext.substring(0, ext.length() - 2)}"}" + 
-      s"${if (cons.isEmpty()) "" else s"where ${cons.substring(0, ext.length() - 2)}"}"
-
-    writer.output(s"${prefix}interface $name $full")
-
-    members.foreach((p) => {
-      if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
-       writer.output(s"$prefix\t${p._1}", TSProgram.getMLSType(p._2))
-    })
   }
 }
 

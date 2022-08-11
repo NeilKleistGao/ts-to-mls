@@ -33,13 +33,19 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
     subSpace.foreach((p) => p._2.visit(writer, prefix + showPrefix))
     members.foreach((p) => p._2 match {
       case t: TSFieldType => {
-        if (p._2.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", p._2.toString)
-        t.visit(writer, prefix + showPrefix)
+        // if (p._2.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", p._2.toString)
+        // t.visit(writer, prefix + showPrefix)
       }
-      case _ => {
-        if (p._2.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", p._2.toString)
-        writer.generate(s"def ${p._1}: ${TSProgram.getMLSType(p._2)}")
+      case f: TSFunctionType => {
+        if (f.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", f.toString)
+
+        val params = f.typeVars.foldLeft("")((p, t) => s"$p${t.name}, ")
+        if (params.length() == 0)
+          writer.generate(s"def ${p._1}: ${TSProgram.getMLSType(f)}")
+        else
+          writer.generate(s"def ${p._1}[${params.substring(0, params.length() - 2)}]: ${TSProgram.getMLSType(f)}")
       }
+      case _ => {}
     })
   }
 }

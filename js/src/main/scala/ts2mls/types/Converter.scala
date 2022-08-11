@@ -19,7 +19,7 @@ object Converter {
     case TSFunctionType(params, res, constraint) => {
       val func = 
         if (params.length == 0) s"${primitiveName("void")} -> (${convert(res)})"
-        else params.foldRight(s"(${convert(res)})")((tst, mlst) => s"(${convert(tst)}) -> (${mlst})")
+        else params.foldRight(convert(res))((tst, mlst) => s"(${convert(tst)}) -> (${mlst})")
       func
       // val consList = convertConstrianedList(constraint)
       // if (consList.length == 0) func
@@ -27,17 +27,17 @@ object Converter {
     }
     case TSUnionType(lhs, rhs) => s"(${convert(lhs)}) | (${convert(rhs)})"
     case TSIntersectionType(lhs, rhs) => s"(${convert(lhs)}) & (${convert(rhs)})"
-    // case v: TSTypeVariable => convertTypeVariable(v)
-    // case TSTupleType(lst) => convertTuple(lst)
+    case TSTypeVariable(name, _) => name
+    case TSTupleType(lst) => s"(${convertTuple(lst)})"
     case TSArrayType(element) => s"MutArray[${convert(element)}]"
     case TSEnumType(_) => "int"
-    // case TSMemberType(base, modifier) => convert(base)
+    case TSMemberType(base, modifier) => convert(base)
     // case TSInterfaceType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
     // case TSClassType(_, members, _, typeVars, parents) => convertRecord(members, typeVars, parents)
-    // case TSApplicationType(base, applied) => base match {
-    //   case TSNamedType(name) => AppliedType(TypeName(name), applied.map((ts) => convert(ts)))
-    //   case _ => throw new java.lang.Exception(s"Wrong Base Type in TSApplicationType: $base") // TODO: can we find the name?
-    // }
+    case TSApplicationType(base, applied) => base match {
+      case TSNamedType(name) => s"${name}[${convertApply(applied)}]"
+      case _ => throw new java.lang.Exception(s"Wrong Base Type in TSApplicationType: $base") // TODO: can we find the name?
+    }
     // case _ => throw new java.lang.Exception("Unknown TypeScript Type")
     case _ => ""
   }
@@ -54,9 +54,16 @@ object Converter {
   //       case _ => lst
   //     })
 
-  // private def convertTuple(types: List[TSType]): mlscript.Tuple =
-  //   mlscript.Tuple(types.map((t) => None -> convertField(t)))
+  private def convertTuple(types: List[TSType]): String =
+    types.foldLeft("")((p, t) => s"$p${convert(t)}, ")
+    
 
+  private def convertApply(applied: List[TSType]): String = {
+    if (applied.length == 0) throw new java.lang.Exception("empty applied list.")
+
+    val res = applied.foldLeft("")((p, t) => s"$p${convert(t)}, ")
+    res.substring(0, res.length() - 2)
+  }
   // private def convertField(tst: TSType): Field = {
   //   val t = convert(tst)
   //   t match {
