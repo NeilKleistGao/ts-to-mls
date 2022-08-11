@@ -38,7 +38,7 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
       }
       case _ => {
         if (p._2.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", p._2.toString)
-        writer.output(s"${prefix}$showPrefix${p._1}", TSProgram.getMLSType(p._2).show)
+        writer.generate(s"def ${p._1}: ${TSProgram.getMLSType(p._2)}")
       }
     })
   }

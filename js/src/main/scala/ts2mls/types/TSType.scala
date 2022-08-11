@@ -97,7 +97,7 @@ case class TSClassType(name: String, members: Map[String, TSMemberType], statics
 
     members.foreach((p) => {
       if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
-      writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2).show)
+      writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2))
     })
     statics.foreach((p) => p._2.base match {
       case t: TSFieldType => {
@@ -106,7 +106,7 @@ case class TSClassType(name: String, members: Map[String, TSMemberType], statics
       }
       case _ => {
         if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
-        writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2).show)
+        writer.output(s"$subPrefix\t${p._1}", TSProgram.getMLSType(p._2))
       }
     })
   }
@@ -146,7 +146,7 @@ case class TSInterfaceType(name: String, members: Map[String, TSMemberType], typ
 
     members.foreach((p) => {
       if (p._2.dbg) writer.debug(s"${p._1}", p._2.toString)
-       writer.output(s"$prefix\t${p._1}", TSProgram.getMLSType(p._2).show)
+       writer.output(s"$prefix\t${p._1}", TSProgram.getMLSType(p._2))
     })
   }
 }

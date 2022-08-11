@@ -51,5 +51,5 @@ class TSProgram(filenames: Seq[String]) extends Module {
 object TSProgram {
     def apply(filenames: Seq[String]) = new TSProgram(filenames)
 
-    def getMLSType(tp: TSType) = Converter.convert(tp)
+    def getMLSType(tp: TSType): String = Converter.convert(tp)
 }

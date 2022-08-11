@@ -5,7 +5,7 @@ import js.Dynamic.{global => g}
 import js.DynamicImplicits._
 
 class DecWriter(filename: String) {
-  private val outputMarker = "////| "
+  private val outputMarker = "// "
 
   private val out = DecWriter.fs.openSync(filename, "w+")
 
@@ -16,7 +16,7 @@ class DecWriter(filename: String) {
 
   def debug(name: String, value: String): Unit = output(s"[debug] $name: $value")
 
-  def generateDef(name: String, tp: String): Unit = DecWriter.fs.writeSync(out, s"def $name: $tp\n")
+  def generate(str: String): Unit = DecWriter.fs.writeSync(out, s"$str\n\n")
 
   def close(): Unit = DecWriter.fs.closeSync(out)
 }

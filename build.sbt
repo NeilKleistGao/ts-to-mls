@@ -1,10 +1,10 @@
 ThisBuild / scalaVersion := "2.13.8"
 
-val diffTests = taskKey[Unit]("")
+// val diffTests = taskKey[Unit]("")
 
-diffTests := (Def.task{
-  (ts2mlsJVM / Test / test).value
-} triggeredBy (ts2mlsJS / Test / test)).value
+// diffTests := (Def.task{
+//   (ts2mlsJVM / Test / test).value
+// } triggeredBy (ts2mlsJS / Test / test)).value
 
 lazy val root = project.in(file("."))
   .aggregate(ts2mlsJS, ts2mlsJVM)
