@@ -1,12 +1,12 @@
-// class CC where 
-// 	print: 
-def con: () -> (())
+class CC[T]: { print: (T) -> (unit) }
 
-def setStringPrinter: () -> ((unit))
+def con[U, T]: (T) -> (U)
 
-def getStringPrinter: unit -> ()
+def setStringPrinter: (Printer[string]) -> (unit)
 
-// class Printer 
-// 	print: 
-def inc: () -> ((number))
+def getStringPrinter: unit -> (Printer[string])
+
+class Printer[T]: { print: (T) -> (unit) }
+
+def inc[T]: (T) -> (number)
 

@@ -1,31 +1,22 @@
-// interface II where 
-// 	test: 
-// interface Counter 
-// 	__call: 
-// 	interval: 
-// 	reset: 
-// interface IEvent 
-// 	callback: 
-// interface StringArray 
-// 	__index: 
-// interface Simple2 where 
-// 	abc: 
-def get: () -> ((string))
+trait II[T]: { test: (T) -> (number) }
 
-// interface Next extends interface Simple {
-// 	a: number
-// 	b: (boolean) => string
-// }
-def create: unit -> ()
+trait Counter: { __call: (number) -> (string); interval: number; reset: unit -> (unit) }
 
-// interface SearchFunc 
-// 	__call: 
-// interface Simple 
-// 	a: 
-// 	b: 
-// interface IFoo 
-// 	a: 
-// 	b: 
-// 	c: 
-// [debug] d: (string) => void
-// 	d: 
+trait IEvent: { callback: (number) -> (unit) }
+
+trait StringArray: { __index: (number) -> (string) }
+
+trait Simple2[T]: { abc: T }
+
+def get: ({ t: string }) -> (string)
+
+trait Next: {} & trait Simple: { a: number; b: (bool) -> (string) }
+
+def create: unit -> ({ v: (number) | (undefined) })
+
+trait SearchFunc: { __call: (string) -> ((string) -> (bool)) }
+
+trait Simple: { a: number; b: (bool) -> (string) }
+
+trait IFoo: { a: string; b: (number) -> (number); c: unit -> (bool); d: (string) -> (unit) }
+

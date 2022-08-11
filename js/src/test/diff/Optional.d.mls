@@ -1,27 +1,28 @@
-def toStr: (((number) | (bool)) | (undefined)) -> ((string))
+def toStr: (((number) | (bool)) | (undefined)) -> (string)
 
-def buildName: (string) -> (((string) | (undefined)) -> ((string)))
+def buildName: (string) -> (((string) | (undefined)) -> (string))
 
-// class B 
-// class ABC 
-def boo: ((() & ()) | (undefined)) -> ((unit))
+class B[T]: {}
 
-def buildName2: (string) -> (((string) | (undefined)) -> ((string)))
+class ABC: {}
 
-def err: (() | (undefined)) -> ((unit))
+def boo[T, U]: (((T) & (U)) | (undefined)) -> (unit)
 
-def testSquareConfig: ((SquareConfig) | (undefined)) -> ((unit))
+def buildName2: (string) -> (((string) | (undefined)) -> (string))
 
-def boom: (() | (undefined)) -> ((anything))
+def err: (((number, string, )) | (undefined)) -> (unit)
 
-def testABC: ((ABC) | (undefined)) -> ((unit))
+def testSquareConfig: ((SquareConfig) | (undefined)) -> (unit)
 
-def buildName3: (string) -> ((any[]) -> ((string)))
+def boom: ((B[nothing]) | (undefined)) -> (anything)
 
-// interface SquareConfig 
-// 	color: 
-// 	width: 
-def getOrElse: ((MutArray[{}]) | (undefined)) -> (({}))
+def testABC: ((ABC) | (undefined)) -> (unit)
 
-def did: (number) -> ((((number) -> ((number))) | (undefined)) -> ((number)))
+def buildName3: (string) -> ((any[]) -> (string))
+
+trait SquareConfig: { color: (string) | (undefined); width: (number) | (undefined) }
+
+def getOrElse: ((MutArray[{}]) | (undefined)) -> ({})
+
+def did: (number) -> ((((number) -> (number)) | (undefined)) -> (number))
 

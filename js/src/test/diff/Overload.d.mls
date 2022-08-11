@@ -1,28 +1,30 @@
-def app: (((number) -> ((unit))) -> ((number) -> ((unit)))) & (((string) -> ((unit))) -> ((string) -> ((unit))))
+def app: (((number) -> (unit)) -> ((number) -> (unit))) & (((string) -> (unit)) -> ((string) -> (unit)))
 
-def op: ((number) -> (((number) | (undefined)) -> ((unit)))) & ((number) -> (((bool) | (undefined)) -> ((unit))))
+def op: ((number) -> (((number) | (undefined)) -> (unit))) & ((number) -> (((bool) | (undefined)) -> (unit)))
 
-def swap: (() -> (())) & (() -> (()))
+def swap: (((number, string, )) -> ((string, number, ))) & (((string, number, )) -> ((number, string, )))
 
-def f: ((number) -> ((number))) & ((string) -> ((string)))
+def f: ((number) -> (number)) & ((string) -> (string))
 
-// class G 
-def g0: ((MutArray[string]) -> ((string))) & ((MutArray[{}]) -> (({})))
+class G[T]: {}
 
-// class M 
-// 	foo: 
-// class N 
-def bar: ((() -> (())) & (() -> (()))) & (() -> (()))
+def g0: ((MutArray[string]) -> (string)) & ((MutArray[{}]) -> ({}))
 
-def tst: (() -> (())) & (() -> (()))
+class M: { foo: ((number) -> (number)) & ((string) -> (string)) }
 
-def u: (((number) | (bool)) -> ((string))) & (({}) -> (((string) | ({}))))
+class N: {}
 
-def doSome: ((() & ()) -> ((() & ()))) & ((string) -> ((nothing)))
+def bar: (((G[string]) -> (G[string])) & ((G[number]) -> (G[number]))) & ((G[bool]) -> (G[bool]))
 
-def create: ((number) -> ((unit -> (number)))) & ((bool) -> ((unit -> (bool))))
+def tst: (({ z: number }) -> ({ y: string })) & (({ z: bool }) -> ({ y: string }))
 
-def id: ((M) -> (())) & ((N) -> (()))
+def u: (((number) | (bool)) -> (string)) & (({}) -> ((string) | ({})))
 
-def db: ((number) -> ((MutArray[number]))) & (({}) -> ((MutArray[{}])))
+def doSome: (((T) & (U)) -> ((T) & (U))) & ((string) -> (nothing))
+
+def create: ((number) -> (unit -> (number))) & ((bool) -> (unit -> (bool)))
+
+def id: ((M) -> ({ foo: (anything) -> (anything) })) & ((N) -> ({}))
+
+def db: ((number) -> (MutArray[number])) & (({}) -> (MutArray[{}]))
 

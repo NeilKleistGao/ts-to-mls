@@ -1,19 +1,19 @@
-// AA.class C 
-// 	f: 
-def f: (anything) -> ((string))
+class C: { f: unit -> (unit) }
 
-// AA.interface I 
-// AA.	f: 
+def f: (anything) -> (string)
+
+trait I: { f: unit -> (number) }
+
 // [debug] N1.N2.fff: (boolean) => number
-def fff: (bool) -> ((number))
+def fff: (bool) -> (number)
 
-// N1.class C 
-// 	f: 
-def f: (anything) -> ((number))
+class C: { f: unit -> (unit) }
+
+def f: (anything) -> (number)
 
 // [debug] f1: (undefined) => C
-def f1: (undefined) -> ((C))
+def f1: (undefined) -> (C)
 
 // [debug] f2: (undefined) => C
-def f2: (undefined) -> ((C))
+def f2: (undefined) -> (C)
 

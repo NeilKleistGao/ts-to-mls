@@ -21,9 +21,6 @@ object Converter {
         if (params.length == 0) s"${primitiveName("void")} -> (${convert(res)})"
         else params.foldRight(convert(res))((tst, mlst) => s"(${convert(tst)}) -> (${mlst})")
       func
-      // val consList = convertConstrianedList(constraint)
-      // if (consList.length == 0) func
-      // else Constrained(func, consList)
     }
     case TSUnionType(lhs, rhs) => s"(${convert(lhs)}) | (${convert(rhs)})"
     case TSIntersectionType(lhs, rhs) => s"(${convert(lhs)}) & (${convert(rhs)})"
@@ -32,27 +29,16 @@ object Converter {
     case TSArrayType(element) => s"MutArray[${convert(element)}]"
     case TSEnumType(_) => "int"
     case TSMemberType(base, modifier) => convert(base)
-    // case TSInterfaceType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
-    // case TSClassType(_, members, _, typeVars, parents) => convertRecord(members, typeVars, parents)
+    case TSInterfaceType(name, members, typeVars, parents) => convertRecord(s"trait $name", members, typeVars, parents)
+    case TSClassType(name, members, _, typeVars, parents) => convertRecord(s"class $name",members, typeVars, parents)
     case TSApplicationType(base, applied) => base match {
       case TSNamedType(name) => s"${name}[${convertApply(applied)}]"
-      case _ => throw new java.lang.Exception(s"Wrong Base Type in TSApplicationType: $base") // TODO: can we find the name?
+      case TSClassType(name, _, _, _, _) => s"${name}[${convertApply(applied)}]"
+      case TSInterfaceType(name, _, _, _) => s"${name}[${convertApply(applied)}]"
+      case _ => throw new java.lang.Exception(s"Wrong Base Type in TSApplicationType: $base")
     }
-    // case _ => throw new java.lang.Exception("Unknown TypeScript Type")
-    case _ => ""
+    case _ => throw new java.lang.Exception("Unknown TypeScript Type")
   }
-
-  // private def convertTypeVariable(tstv: TSTypeVariable) = TypeName(tstv.name)
-  // private def convertConstrained(tstv: TSTypeVariable): Option[Bounds] = tstv.constraint match {
-  //   case Some(v) => Some(Bounds(Bot, convert(v)))
-  //   case _ => None
-  // }
-
-  // private def convertConstrianedList(typeVars: List[TSTypeVariable]) =
-  //   typeVars.foldLeft(List[(TypeVar, Bounds)]())((lst, v) => convertConstrained(v) match {
-  //       case Some(bd) => lst :+ (TypeVar(Right(v.name), None) -> bd)
-  //       case _ => lst
-  //     })
 
   private def convertTuple(types: List[TSType]): String =
     types.foldLeft("")((p, t) => s"$p${convert(t)}, ")
@@ -64,28 +50,24 @@ object Converter {
     val res = applied.foldLeft("")((p, t) => s"$p${convert(t)}, ")
     res.substring(0, res.length() - 2)
   }
-  // private def convertField(tst: TSType): Field = {
-  //   val t = convert(tst)
-  //   t match {
-  //     case Function(lhs, rhs) => Field(Some(lhs), rhs)
-  //     case _ => Field(None, t) 
-  //   }
-  // }
 
-  // private def convertRecord(members: Map[String, TSMemberType]): Record =
-  //   Record(members.toList.foldLeft(List[(Var, Field)]())((list, m) => m._2.modifier match {
-  //     case Public => list :+ (Var(m._1), convertField(m._2))
-  //     case _ => list
-  //   }))
-
-  // private def convertRecord(members: Map[String, TSMemberType], typeVars: List[TSTypeVariable], parents: List[TSType]): Type = {
-  //   val rec: Record = convertRecord(members)
-  //   val cons = convertConstrianedList(typeVars)
-  //   val typedInt = if (cons.isEmpty) rec else Constrained(rec, cons)
+  private def convertRecord(typeName: String, members: Map[String, TSMemberType], typeVars: List[TSTypeVariable], parents: List[TSType]) = {
+    val rec = members.toList.foldLeft(" ")((p, m) => m._2.modifier match {
+      case Public => s"$p${m._1}: ${convert(m._2)}; "
+      case _ => p
+    })
     
-  //   parents.foldLeft(typedInt)((t, p) => convert(p) match {
-  //     case r: Record => WithExtension(t, r)
-  //     case _ => t
-  //   })
-  // }
+    val body = if (members.isEmpty) "{}"
+      else s"{${rec.substring(0, rec.length() - 2)} }"
+    
+    if (typeName.equals("trait ")) body
+    else {
+      val extBody = parents.foldLeft(body)((b, p) => s"$b & ${convert(p)}")
+      val params = typeVars.foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
+      if (params.length == 0)
+        s"$typeName: $extBody"
+      else
+        s"$typeName[${params.substring(0, params.length() - 2)}]: $extBody"
+    }
+  }
 }
