@@ -25,4 +25,4 @@ jobs:
     - name: Run tests
       run: sbt ts2mlsJS/test
     - name: Check no changes
-      run: git diff-files -p --exit-code
+      run: git diff-index --quiet HEAD
