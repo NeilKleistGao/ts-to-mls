@@ -1,17 +1,17 @@
-////| class EZ 
-////| 	inc: number -> number
-////| 	foo: unit -> unit
-////| 	bar: undefined
-////| class Foo where 
-////| 	bar: T -> unit
-////| class Outer 
-////| 	class Inner 
-////| 		a: number
-////| class Student 
-////| 	name: string
-////| 	isFriend: Student -> bool
-////| 	a: number
-////| [debug] addScore: (string, number) => void
-////| 	addScore: string -> number -> unit
-////| 	b: string
-////| 	getID: unit -> number
+// class EZ 
+// 	inc: 
+// 	foo: 
+// 	bar: 
+// class Foo where 
+// 	bar: 
+// class Outer 
+// 	class Inner 
+// 		a: 
+// class Student 
+// 	name: 
+// 	isFriend: 
+// 	a: 
+// [debug] addScore: (string, number) => void
+// 	addScore: 
+// 	b: 
+// 	getID: 

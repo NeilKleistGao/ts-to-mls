@@ -1,19 +1,33 @@
-////| class A 
-////| 	x: number
-////| class B 
-////| tupleIt: string -> (mut in unit out string,)
-////| swap: ({x: number}, {},) -> (B, A,)
-////| class FFF 
-////| 	fff: T -> unit
-////| fff: FFF[string] -> string -> unit
-////| foo: (T & U) -> unit
-////| vec2: number -> number -> (number, number,)
-////| s: bool -> (string | number, number | false | true,)
-////| ex: T -> U -> (T, U, T & U,)
-////| third: (number, number, number,) -> number
-////| getFFF: unit -> FFF[number]
-////| twoFunctions: (mut number, mut number,) -> number -> number
-////| conv: {y: number} -> ({y: number}, {z: string},)
-////| value: (string, bool,) -> bool
-////| key: (string, bool,) -> string
-////| s2: (bool, string | number,) -> (string | number)
+// class A 
+// 	x: 
+// class B 
+def tupleIt: (string) -> (())
+
+def swap: () -> (())
+
+// class FFF 
+// 	fff: 
+def fff: () -> ((string) -> ((unit)))
+
+def foo: () -> ((unit))
+
+def vec2: (number) -> ((number) -> (()))
+
+def s: (bool) -> (())
+
+def ex: () -> (() -> (()))
+
+def third: () -> ((number))
+
+def getFFF: unit -> ()
+
+def twoFunctions: () -> ((number) -> ((number)))
+
+def conv: () -> (())
+
+def value: () -> ((bool))
+
+def key: () -> ((string))
+
+def s2: () -> (((string) | (number)))
+

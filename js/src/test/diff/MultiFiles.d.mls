@@ -1,6 +1,10 @@
-////| multi4: unit -> unit
-////| multi3: unit -> unit
-////| multi2: string -> string
-////| multi1: number -> number
-////| interface Base 
-////| 	a: number
+def multi4: unit -> (unit)
+
+def multi3: unit -> (unit)
+
+def multi2: (string) -> ((string))
+
+def multi1: (number) -> ((number))
+
+// interface Base 
+// 	a: 

@@ -25,12 +25,12 @@ object Converter {
       // if (consList.length == 0) func
       // else Constrained(func, consList)
     }
-    // case TSUnionType(lhs, rhs) => Union(convert(lhs), convert(rhs))
-    // case TSIntersectionType(lhs, rhs) => Inter(convert(lhs), convert(rhs))
+    case TSUnionType(lhs, rhs) => s"(${convert(lhs)}) | (${convert(rhs)})"
+    case TSIntersectionType(lhs, rhs) => s"(${convert(lhs)}) & (${convert(rhs)})"
     // case v: TSTypeVariable => convertTypeVariable(v)
     // case TSTupleType(lst) => convertTuple(lst)
-    // case TSArrayType(_) => TypeName("MutArray")
-    // case TSEnumType(_) => TypeName("int")
+    case TSArrayType(element) => s"MutArray[${convert(element)}]"
+    case TSEnumType(_) => "int"
     // case TSMemberType(base, modifier) => convert(base)
     // case TSInterfaceType(_, members, typeVars, parents) => convertRecord(members, typeVars, parents)
     // case TSClassType(_, members, _, typeVars, parents) => convertRecord(members, typeVars, parents)

@@ -1,16 +1,27 @@
-////| toStr: (number | bool | undefined) -> string
-////| buildName: string -> (string | undefined) -> string
-////| class B 
-////| class ABC 
-////| boo: (T & U | undefined) -> unit
-////| buildName2: string -> (string | undefined) -> string
-////| err: ((number, string,) | undefined) -> unit
-////| testSquareConfig: (SquareConfig | undefined) -> unit
-////| boom: (B[nothing] | undefined) -> anything
-////| testABC: (ABC | undefined) -> unit
-////| buildName3: string -> any[] -> string
-////| interface SquareConfig 
-////| 	color: string | undefined
-////| 	width: number | undefined
-////| getOrElse: (MutArray | undefined) -> {}
-////| did: number -> (number -> number | undefined) -> number
+def toStr: (((number) | (bool)) | (undefined)) -> ((string))
+
+def buildName: (string) -> (((string) | (undefined)) -> ((string)))
+
+// class B 
+// class ABC 
+def boo: ((() & ()) | (undefined)) -> ((unit))
+
+def buildName2: (string) -> (((string) | (undefined)) -> ((string)))
+
+def err: (() | (undefined)) -> ((unit))
+
+def testSquareConfig: ((SquareConfig) | (undefined)) -> ((unit))
+
+def boom: (() | (undefined)) -> ((anything))
+
+def testABC: ((ABC) | (undefined)) -> ((unit))
+
+def buildName3: (string) -> ((any[]) -> ((string)))
+
+// interface SquareConfig 
+// 	color: 
+// 	width: 
+def getOrElse: ((MutArray[{}]) | (undefined)) -> (({}))
+
+def did: (number) -> ((((number) -> ((number))) | (undefined)) -> ((number)))
+

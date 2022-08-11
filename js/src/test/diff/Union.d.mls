@@ -1,6 +1,12 @@
-////| test: bool -> (string | number)
-////| get: MutArray -> unit
-////| run: (number -> number | number -> string) -> anything
-////| typeVar: (T | U) -> (T | U)
-////| getString: (string | number | bool) -> string
-////| get2: ((string, string,) | (number, string,)) -> string
+def test: (bool) -> (((string) | (number)))
+
+def get: ((MutArray[number]) | (MutArray[string])) -> ((unit))
+
+def run: (((number) -> ((number))) | ((number) -> ((string)))) -> ((anything))
+
+def typeVar: (() | ()) -> ((() | ()))
+
+def getString: (((string) | (number)) | (bool)) -> ((string))
+
+def get2: (() | ()) -> ((string))
+

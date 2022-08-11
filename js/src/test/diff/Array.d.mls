@@ -1,3 +1,6 @@
-////| getZero3: unit -> MutArray
-////| first2: MutArray -> number -> number
-////| first: MutArray -> string
+def getZero3: unit -> (MutArray[number])
+
+def first2: (MutArray[(number) -> ((number))]) -> (((number) -> ((number))))
+
+def first: (MutArray[string]) -> ((string))
+

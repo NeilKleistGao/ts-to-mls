@@ -1,8 +1,8 @@
-////| class A 
-////| 	foo: unit -> unit
-////| class B extends class A
-////| class C 
-////| 	t: T
-////| 	set: T -> unit
-////| 	get: unit -> T
-////| class D extends class C<number>
+// class A 
+// 	foo: 
+// class B extends class A
+// class C 
+// 	t: 
+// 	set: 
+// 	get: 
+// class D extends class C<number>

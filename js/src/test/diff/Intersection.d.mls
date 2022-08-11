@@ -1,2 +1,4 @@
-////| extend: T -> U -> (T & U)
-////| foo: (T & U) -> unit
+def extend: () -> (() -> ((() & ())))
+
+def foo: (() & ()) -> ((unit))
+

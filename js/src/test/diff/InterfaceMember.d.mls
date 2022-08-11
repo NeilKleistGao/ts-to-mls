@@ -1,29 +1,31 @@
-////| interface II where 
-////| 	test: T -> number
-////| interface Counter 
-////| 	__call: number -> string
-////| 	interval: number
-////| 	reset: unit -> unit
-////| interface IEvent 
-////| 	callback: number -> unit
-////| interface StringArray 
-////| 	__index: number -> string
-////| interface Simple2 where 
-////| 	abc: T
-////| get: {t: string} -> string
-////| interface Next extends interface Simple {
-////| 	a: number
-////| 	b: (boolean) => string
-////| }
-////| create: unit -> {v: number | undefined}
-////| interface SearchFunc 
-////| 	__call: string -> string -> bool
-////| interface Simple 
-////| 	a: number
-////| 	b: bool -> string
-////| interface IFoo 
-////| 	a: string
-////| 	b: number -> number
-////| 	c: unit -> bool
-////| [debug] d: (string) => void
-////| 	d: string -> unit
+// interface II where 
+// 	test: 
+// interface Counter 
+// 	__call: 
+// 	interval: 
+// 	reset: 
+// interface IEvent 
+// 	callback: 
+// interface StringArray 
+// 	__index: 
+// interface Simple2 where 
+// 	abc: 
+def get: () -> ((string))
+
+// interface Next extends interface Simple {
+// 	a: number
+// 	b: (boolean) => string
+// }
+def create: unit -> ()
+
+// interface SearchFunc 
+// 	__call: 
+// interface Simple 
+// 	a: 
+// 	b: 
+// interface IFoo 
+// 	a: 
+// 	b: 
+// 	c: 
+// [debug] d: (string) => void
+// 	d: 
