@@ -1,2 +1,5 @@
-////| extend: T -> U -> (T & U)
-////| foo: (T & U) -> unit
+def extend[T, U]: (T) -> ((U) -> ((T) & (U)))
+
+// [debug] foo: (T' & U') => void
+def foo[T, U]: ((T) & (U)) -> (unit)
+

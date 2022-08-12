@@ -1,17 +1,8 @@
-////| class EZ 
-////| 	inc: number -> number
-////| 	foo: unit -> unit
-////| 	bar: undefined
-////| class Foo where 
-////| 	bar: T -> unit
-////| class Outer 
-////| 	class Inner 
-////| 		a: number
-////| class Student 
-////| 	name: string
-////| 	isFriend: Student -> bool
-////| 	a: number
-////| [debug] addScore: (string, number) => void
-////| 	addScore: string -> number -> unit
-////| 	b: string
-////| 	getID: unit -> number
+class EZ: { inc: (number) -> (number) }
+
+class Foo[T]: { bar: (T) -> (unit) }
+
+class Outer: {}
+
+class Student: { name: string; isFriend: (Student) -> (bool); addScore: (string) -> ((number) -> (unit)); getID: unit -> (number) }
+

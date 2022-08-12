@@ -32,6 +32,4 @@ abstract class TSFieldType(members: Map[String, TSMemberType], parents: List[TST
       case _ => throw new java.lang.Exception(s"Field \"$fieldName\" not found.")
     }
   }
-
-  def visit(writer: DecWriter, prefix: String): Unit = ???
 }
