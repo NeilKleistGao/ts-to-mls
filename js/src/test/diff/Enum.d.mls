@@ -1,4 +1,4 @@
-def stop: unit -> (Color)
+def stop: unit -> (int)
 
-def pass: (Color) -> (bool)
+def pass: (int) -> (bool)
 
