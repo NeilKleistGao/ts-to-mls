@@ -69,7 +69,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
           if (!typeNode.typeArguments.isUndefined)
             TSApplicationType(name, getApplicationArguments(typeNode.typeArguments, 0))
           else if (tv.contains(name)) tv(name)
-          else if (ns.containsMember(name.split("'").toList)) TSNamedType(name)
+          else if (ns.containsMember(name)) TSNamedType(name)
           else TSEnumType(name)
         }
         else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
@@ -111,7 +111,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
             TSInterfaceType("", getInterfacePropertiesType(symDec.properties, 0), List(), List())
           else if (!dec.isUndefined && !dec.members.isUndefined)
             TSInterfaceType("", getInterfacePropertiesType(dec.members, 0), List(), List())
-          else tv.getOrElse(obj.symbol.escapedName, TSNamedType(obj.symbol.getFullName)) 
+          else tv.getOrElse(obj.symbol.escapedName, TSNamedType(obj.symbol.escapedName)) 
       }
       else {
         if (tv.contains(obj.intrinsicName)) tv(obj.intrinsicName)

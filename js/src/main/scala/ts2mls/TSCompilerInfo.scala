@@ -54,14 +54,9 @@ class TSSymbolObject(sym: js.Dynamic) extends TSAny(sym) {
   lazy val escapedName: String = sym.escapedName.toString
   lazy val valueDeclaration: TSNodeObject = TSNodeObject(sym.valueDeclaration)
   lazy val exports = TSSymbolIter(sym.exports.entries())
-  lazy val parent = TSSymbolObject(sym.parent)
 
   def getType()(implicit checker: TSTypeChecker): String = checker.getTypeOfSymbolAtLocation(sym)
   def getFirstDeclaration(): TSNodeObject = TSNodeObject(sym.declarations.shift())
-
-  def getFullName(): String =
-    if (parent.isUndefined || parent.escapedName.equals("undefined") || parent.escapedName.equals("")) escapedName
-    else s"${parent.getFullName}'$escapedName"
 }
 
 object TSSymbolObject {
@@ -168,12 +163,7 @@ object TSTypeObject {
 }
 
 class TSIdentifierObject(id: js.Dynamic) extends TSAny(id) {
-  private lazy val left = TSIdentifierObject(id.left)
-  private lazy val right = TSIdentifierObject(id.right)
-
-  def escapedText(): String =
-    if (left.isUndefined) id.escapedText.toString
-    else s"${left.escapedText}'${right.escapedText}"
+  lazy val escapedText: String = id.escapedText.toString
 }
 
 object TSIdentifierObject {
