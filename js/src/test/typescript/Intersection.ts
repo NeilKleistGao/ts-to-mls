@@ -3,6 +3,9 @@ function extend<T, U>(first: T, second: U): T & U {
   return result;
 }
 
+/**
+ * @debug
+ */
 function foo<T, U>(x: T & U) {
   console.log(x)
 }
