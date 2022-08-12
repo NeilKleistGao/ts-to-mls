@@ -42,14 +42,25 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
       case f: TSFunctionType => {
         if (f.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", f.toString)
 
+        val nsName = getFullName()
+        val fullName = if (nsName.equals("")) p._1 else s"$nsName'${p._1}"
         val params = f.typeVars.foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
         if (params.length() == 0)
-          writer.generate(s"def ${p._1}: ${TSProgram.getMLSType(f)}")
+          writer.generate(s"def ${fullName}: ${TSProgram.getMLSType(f)}")
         else
-          writer.generate(s"def ${p._1}[${params.substring(0, params.length() - 2)}]: ${TSProgram.getMLSType(f)}")
+          writer.generate(s"def ${fullName}[${params.substring(0, params.length() - 2)}]: ${TSProgram.getMLSType(f)}")
       }
       case _ => writer.generate(TSProgram.getMLSType(p._2))
     })
+  }
+
+  def getFullName(): String = parent match {
+    case Some(p) => {
+      val pn = p.getFullName()
+      if (pn.equals("")) name
+      else s"$pn'$name"
+    }
+    case _ => ""
   }
 }
 
