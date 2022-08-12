@@ -2,7 +2,7 @@ def toStr: (((number) | (bool)) | (undefined)) -> (string)
 
 def buildName: (string) -> (((string) | (undefined)) -> (string))
 
-class B[T]: {}
+class B[T]: { b: T }
 
 class ABC: {}
 
