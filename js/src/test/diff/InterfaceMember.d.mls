@@ -10,7 +10,7 @@ trait Simple2[T]: { abc: T }
 
 def get: ({ t: string }) -> (string)
 
-trait Next: {} & trait Simple: { a: number; b: (bool) -> (string) }
+trait Next: {} & Simple
 
 def create: unit -> ({ v: (number) | (undefined) })
 
