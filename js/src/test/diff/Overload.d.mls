@@ -6,7 +6,7 @@ def swap: (((number, string, )) -> ((string, number, ))) & (((string, number, ))
 
 def f: ((number) -> (number)) & ((string) -> (string))
 
-class G[T]: {}
+class G[T]: { g: T }
 
 def g0: ((MutArray[string]) -> (string)) & ((MutArray[{}]) -> ({}))
 
