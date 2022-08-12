@@ -65,7 +65,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         if (typeNode.hasTypeName) {
           val name = typeNode.typeName.escapedText
           if (!typeNode.typeArguments.isUndefined)
-            TSApplicationType(TSNamedType(name), getApplicationArguments(typeNode.typeArguments, 0))
+            TSApplicationType(name, getApplicationArguments(typeNode.typeArguments, 0))
           else if (tv.contains(name)) tv(name)
           else TSNamedType(name)
         }
@@ -101,7 +101,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (obj.isUnionType) getStructuralType(obj.types, None, true, 0)
       else if (obj.isIntersectionType) getStructuralType(obj.types, None, false, 0)
       else if (obj.isArrayType) TSArrayType(getObjectType(args.get(0)))
-      else if (!args.isUndefined) TSApplicationType(TSNamedType(obj.symbol.escapedName), getApplicationArguments(args, 0))
+      else if (!args.isUndefined) TSApplicationType(obj.symbol.escapedName, getApplicationArguments(args, 0))
       else if (!obj.symbol.isUndefined) {
           val symDec = obj.symbol.valueDeclaration
           if (!symDec.isUndefined && !symDec.properties.isUndefined)
@@ -215,10 +215,10 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       val parent = tail.types.get(index)
       val name = parent.expression.escapedText
       if (parent.typeArguments.isUndefined)
-        getInheritList(list, index + 1) :+ ns.>(name)
+        getInheritList(list, index + 1) :+ TSNamedType(name)
       else {
         val app = getApplicationArguments(parent.typeArguments, 0)(Map())
-        getInheritList(list, index + 1) :+ TSApplicationType(ns.>(name), app)
+        getInheritList(list, index + 1) :+ TSApplicationType(name, app)
       }
     }
   }
