@@ -163,7 +163,12 @@ object TSTypeObject {
 }
 
 class TSIdentifierObject(id: js.Dynamic) extends TSAny(id) {
-  lazy val escapedText: String = id.escapedText.toString
+  private lazy val left = TSIdentifierObject(id.left)
+  private lazy val right = TSIdentifierObject(id.right)
+
+  def escapedText(): String =
+    if (left.isUndefined) id.escapedText.toString
+    else s"${left.escapedText}'${right.escapedText}"
 }
 
 object TSIdentifierObject {

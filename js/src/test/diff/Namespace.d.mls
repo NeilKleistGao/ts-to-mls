@@ -11,9 +11,9 @@ class C: { f: unit -> (unit) }
 
 def f: (anything) -> (number)
 
-// [debug] f1: (undefined) => C
+// [debug] f1: (N1'C) => C
 def f1: (N1'C) -> (N1'C)
 
-// [debug] f2: (undefined) => C
+// [debug] f2: (AA'C) => C
 def f2: (AA'C) -> (AA'C)
 

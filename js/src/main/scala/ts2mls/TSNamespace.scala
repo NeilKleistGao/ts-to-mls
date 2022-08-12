@@ -29,6 +29,12 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
   def containsMember(name: String): Boolean = 
     if (parent.isEmpty) members.contains(name) else (members.contains(name) || parent.get.containsMember(name))
 
+  def containsMember(path: List[String]): Boolean = path match {
+    case name :: Nil => containsMember(name)
+    case sub :: rest if (subSpace.contains(sub)) => subSpace(sub).containsMember(rest)
+    case _ => false
+  }
+
   override def visit(writer: DecWriter, prefix: String): Unit = {
     subSpace.foreach((p) => p._2.visit(writer, prefix + showPrefix))
     members.foreach((p) => p._2 match {
