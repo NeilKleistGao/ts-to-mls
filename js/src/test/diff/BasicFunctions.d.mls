@@ -1,29 +1,15 @@
 def hello: unit -> (unit)
-
 // [debug] add: (number, number) => number
 def add: (number) -> ((number) -> (number))
-
 def sub: (number) -> ((number) -> (number))
-
 def foo: unit -> (number)
-
 def id: (anything) -> (anything)
-
 def odd: (number) -> (bool)
-
 def isnull: (anything) -> (bool)
-
 def bar: unit -> (anything)
-
 def nu: (null) -> (null)
-
 def un: (undefined) -> (undefined)
-
 def fail: unit -> (nothing)
-
 def create: unit -> ({})
-
 def pa: (number) -> (number)
-
 def wtf: (anything) -> (unit)
-

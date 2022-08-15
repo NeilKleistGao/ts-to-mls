@@ -1,16 +1,8 @@
 def multi1: (number) -> (number)
-
 def multi3: unit -> (unit)
-
-trait Base: { a: number }
-
 class Foo: {} & Base
-
 trait AnotherBase: { y: string }
-
 def multi2: (string) -> (string)
-
 def multi4: unit -> (unit)
-
+trait Base: { a: number }
 class AnotherFoo: {} & AnotherBase
-
