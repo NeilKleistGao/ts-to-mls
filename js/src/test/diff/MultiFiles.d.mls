@@ -6,3 +6,4 @@ def multi2: (string) -> (string)
 def multi4: unit -> (unit)
 trait Base: { a: number }
 class AnotherFoo: {} & AnotherBase
+def multi5: unit -> (unit)
