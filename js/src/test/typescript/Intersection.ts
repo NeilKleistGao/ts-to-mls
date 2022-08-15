@@ -33,3 +33,11 @@ function uu<U, V, T, P>(x: (U | V) & (T | P)): (U | V) & (T | P) {
 function iiii<U, T, V>(x: U & (T & V)): U & (T & V) {
   return x;
 }
+
+function arr<U, T>(a: U[] & T[]): U[] & T[] {
+  return a;
+}
+
+function tt<U, T, V>(x: [U, T] & [V, V]): [U, T] & [V, V] {
+  return x;
+}
