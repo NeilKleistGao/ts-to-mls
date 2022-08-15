@@ -9,3 +9,5 @@ function multi4() {
 interface Base {
   a: number
 }
+
+class AnotherFoo extends AnotherBase {}

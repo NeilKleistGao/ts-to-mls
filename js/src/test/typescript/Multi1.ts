@@ -4,4 +4,8 @@ function multi1(x: number) {
 
 function multi3() {}
 
-// class Foo extends Base {}
+class Foo extends Base {}
+
+interface AnotherBase {
+  y: string
+}
