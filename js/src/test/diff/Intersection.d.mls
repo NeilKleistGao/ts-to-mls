@@ -1,5 +1,17 @@
 def extend[T, U]: (T) -> ((U) -> ((T) & (U)))
 
+def uu[U, V, T, P]: (((U) | (V)) & ((T) | (P))) -> (((((U) & (T)) | ((U) & (P))) | ((V) & (T))) | ((V) & (P)))
+
+def over: (((number) -> (string)) & (({}) -> (string))) -> (string)
+
+def iiii[U, T, V]: ((U) & ((T) & (V))) -> (((U) & (T)) & (V))
+
 // [debug] foo: (T' & U') => void
 def foo[T, U]: ((T) & (U)) -> (unit)
+
+trait IA: { x: number }
+
+def iii: ((IA) & (IB)) -> (({ x: number }) & ({ y: number }))
+
+trait IB: { y: number }
 
