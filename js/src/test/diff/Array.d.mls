@@ -12,3 +12,4 @@ def translate[T, U]: (MutArray[T]) -> (MutArray[U])
 def uu: (MutArray[((number) | (false)) | (true)]) -> (MutArray[((number) | (false)) | (true)])
 class Temp[T]: { x: T }
 def ta: (MutArray[Temp[bool]]) -> (MutArray[Temp[bool]])
+def tat[T]: (MutArray[Temp[T]]) -> (MutArray[Temp[T]])

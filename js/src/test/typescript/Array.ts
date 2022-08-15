@@ -52,3 +52,7 @@ class Temp<T> {
 function ta(ts: Temp<boolean>[]): Temp<boolean>[] {
   return [];
 }
+
+function tat<T>(ts: Temp<T>[]): Temp<T>[] {
+  return [];
+}
