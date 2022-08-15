@@ -1,15 +1,15 @@
-class AA'C: { f: unit -> (unit) }
+def N1'f: (anything) -> (number)
 
-def AA'f: (anything) -> (string)
-
-trait AA'I: { f: unit -> (number) }
+class N1'C: { f: unit -> (unit) }
 
 // [debug] N1.N2.fff: (boolean) => number
 def N1'N2'fff: (bool) -> (number)
 
-class N1'C: { f: unit -> (unit) }
+def AA'f: (anything) -> (string)
 
-def N1'f: (anything) -> (number)
+class AA'C: { f: unit -> (unit) }
+
+trait AA'I: { f: unit -> (number) }
 
 // [debug] f1: (N1'C) => N1'C
 def f1: (N1'C) -> (N1'C)

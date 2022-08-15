@@ -1,10 +1,10 @@
-def multi4: unit -> (unit)
+def multi1: (number) -> (number)
 
 def multi3: unit -> (unit)
 
 def multi2: (string) -> (string)
 
-def multi1: (number) -> (number)
+def multi4: unit -> (unit)
 
 trait Base: { a: number }
 

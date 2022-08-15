@@ -1,8 +1,8 @@
-class EZ: { inc: (number) -> (number) }
+class Student: { name: string; isFriend: (Student) -> (bool); addScore: (string) -> ((number) -> (unit)); getID: unit -> (number) }
 
 class Foo[T]: { bar: (T) -> (unit) }
 
-class Outer: {}
+class EZ: { inc: (number) -> (number) }
 
-class Student: { name: string; isFriend: (Student) -> (bool); addScore: (string) -> ((number) -> (unit)); getID: unit -> (number) }
+class Outer: {}
 
