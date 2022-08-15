@@ -1,8 +1,4 @@
 class A: { foo: unit -> (unit) }
-
 class B: {} & A
-
 class C[T]: { set: (T) -> (unit); get: unit -> (T) }
-
 class D: {} & C[number]
-

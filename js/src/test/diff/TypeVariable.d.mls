@@ -1,12 +1,6 @@
-class CC[T]: { print: (T) -> (unit) }
-
-def con[U, T]: (T) -> (U)
-
-def setStringPrinter: (Printer[string]) -> (unit)
-
-def getStringPrinter: unit -> (Printer[string])
-
-class Printer[T]: { print: (T) -> (unit) }
-
 def inc[T]: (T) -> (number)
-
+class CC[T]: { print: (T) -> (unit) }
+def con[U, T]: (T) -> (U)
+class Printer[T]: { print: (T) -> (unit) }
+def setStringPrinter: (Printer[string]) -> (unit)
+def getStringPrinter: unit -> (Printer[string])

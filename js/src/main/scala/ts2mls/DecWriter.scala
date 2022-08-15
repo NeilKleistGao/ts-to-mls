@@ -16,7 +16,7 @@ class DecWriter(filename: String) {
 
   def debug(name: String, value: String): Unit = output(s"[debug] $name: $value")
 
-  def generate(str: String): Unit = DecWriter.fs.writeSync(out, s"$str\n\n")
+  def generate(str: String): Unit = DecWriter.fs.writeSync(out, s"$str\n")
 
   def close(): Unit = DecWriter.fs.closeSync(out)
 }

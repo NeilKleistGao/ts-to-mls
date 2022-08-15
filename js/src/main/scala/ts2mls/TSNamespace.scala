@@ -1,21 +1,28 @@
 package ts2mls
 
-import scala.collection.mutable.HashMap
+import scala.collection.mutable.{HashMap, ListBuffer}
 import types._
 
 class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
   private val subSpace = HashMap[String, TSNamespace]()
   private val members = HashMap[String, TSType]()
 
+  private val order = ListBuffer.empty[Either[String, String]]
+
   private lazy val showPrefix = if (name.equals("globalThis")) "" else s"$name."
 
   def derive(name: String): TSNamespace = {
     val sub = new TSNamespace(name, Some(this))
     subSpace.put(name, sub)
+    order += Left(name)
     sub
   }
 
-  def put(name: String, tp: TSType): Unit = members.put(name, tp)
+  def put(name: String, tp: TSType): Unit = {
+    if (!members.contains(name)) order += Right(name)
+    
+    members.put(name, tp)
+  }
 
   override def >(name: String): TSType = members.get(name) match {
     case Some(tst) => tst
@@ -36,21 +43,26 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
   }
 
   override def visit(writer: DecWriter, prefix: String): Unit = {
-    subSpace.foreach((p) => p._2.visit(writer, prefix + showPrefix))
-    members.foreach((p) => p._2 match {
-      case inter: TSIntersectionType => writer.generate(s"def ${p._1}: ${TSProgram.getMLSType(inter)}")
-      case f: TSFunctionType => {
-        if (f.dbg) writer.debug(s"${prefix}$showPrefix${p._1}", f.toString)
-
-        val nsName = getFullName()
-        val fullName = if (nsName.equals("")) p._1 else s"$nsName'${p._1}"
-        val params = f.typeVars.foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
-        if (params.length() == 0)
-          writer.generate(s"def ${fullName}: ${TSProgram.getMLSType(f)}")
-        else
-          writer.generate(s"def ${fullName}[${params.substring(0, params.length() - 2)}]: ${TSProgram.getMLSType(f)}")
+    order.toList.foreach((p) => p match {
+      case Left(name) => subSpace(name).visit(writer, prefix + showPrefix)
+      case Right(name) => {
+        val mem = members(name)
+        mem match {
+          case inter: TSIntersectionType => writer.generate(s"def ${name}: ${TSProgram.getMLSType(inter)}")
+          case f: TSFunctionType => {
+            if (f.dbg) writer.debug(s"${prefix}$showPrefix${name}", f.toString)
+          
+            val nsName = getFullName()
+            val fullName = if (nsName.equals("")) name else s"$nsName'${name}"
+            val params = f.typeVars.foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
+            if (params.length() == 0)
+              writer.generate(s"def ${fullName}: ${TSProgram.getMLSType(f)}")
+            else
+              writer.generate(s"def ${fullName}[${params.substring(0, params.length() - 2)}]: ${TSProgram.getMLSType(f)}")
+          }
+          case _ => writer.generate(TSProgram.getMLSType(mem))
+        }
       }
-      case _ => writer.generate(TSProgram.getMLSType(p._2))
     })
   }
 
