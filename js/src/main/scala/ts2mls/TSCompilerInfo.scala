@@ -114,7 +114,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   }
 
   private def getTypeField(t: TSNodeObject): TSNodeObject =
-    if (t.isUndefined || t.`type`.isUndefined || t.`type`.isToken) t else t.`type`
+    if (t.isUndefined || !t.parameters.isUndefined || t.`type`.isUndefined || t.`type`.isToken) t else t.`type`
 
   def `type`(): TSNodeObject = getTypeField(TSNodeObject(node.selectDynamic("type")))
 
