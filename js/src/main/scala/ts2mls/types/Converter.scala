@@ -30,7 +30,7 @@ object Converter {
     case TSEnumType(_) => "int"
     case TSMemberType(base, modifier) => convert(base)
     case TSInterfaceType(name, members, typeVars, parents) => convertRecord(s"trait $name", members, typeVars, parents)
-    case TSClassType(name, members, _, typeVars, parents) => convertRecord(s"class $name",members, typeVars, parents)
+    case TSClassType(name, members, _, typeVars, parents) => convertRecord(s"class $name", members, typeVars, parents)
     case TSApplicationType(base, applied) => s"${base}[${convertApply(applied)}]"
     case _ => throw new java.lang.Exception("Unknown TypeScript Type")
   }

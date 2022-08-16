@@ -48,3 +48,7 @@ interface Simple2<T extends number> {
 }
 
 interface Next extends Simple {}
+
+interface TTT<T> {
+  ttt: (x: T) => T
+}

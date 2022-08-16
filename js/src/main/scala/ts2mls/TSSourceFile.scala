@@ -64,7 +64,9 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
     case node: TSNodeObject => {
       val res = {
         val typeNode = node.`type`
-        if (typeNode.hasTypeName) {
+        if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
+        else if (node.isFunctionLike) getFunctionType(node)
+        else if (typeNode.hasTypeName) {
           val name = typeNode.typeName.escapedText
           if (!typeNode.typeArguments.isUndefined)
             TSApplicationType(name, getApplicationArguments(typeNode.typeArguments, 0))
@@ -72,8 +74,6 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
           else if (ns.containsMember(name.split("'").toList)) TSNamedType(name)
           else TSEnumType(name)
         }
-        else if (typeNode.isFunctionTypeNode) getFunctionType(typeNode)
-        else if (node.isFunctionLike) getFunctionType(node)
         else if (typeNode.isTupleTypeNode) TSTupleType(getTupleElements(typeNode.elements, 0))
         else if (node.isTupleTypeNode) TSTupleType(getTupleElements(node.elements, 0))
         else if (typeNode.isUnionTypeNode) getUnionType(typeNode.typesToken, None, 0)
@@ -116,6 +116,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
           else if (!dec.isUndefined && !dec.members.isUndefined)
             TSInterfaceType("", getInterfacePropertiesType(dec.members, 0), List(), List())
           else tv.getOrElse(obj.symbol.escapedName, TSNamedType(obj.symbol.getFullName)) 
+      }
+      else if (!obj.aliasSymbol.isUndefined) {
+        val name = obj.aliasSymbol.escapedName
+        if (tv.contains(name)) tv(name)
+        else TSNamedType(name)
       }
       else {
         if (tv.contains(obj.intrinsicName)) tv(obj.intrinsicName)
