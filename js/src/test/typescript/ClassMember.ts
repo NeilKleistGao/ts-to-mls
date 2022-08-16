@@ -36,3 +36,11 @@ class Outer {
    a: number
   } 
 }
+
+class TTT<T> {
+  ttt(x: T): T {
+    return x;
+  }
+
+  ttt2: (x: T) => T
+}
