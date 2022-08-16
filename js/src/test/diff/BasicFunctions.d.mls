@@ -1,5 +1,4 @@
 def hello: unit -> (unit)
-// [debug] add: (number, number) => number
 def add: (number) -> ((number) -> (number))
 def sub: (number) -> ((number) -> (number))
 def foo: unit -> (number)
@@ -13,3 +12,9 @@ def fail: unit -> (nothing)
 def create: unit -> ({})
 def pa: (number) -> (number)
 def wtf: (anything) -> (unit)
+class Foooooo: { ooooooo: number }
+def inn: (Foooooo) -> (unit)
+def out: unit -> ({ ooooooo: number })
+trait Barrrrrrrrr: { rrrrrrr: number }
+def inn2: (Barrrrrrrrr) -> (unit)
+def out2: unit -> ({ rrrrrrr: number })
