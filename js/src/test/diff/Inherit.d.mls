@@ -9,4 +9,4 @@ trait Never: { w: unit -> (nothing) } & WuWuWu
 class VG[T]: { x: T }
 class Home[T]: { y: T } & VG[string]
 trait O[I]: { xx: (I) -> (I) }
-class OR[R]: {} & O[R]
+class OR[R]: { xx: (R) -> (R) } & O[R]

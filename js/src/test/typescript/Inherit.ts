@@ -48,4 +48,8 @@ interface O<I> {
   xx: (x: I) => I
 }
 
-class OR<R> extends O<R> {}
+class OR<R> implements O<R> {
+  xx(x: R): R {
+    return x;
+  }
+}
