@@ -14,7 +14,7 @@ def pa: (number) -> (number)
 def wtf: (anything) -> (unit)
 class Foooooo: { ooooooo: number }
 def inn: (Foooooo) -> (unit)
-def out: unit -> ({ ooooooo: number })
+def out: unit -> (Foooooo)
 trait Barrrrrrrrr: { rrrrrrr: number }
 def inn2: (Barrrrrrrrr) -> (unit)
-def out2: unit -> ({ rrrrrrr: number })
+def out2: unit -> (Barrrrrrrrr)

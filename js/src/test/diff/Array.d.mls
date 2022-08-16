@@ -4,8 +4,8 @@ def first2: (MutArray[(number) -> (number)]) -> ((number) -> (number))
 def doEs: (MutArray[int]) -> (MutArray[int])
 class C: {}
 trait I: { i: number }
-def doCs: (MutArray[{}]) -> (MutArray[C])
-def doIs: (MutArray[{ i: number }]) -> (MutArray[I])
+def doCs: (MutArray[C]) -> (MutArray[C])
+def doIs: (MutArray[I]) -> (MutArray[I])
 def inter[U, T]: (MutArray[(U) & (T)]) -> (MutArray[(U) & (T)])
 def clean: (MutArray[(string, number, )]) -> (MutArray[(string, number, )])
 def translate[T, U]: (MutArray[T]) -> (MutArray[U])
