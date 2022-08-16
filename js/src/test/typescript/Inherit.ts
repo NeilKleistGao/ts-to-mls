@@ -43,3 +43,9 @@ class VG<T> {
 class Home<T> extends VG<string> {
   y: T
 }
+
+interface O<I> {
+  xx: (x: I) => I
+}
+
+class OR<R> extends O<R> {}
