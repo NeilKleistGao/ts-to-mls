@@ -111,7 +111,9 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       else if (!args.isUndefined) TSApplicationType(obj.symbol.escapedName, getApplicationArguments(args, 0))
       else if (!obj.symbol.isUndefined) {
           val symDec = obj.symbol.valueDeclaration
-          if (!symDec.isUndefined && !symDec.properties.isUndefined)
+          val name = obj.symbol.escapedName
+          if (ns.containsMember(name.split("'").toList)) TSNamedType(name)
+          else if (!symDec.isUndefined && !symDec.properties.isUndefined)
             TSInterfaceType("", getInterfacePropertiesType(symDec.properties, 0), List(), List())
           else if (!dec.isUndefined && !dec.members.isUndefined)
             TSInterfaceType("", getInterfacePropertiesType(dec.members, 0), List(), List())
@@ -122,10 +124,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
         if (tv.contains(name)) tv(name)
         else TSNamedType(name)
       }
-      else {
+      else if (obj.intrinsicName != null && !obj.intrinsicName.equals("error") && !obj.intrinsicName.equals("unresolved")) {
         if (tv.contains(obj.intrinsicName)) tv(obj.intrinsicName)
         else TSNamedType(obj.intrinsicName)
       }
+      else throw new java.lang.Exception("unknown type.")
     }
   }
 

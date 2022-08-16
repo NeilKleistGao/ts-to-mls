@@ -5,7 +5,7 @@ def create: ((number) -> (unit -> (number))) & ((bool) -> (unit -> (bool)))
 def g0: ((MutArray[string]) -> (string)) & ((MutArray[{}]) -> ({}))
 def db: ((number) -> (MutArray[number])) & (({}) -> (MutArray[{}]))
 class N: {}
-def id: ((M) -> ({ foo: (anything) -> (anything) })) & ((N) -> ({}))
+def id: ((M) -> (M)) & ((N) -> (N))
 def tst: (({ z: number }) -> ({ y: string })) & (({ z: bool }) -> ({ y: string }))
 def op: ((number) -> (((number) | (undefined)) -> (unit))) & ((number) -> (((bool) | (undefined)) -> (unit)))
 def swap: (((number, string, )) -> ((string, number, ))) & (((string, number, )) -> ((number, string, )))

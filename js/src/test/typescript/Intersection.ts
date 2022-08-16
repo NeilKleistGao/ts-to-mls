@@ -41,3 +41,10 @@ function arr<U, T>(a: U[] & T[]): U[] & T[] {
 function tt<U, T, V>(x: [U, T] & [V, V]): [U, T] & [V, V] {
   return x;
 }
+
+class A{}
+class B{}
+
+function inter(c: A & B): A & B {
+  return c;
+}
