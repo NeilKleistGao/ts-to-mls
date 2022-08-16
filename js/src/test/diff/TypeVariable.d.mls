@@ -4,5 +4,5 @@ def con[U, T]: (T) -> (U)
 class Printer[T]: { print: (T) -> (unit) }
 def setStringPrinter: (Printer[string]) -> (unit)
 def getStringPrinter: unit -> (Printer[string])
-def foo[T]: (Printer[T]) -> (T)
-def foo2[T]: (Printer[T]) -> (T)
+def foo[T]: (Printer[T]) -> ((T) -> (T))
+def foo2[T]: (Printer[T]) -> ((T) -> (T))
