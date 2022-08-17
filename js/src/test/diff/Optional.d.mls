@@ -1,6 +1,7 @@
 def buildName: (string) -> (((string) | (undefined)) -> (string))
 def buildName2: (string) -> (((string) | (undefined)) -> (string))
-def buildName3: (string) -> ((any[]) -> (string))
+def buildName3: (string) -> ((MutArray[string]) -> (string))
+def buildName4: (string) -> ((MutArray[anything]) -> (string))
 trait SquareConfig: { color: (string) | (undefined); width: (number) | (undefined) }
 def did: (number) -> ((((number) -> (number)) | (undefined)) -> (number))
 def getOrElse: ((MutArray[{}]) | (undefined)) -> ({})
