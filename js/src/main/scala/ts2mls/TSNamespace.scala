@@ -33,8 +33,8 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
 
   override def toString(): String = s"namespace $name"
 
-  def containsMember(name: String): Boolean = 
-    if (parent.isEmpty) members.contains(name) else (members.contains(name) || parent.get.containsMember(name))
+  def containsMember(name: String, searchParent: Boolean = true): Boolean = 
+    if (parent.isEmpty) members.contains(name) else (members.contains(name) || (searchParent && parent.get.containsMember(name)))
 
   def containsMember(path: List[String]): Boolean = path match {
     case name :: Nil => containsMember(name)

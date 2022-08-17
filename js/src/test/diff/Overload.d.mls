@@ -13,3 +13,4 @@ def u: (((number) | (bool)) -> (string)) & (({}) -> ((string) | ({})))
 def doSome[T, U]: (((T) & (U)) -> ((T) & (U))) & ((string) -> (nothing))
 class G[T]: { g: T }
 def bar: (((G[string]) -> (G[string])) & ((G[number]) -> (G[number]))) & ((G[bool]) -> (G[bool]))
+def XX'f[T]: (T) -> ((number) -> (string))

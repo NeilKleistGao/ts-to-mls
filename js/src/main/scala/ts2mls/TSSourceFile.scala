@@ -324,9 +324,11 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
       val name = data._1
       val node = data._2.getFirstDeclaration()
 
+      System.out.println(s"rua: $name")
+
       if (!node.isToken && node.isFunctionDeclaration) {
         val func = getFunctionType(node)(ns, Map())
-        if (!ns.containsMember(name)) ns.put(name, func)
+        if (!ns.containsMember(name, false)) ns.put(name, func)
         else ns.>(name) match {
           case old: TSFunctionType if (node.body.isUndefined) =>
             ns.put(name, TSIntersectionType(old, func))
