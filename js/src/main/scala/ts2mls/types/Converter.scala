@@ -51,6 +51,11 @@ object Converter {
       case Public => {
         m._2.base match {
           case TSFunctionType(_, _, typeVars) if (typeVars.length > 0) => p
+          case inter: TSIntersectionType => {
+            val lst = TSIntersectionType.getOverloadTypeVariables(inter)
+            if (lst.isEmpty) s"$p${m._1}: ${convert(m._2)}; "
+            else p
+          }
           case _ => s"$p${m._1}: ${convert(m._2)}; "
         }
       }
@@ -77,6 +82,14 @@ object Converter {
           case TSFunctionType(_, _, typeVars) if (typeVars.length > 0) => {
             val params = typeVars.foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
             s"$p\n  method ${m._1}[${params.substring(0, params.length - 2)}]: ${convert(m._2)}"
+          }
+          case inter: TSIntersectionType => {
+            val lst = TSIntersectionType.getOverloadTypeVariables(inter)
+            if (lst.isEmpty) p
+            else {
+              val params = lst.foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
+              s"$p\n  method ${m._1}[${params.substring(0, params.length - 2)}]: ${convert(m._2)}"
+            }
           }
           case _ => p
         }
