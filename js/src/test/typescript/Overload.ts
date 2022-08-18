@@ -101,3 +101,21 @@ function bar(x: G<boolean>): G<boolean>;
 function bar(x) {
   return x;
 }
+
+namespace XX {
+  export function f<T>(x: T, n: number): string;
+  export function f<T>(x: T, n: boolean): string;
+
+  export function f<T>(x, n) {
+    return "";
+  }
+}
+
+class WWW {
+  F<T>(x: string): T;
+  F<T>(x: number): T;
+
+  F<T>(x) {
+    return null;
+  }
+}

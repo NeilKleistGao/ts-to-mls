@@ -50,17 +50,23 @@ object TSTypeChecker {
 }
 
 class TSSymbolObject(sym: js.Dynamic) extends TSAny(sym) {
-  lazy val declaration = if (js.isUndefined(sym)) TSNodeObject(sym) else getFirstDeclaration
+  lazy val declaration =
+    if (js.isUndefined(sym)) TSNodeObject(sym)
+    else if (declarations.isUndefined) TSNodeObject(sym.declarations)
+    else declarations.get(0)
   lazy val escapedName: String = sym.escapedName.toString
   lazy val valueDeclaration: TSNodeObject = TSNodeObject(sym.valueDeclaration)
   lazy val exports = TSSymbolIter(sym.exports.entries())
   lazy val parent = TSSymbolObject(sym.parent)
+  lazy val declarations = TSNodeArray(sym.declarations)
 
   def getType()(implicit checker: TSTypeChecker): String = checker.getTypeOfSymbolAtLocation(sym)
-  def getFirstDeclaration(): TSNodeObject = TSNodeObject(sym.declarations.shift())
 
   def getFullName(): String =
-    if (parent.isUndefined || parent.escapedName.equals("undefined") || parent.escapedName.equals("")) escapedName
+    if (parent.isUndefined ||
+        parent.escapedName.equals("undefined") ||
+        parent.escapedName.equals("") ||
+        !parent.declaration.isNamespace) escapedName
     else s"${parent.getFullName}'$escapedName"
 }
 
@@ -104,6 +110,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val typeArguments = TSTokenArray(node.typeArguments)
   lazy val expression: TSIdentifierObject = TSIdentifierObject(node.expression)
   lazy val modifiers = TSTokenArray(node.modifiers)
+  lazy val dotDotDot = TSTokenObject(node.dotDotDotToken)
 
   private lazy val tagName =
     if (isUndefined) TSIdentifierObject(node) else TSIdentifierObject(node.tagName)
@@ -160,7 +167,7 @@ class TSTypeObject(obj: js.Dynamic) extends TSAny(obj) with TSTypeSource {
   lazy val isEnumType: Boolean = !aliasSymbol.isUndefined && obj.aliasSymbol.hasOwnProperty("exports")
   lazy val isUnionType: Boolean = flags == TypeScript.typeFlagsUnion
   lazy val isIntersectionType: Boolean = flags == TypeScript.typeFlagsInter
-  lazy val declaration: TSNodeObject = if (symbol.isUndefined) TSNodeObject(obj.symbol) else symbol.getFirstDeclaration()
+  lazy val declaration: TSNodeObject = if (symbol.isUndefined) TSNodeObject(obj.symbol) else symbol.declaration
 }
 
 object TSTypeObject {

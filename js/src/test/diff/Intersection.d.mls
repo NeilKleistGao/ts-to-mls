@@ -1,5 +1,4 @@
 def extend[T, U]: (T) -> ((U) -> ((T) & (U)))
-// [debug] foo: (T' & U') => void
 def foo[T, U]: ((T) & (U)) -> (unit)
 def over: (((number) -> (string)) & (({}) -> (string))) -> (string)
 trait IA: { x: number }
