@@ -380,7 +380,7 @@ class TSSourceFile(sf: js.Dynamic, global: TSNamespace)(implicit checker: TSType
 
   private def parseNamespace(node: TSNodeObject)(implicit ns: TSNamespace): Unit = {
     val name = node.symbol.escapedName
-    val iterator = node.symbol.exports
+    val iterator = node.locals
     val sub = ns.derive(name)
     parseNamespaceExports(iterator)(sub)
   }

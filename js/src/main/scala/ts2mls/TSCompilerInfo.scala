@@ -114,6 +114,7 @@ case class TSNodeObject(node: js.Dynamic) extends TSAny(node) with TSTypeSource 
   lazy val modifiers = TSTokenArray(node.modifiers)
   lazy val dotDotDot = TSTokenObject(node.dotDotDotToken)
   lazy val name = TSIdentifierObject(node.name)
+  lazy val locals = TSSymbolIter(node.locals.entries())
 
   private lazy val tagName =
     if (isUndefined) TSIdentifierObject(node) else TSIdentifierObject(node.tagName)

@@ -1,5 +1,7 @@
 def N1'f: (anything) -> (number)
+def N1'ff: (anything) -> (number)
 class N1'C: { f: unit -> (unit) }
+trait N1'I: { f: unit -> (number) }
 def N1'N2'fff: (bool) -> (number)
 def AA'f: (anything) -> (string)
 class AA'C: { f: unit -> (unit) }
