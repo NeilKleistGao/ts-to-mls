@@ -10,3 +10,6 @@ class VG[T]: { x: T }
 class Home[T]: { y: T } & VG[string]
 trait O[I]: { xx: (I) -> (I) }
 class OR[R]: { xx: (R) -> (R) } & O[R]
+class Five'ROTK: { wu: string }
+class Five'Y: {} & Five'ROTK
+class Y: {} & Five'ROTK
