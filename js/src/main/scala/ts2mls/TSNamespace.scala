@@ -3,13 +3,13 @@ package ts2mls
 import scala.collection.mutable.{HashMap, ListBuffer}
 import types._
 
-class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
+class TSNamespace(name: String, parent: Option[TSNamespace]) {
   private val subSpace = HashMap[String, TSNamespace]()
   private val members = HashMap[String, TSType]()
 
   private val order = ListBuffer.empty[Either[String, String]]
 
-  private lazy val showPrefix = if (name.equals("globalThis")) "" else s"$name."
+  private lazy val showPrefix = if (name.equals("")) "" else s"$name."
 
   def derive(name: String): TSNamespace = {
     if (subSpace.contains(name)) subSpace(name)
@@ -27,12 +27,11 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
     members.put(name, tp)
   }
 
-  override def >(name: String): TSType = members.get(name) match {
+  def get(name: String): TSType = members.get(name) match {
     case Some(tst) => tst
-    case None if (!parent.isEmpty) => parent.get.>(name)
-    case _ => throw new java.lang.Exception(s"member $name not found.")
+    case None if (!parent.isEmpty) => parent.get.get(name)
+    case _ => throw new Exception(s"member $name not found.")
   }
-  override def >>(name: String): TSNamespace = subSpace.getOrElse(name, throw new java.lang.Exception(s"namespace $name not found."))
 
   override def toString(): String = s"namespace $name"
 
@@ -45,7 +44,7 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
     case _ => false
   }
 
-  override def visit(writer: DecWriter, prefix: String): Unit = {
+  def visit(writer: DecWriter, prefix: String): Unit = {
     order.toList.foreach((p) => p match {
       case Left(name) => subSpace(name).visit(writer, prefix + showPrefix)
       case Right(name) => {
@@ -62,8 +61,6 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
               writer.generate(s"def ${fullName}[${params.substring(0, params.length() - 2)}]: ${TSProgram.getMLSType(inter)}")
           }
           case f: TSFunctionType => {
-            if (f.dbg) writer.debug(s"${prefix}$showPrefix${name}", f.toString)
-          
             val nsName = getFullName()
             val fullName = if (nsName.equals("")) name else s"$nsName'${name}"
             val params = f.typeVars.foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
@@ -89,5 +86,5 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) extends Module {
 }
 
 object TSNamespace {
-  def apply() = new TSNamespace("globalThis", None)
+  def apply() = new TSNamespace("", None)
 }
