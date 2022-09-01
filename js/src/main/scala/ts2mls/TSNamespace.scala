@@ -7,12 +7,12 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) {
   private val subSpace = HashMap[String, TSNamespace]()
   private val members = HashMap[String, TSType]()
 
+  // write down the order of members
+  // easier to check the output one by one
   private val order = ListBuffer.empty[Either[String, String]]
 
-  private lazy val showPrefix = if (name.equals("")) "" else s"$name."
-
   def derive(name: String): TSNamespace = {
-    if (subSpace.contains(name)) subSpace(name)
+    if (subSpace.contains(name)) subSpace(name) // if the namespace has appeared in another file, just return it
     else {
       val sub = new TSNamespace(name, Some(this))
       subSpace.put(name, sub)
@@ -21,70 +21,55 @@ class TSNamespace(name: String, parent: Option[TSNamespace]) {
     }
   }
 
-  def put(name: String, tp: TSType): Unit = {
-    if (!members.contains(name)) order += Right(name)
-    
-    members.put(name, tp)
-  }
+  def put(name: String, tp: TSType): Unit =
+    if (!members.contains(name)) {
+      order += Right(name)
+      members.put(name, tp)
+    }
+    else members.update(name, tp)
 
-  def get(name: String): TSType = members.get(name) match {
-    case Some(tst) => tst
-    case None if (!parent.isEmpty) => parent.get.get(name)
-    case _ => throw new Exception(s"member $name not found.")
-  }
+  def get(name: String): TSType =
+    members.getOrElse(name,
+      if (!parent.isEmpty) parent.get.get(name) else throw new Exception(s"member $name not found."))
 
-  override def toString(): String = s"namespace $name"
-
-  def containsMember(name: String, searchParent: Boolean = true): Boolean = 
+  def containsMember(name: String, searchParent: Boolean = true): Boolean =
     if (parent.isEmpty) members.contains(name) else (members.contains(name) || (searchParent && parent.get.containsMember(name)))
 
-  def containsMember(path: List[String]): Boolean = path match {
-    case name :: Nil => containsMember(name)
-    case sub :: rest if (subSpace.contains(sub)) => subSpace(sub).containsMember(rest)
-    case _ => false
-  }
-
-  def visit(writer: DecWriter, prefix: String): Unit = {
+  def generate(writer: JSWriter): Unit =
     order.toList.foreach((p) => p match {
-      case Left(name) => subSpace(name).visit(writer, prefix + showPrefix)
+      case Left(name) => subSpace(name).generate(writer)
       case Right(name) => {
         val mem = members(name)
+        val fullName = getFullPath(name)
         mem match {
-          case inter: TSIntersectionType => {
-            val nsName = getFullName()
-            val fullName = if (nsName.equals("")) name else s"$nsName'${name}"
-            val params = TSIntersectionType.getOverloadTypeVariables(inter).foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
+          case inter: TSIntersectionType => { // overloaded functions
+            val typeParams = TSIntersectionType.getOverloadTypeParameters(inter).map((t) => t.name)
 
-            if (params.length() == 0)
-              writer.generate(s"def ${fullName}: ${TSProgram.getMLSType(inter)}")
-            else
-              writer.generate(s"def ${fullName}[${params.substring(0, params.length() - 2)}]: ${TSProgram.getMLSType(inter)}")
+            if (typeParams.isEmpty)
+              writer.writeln(s"def ${fullName}: ${Converter.convert(inter)}")
+            else // TODO: add constraints
+              writer.writeln(s"def ${fullName}[${typeParams.reduceLeft((r, s) => s"$r, $s")}]: ${Converter.convert(inter)}")
           }
           case f: TSFunctionType => {
-            val nsName = getFullName()
-            val fullName = if (nsName.equals("")) name else s"$nsName'${name}"
-            val params = f.typeVars.foldLeft("")((p, t) => s"$p${t.name}, ") // TODO: add constraints
-            if (params.length() == 0)
-              writer.generate(s"def ${fullName}: ${TSProgram.getMLSType(f)}")
-            else
-              writer.generate(s"def ${fullName}[${params.substring(0, params.length() - 2)}]: ${TSProgram.getMLSType(f)}")
+            val typeParams = f.typeVars.map((t) => t.name)
+            if (typeParams.isEmpty)
+              writer.writeln(s"def ${fullName}: ${Converter.convert(f)}")
+            else // TODO: add constraints
+              writer.writeln(s"def ${fullName}[${typeParams.reduceLeft((r, s) => s"$r, $s")}]: ${Converter.convert(f)}")
           }
-          case _ => writer.generate(TSProgram.getMLSType(mem))
+          case _ => writer.writeln(Converter.convert(mem))
         }
       }
     })
-  }
 
-  def getFullName(): String = parent match {
-    case Some(p) => {
-      val pn = p.getFullName()
-      if (pn.equals("")) name
-      else s"$pn'$name"
-    }
-    case _ => ""
+  // generate full path with namespaces' names
+  // e.g. f => Namespace1.Namespace2.f
+  def getFullPath(nm: String): String = parent match {
+    case Some(p) => p.getFullPath(s"$name'$nm")
+    case _ => nm
   }
 }
 
 object TSNamespace {
-  def apply() = new TSNamespace("", None)
+  def apply() = new TSNamespace("", None) // global namespace
 }

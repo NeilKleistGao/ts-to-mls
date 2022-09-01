@@ -9,7 +9,34 @@ class ABC: {}
 def testABC: ((ABC) | (undefined)) -> (unit)
 def testSquareConfig: ((SquareConfig) | (undefined)) -> (unit)
 def err: (((number, string, )) | (undefined)) -> (unit)
-def toStr: (((number) | (bool)) | (undefined)) -> (string)
+def toStr: ((((number) | (false)) | (true)) | (undefined)) -> (string)
 def boo[T, U]: (((T) & (U)) | (undefined)) -> (unit)
 class B[T]: { b: T }
 def boom: ((B[nothing]) | (undefined)) -> (anything)
+//│ Defined trait SquareConfig
+//│ Defined class ABC
+//│ Defined class B[+T]
+//│ buildName: string -> (string | undefined) -> string
+//│          = <missing implementation>
+//│ buildName2: string -> (string | undefined) -> string
+//│           = <missing implementation>
+//│ buildName3: string -> MutArray[string] -> string
+//│           = <missing implementation>
+//│ buildName4: string -> MutArray[anything] -> string
+//│           = <missing implementation>
+//│ did: number -> (number -> number | undefined) -> number
+//│    = <missing implementation>
+//│ getOrElse: (MutArray[anything] | undefined) -> anything
+//│          = <missing implementation>
+//│ testABC: (ABC | undefined) -> unit
+//│        = <missing implementation>
+//│ testSquareConfig: (undefined | SquareConfig) -> unit
+//│                 = <missing implementation>
+//│ err: ((number, string,) | undefined) -> unit
+//│    = <missing implementation>
+//│ toStr: (false | number | true | undefined) -> string
+//│      = <missing implementation>
+//│ boo: anything -> unit
+//│    = <missing implementation>
+//│ boom: (B[nothing] | undefined) -> anything
+//│     = <missing implementation>
